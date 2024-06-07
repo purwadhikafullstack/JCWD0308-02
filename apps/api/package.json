@@ -12,7 +12,8 @@
     "push": "prisma db push",
     "generate": "prisma generate",
     "postinstall": "prisma db push && prisma generate",
-    "migrate:dev": "prisma migrate dev"
+    "migrate:dev": "prisma migrate dev",
+    "seed": "ts-node --transpile-only prisma/seed.ts"
   },
   "author": "",
   "license": "ISC",
