@@ -85,7 +85,7 @@ enum PaymentMethod {
 // Define the models
 model User {
   id               String      @id @default(uuid())
-  accountType      AccountType @map("account_type") @default(EMAIL)
+  accountType      AccountType @default(EMAIL) @map("account_type")
   email            String?     @unique
   contactEmail     String?     @unique @map("contact_email")
   password         String?     @db.LongText
@@ -124,7 +124,7 @@ model Session {
   userId    String   @map("user_id")
 
   // relation
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -138,7 +138,7 @@ model LoginAttempt {
   createdAt   DateTime @default(now()) @map("created_at")
 
   //relation
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("login_attempts")
 }
@@ -155,7 +155,7 @@ model UserAddress {
   createdAt     DateTime @default(now()) @map("created_at")
 
   //relation
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   city City @relation(fields: [cityId], references: [id])
 
   @@map("user_addresses")
@@ -218,7 +218,7 @@ model StoreAdmin {
 
   //relation
   store      Store @relation(fields: [storeId], references: [id])
-  storeAdmin User  @relation(fields: [storeAdminId], references: [id])
+  storeAdmin User  @relation(fields: [storeAdminId], references: [id], onDelete: Cascade)
 
   @@map("store_admins")
 }
@@ -232,7 +232,7 @@ model Category {
 
   //relation
   products   Product[]
-  superAdmin User      @relation("SuperAdminCategories", fields: [superAdminId], references: [id])
+  superAdmin User      @relation("SuperAdminCategories", fields: [superAdminId], references: [id], onDelete: Cascade)
 
   @@map("categories")
 }
@@ -260,7 +260,7 @@ model Product {
   //relation
   images     ProductImage[]
   stock      Stock[]
-  superAdmin User           @relation("SuperAdminProducts", fields: [superAdminId], references: [id])
+  superAdmin User           @relation("SuperAdminProducts", fields: [superAdminId], references: [id], onDelete: Cascade)
   category   Category       @relation(fields: [categoryId], references: [id])
 
   @@map("products")
@@ -309,7 +309,7 @@ model StockMutation {
 
   //relation
   stock Stock  @relation(fields: [stockId], references: [id])
-  admin User?  @relation("AdminStockMutations", fields: [adminId], references: [id])
+  admin User?  @relation("AdminStockMutations", fields: [adminId], references: [id], onDelete: Cascade)
   order Order? @relation("OrderStockMutations", fields: [orderId], references: [id])
 
   @@map("stock_mutation")
@@ -340,8 +340,8 @@ model Order {
 
   //relation
   orderItems    OrderItem[]
-  user          User            @relation("UserOrders", fields: [userId], references: [id])
-  storeAdmin    User?           @relation("StoreAdminOrders", fields: [storeAdminId], references: [id])
+  user          User            @relation("UserOrders", fields: [userId], references: [id], onDelete: Cascade)
+  storeAdmin    User?           @relation("StoreAdminOrders", fields: [storeAdminId], references: [id], onDelete: Cascade)
   store         Store?          @relation(fields: [storeId], references: [id])
   StockMutation StockMutation[] @relation("OrderStockMutations")
 
@@ -364,7 +364,7 @@ model OrderItem {
   createdAt     DateTime      @default(now()) @map("created_at")
 
   //relation
-  user  User   @relation(fields: [userId], references: [id])
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   order Order? @relation(fields: [orderId], references: [id])
   stock Stock  @relation(fields: [stockId], references: [id])
 
@@ -392,7 +392,7 @@ model Voucher {
   createdAt     DateTime     @default(now()) @map("created_at")
 
   //relation
-  superAdmin   User          @relation("AdminVouchers", fields: [superAdminId], references: [id])
+  superAdmin   User          @relation("AdminVouchers", fields: [superAdminId], references: [id], onDelete: Cascade)
   userVouchers UserVoucher[]
   // User         User
 
@@ -411,7 +411,7 @@ model UserVoucher {
 
   //relation
   voucher Voucher @relation(fields: [voucherId], references: [id])
-  user    User    @relation(fields: [userId], references: [id])
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_vouchers")
 }
