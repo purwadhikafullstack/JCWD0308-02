@@ -85,7 +85,7 @@ enum PaymentMethod {
 // Define the models
 model User {
   id               String      @id @default(uuid())
-  accountType      AccountType @map("account_type")
+  accountType      AccountType @map("account_type") @default(EMAIL)
   email            String?     @unique
   contactEmail     String?     @unique @map("contact_email")
   password         String?     @db.LongText
