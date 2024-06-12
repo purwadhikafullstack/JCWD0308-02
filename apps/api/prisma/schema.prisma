@@ -244,6 +244,8 @@ model Product {
   description       String
   price             Int
   packPrice         Int       @map("pack_price")
+  weight            Int
+  packWeight        Int
   discountPrice     Int?      @map("discount_price")
   discountPackPrice Int?      @map("discount_pack_price")
   packQuantity      Int       @map("pack_quantity")
