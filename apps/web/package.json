@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "serve": "next start",
+    "serve": "next start -p 3082",
     "lint": "next lint",
     "test": "npx cypress verify & cypress run --component"
   },
