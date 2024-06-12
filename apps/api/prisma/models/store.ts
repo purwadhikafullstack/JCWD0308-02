@@ -4,7 +4,7 @@ export function listStores(id: string) {
   return [
     {
       name: 'Grosirun Pusat',
-      slug: 'toko-rintis',
+      slug: 'grosirun-pusat',
       superAdminId: id,
       status: Status.PUBLISHED,
       imageUrl: 'http://example.com/avatar.jpg',
