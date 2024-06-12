@@ -15,17 +15,21 @@ export const calculateShippingCost = async (
     key: apiKey,
     'content-type': 'application/x-www-form-urlencoded',
   };
+
   const body = new URLSearchParams({
-    origin: origin.toString(),
-    destination: destination.toString(),
-    weight: weight.toString(),
-    courier: courier,
+    origin: String(origin),
+    destination: String(destination),
+    weight: String(weight),
+    courier,
   });
+  console.log('Request Body:', body.toString());
+
   const response = await fetch(url, {
     method: 'POST',
     headers,
     body: body.toString(),
   });
+  console.log('Response Status:', response.status);
 
   if (!response.ok) {
     throw new ResponseError(
@@ -35,7 +39,9 @@ export const calculateShippingCost = async (
   }
 
   const data = await response.json();
+  console.log(data);
   const cost = data.rajaongkir.results[0].costs[0].cost[0].value;
+  const estimation = data.rajaongkir.results[0].costs[0].cost[0].etd;
 
-  return cost;
+  return { cost, estimation };
 };
