@@ -26,7 +26,7 @@ export const findNearestStore = async (userCoordinate: string) => {
 
   if (nearestDistance > MAX_DISTANCE_KM) {
     nearestStore = await prisma.store.findUnique({
-      where: { slug: 'toko-rintis' },
+      where: { slug: 'grosirun-pusat' },
     });
   }
   return nearestStore;

@@ -4,6 +4,7 @@ import { ResponseError } from '@/utils/error.response.js';
 import { Validation } from '@/utils/validation.js';
 import { CartValidation, patchCartValidation } from './cart.validation.js';
 import { Response } from 'express';
+import { findNearestStore } from '../distance/distance.service.js';
 
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
@@ -14,25 +15,55 @@ export class CartService {
     //hanya user yang active dan role user
     const user = await prisma.user.findUnique({
       where: { id: res.locals.user?.id },
-      select: { id: true, status: true, role: true },
+      select: { id: true, status: true, role: true, addresses: true },
     });
 
     if (!user) throw new ResponseError(401, 'Unauthorized');
 
-    //validasi adanya stok
-    const stock = await prisma.stock.findUnique({
-      where: { id: cartRequest.stockId },
-    });
+    const userAddress = user.addresses.find(
+      (address: any) => address.id === cartRequest.addressId,
+    );
 
-    if (!stock) {
-      throw new ResponseError(400, 'Stock not found!');
+    if (!userAddress) throw new ResponseError(401, 'Address not found!');
+
+    //toko terdekat
+    const nearestStore = await findNearestStore(userAddress.coordinate);
+
+    let stock;
+    if (nearestStore) {
+      stock = await prisma.stock.findFirst({
+        where: {
+          productId: cartRequest.productId,
+          storeId: nearestStore.id,
+        },
+      });
     }
 
-    //validasi ada barangnya di cart/tidak
+    if (!stock) {
+      const centralStore = await prisma.store.findUnique({
+        where: { slug: 'grosirun-pusat' },
+      });
+      if (centralStore) {
+        stock = await prisma.stock.findFirst({
+          where: {
+            productId: cartRequest.productId,
+            storeId: centralStore.id,
+          },
+        });
+      }
+    }
+
+    if (!stock) {
+      throw new ResponseError(
+        400,
+        'Stock not found in the nearest or central store!',
+      );
+    }
+
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
         userId: user.id,
-        stockId: cartRequest.stockId,
+        stockId: stock.id,
         orderItemType: 'CART_ITEM',
         isDeleted: false,
       },
@@ -49,11 +80,11 @@ export class CartService {
       return updatedCartItem;
     }
 
-    //kalau gaada di cart
+    // If the item is not in the cart
     const orderItem = await prisma.orderItem.create({
       data: {
-        userId: user?.id,
-        stockId: cartRequest.stockId,
+        userId: user.id,
+        stockId: stock.id,
         quantity: cartRequest.quantity,
         isPack: cartRequest.isPack,
       },

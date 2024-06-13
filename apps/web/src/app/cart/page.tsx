@@ -12,7 +12,7 @@ import React from 'react';
 
 export default function Cart() {
   return (
-    <div className="container mx-auto mt-10 p-4">
+    <div className="container mx-auto mt-10 p-4 min-h-[40rem]">
       <div className="grid md:grid-cols-3 gap-6">
         {/* Shopping List */}
         <div className="md:col-span-2">
