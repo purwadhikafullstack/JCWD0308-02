@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import Image from 'next/image';
+import axios from 'axios';
 
 export const Header = () => {
   const [state, setState] = useState<boolean>(false);
@@ -35,6 +36,21 @@ export const Header = () => {
         />
       ),
     },
+    {
+      title: 'Logout',
+      path: '/login', // Redirect path after logout
+      icon: <User className="h-5 w-5" />,
+      onClick: async () => {
+        try {
+          await axios.post('http://localhost:8000/api/auth/signout', {}, { withCredentials: true });
+          alert('Logged out successfully');
+          window.location.href = 'http://localhost:3000/auth/login'; // Redirect to login page after logout
+        } catch (error) {
+          console.error('Error logging out:', error);
+          alert('Failed to log out');
+        }
+      }
+    }
   ];
 
   return (
@@ -82,7 +98,11 @@ export const Header = () => {
                 className="text-gray-600 hover:text-indigo-600 flex items-center space-x-2"
               >
                 {item.icon}
-                <Link href={item.path}>{item.title}</Link>
+                {item.title === 'Logout' ? (
+                  <button onClick={item.onClick}>{item.title}</button>
+                ) : (
+                  <Link href={item.path}>{item.title}</Link>
+                )}
               </li>
             ))}
           </ul>

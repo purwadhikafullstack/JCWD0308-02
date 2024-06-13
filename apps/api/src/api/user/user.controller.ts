@@ -31,11 +31,9 @@ export class UserController {
     try {
       const user = await UserService.createUser(req.body)
 
-      const session = await lucia.createSession(user.id, {})
 
       return res
         .status(201)
-        .appendHeader("Set-Cookie", lucia.createSessionCookie(session.id).serialize())
         .json({ status: "OK", message: "Good Job Admin! New User Created!", user })
     } catch (error) {
       next(error)

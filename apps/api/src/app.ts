@@ -36,8 +36,10 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors());
-    this.app.use(json({ limit: '10mb' }));
+    this.app.use(cors({
+      origin: 'http://localhost:3000', // Specify your frontend's URL
+      credentials: true
+    }));    this.app.use(json({ limit: '10mb' }));
     this.app.use(urlencoded({ extended: true, limit: '10mb' }));
     this.app.use(morganMiddleware);
     this.app.use(AuthMiddleware.identifyRequest);
