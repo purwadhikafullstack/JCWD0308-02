@@ -244,12 +244,12 @@ model Product {
   description       String
   price             Int
   packPrice         Int       @map("pack_price")
-  weight            Int
-  packWeight        Int
   discountPrice     Int?      @map("discount_price")
   discountPackPrice Int?      @map("discount_pack_price")
   packQuantity      Int       @map("pack_quantity")
   bonus             Int?
+  weight            Float
+  weightPack        Float    @map("weight_pack")
   minOrderItem      Int?      @map("min_order_item")
   superAdminId      String    @map("super_admin_id")
   status            Status    @default(DRAFT)
