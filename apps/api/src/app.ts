@@ -19,6 +19,7 @@ import { CartRouter } from './api/cart/cart.router.js';
 import { OrderRouter } from './api/order/order.router.js';
 import { StockRouter } from './api/stock/stock.router.js';
 import { AddressRouter } from './api/address/address.router.js';
+import { ProductRouter } from './api/product/product.router.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -53,6 +54,7 @@ export default class App {
     const orderRouter = new OrderRouter();
     const stockRouter = new StockRouter();
     const addressRouter = new AddressRouter();
+    const productRouter = new ProductRouter()
 
     this.app.get('/', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
@@ -69,7 +71,10 @@ export default class App {
     this.app.use('/api/stock', stockRouter.getRouter());
 
     this.app.use('/api/address', addressRouter.getRouter());
+    this.app.use('/api/product', productRouter.getRouter());
+
   }
+  
 
   private handleError(): void {
     this.app.use(errorMiddleware);
