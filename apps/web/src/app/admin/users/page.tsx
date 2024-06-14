@@ -21,6 +21,7 @@ const Users = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [creatingUser, setCreatingUser] = useState<boolean>(false);
+  const [updateFlag, setUpdateFlag] = useState<boolean>(false); // Added state to trigger useEffect
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -39,17 +40,22 @@ const Users = () => {
     };
 
     fetchUserData();
-  }, []);
+  }, [updateFlag]); // Adding updateFlag as a dependency
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
   };
 
-  const handleUpdate = async (updatedUser: User) => {
+  const handleUpdate = async (id: string, updatedUser: Partial<User>) => {
     try {
-      const user = await updateUser(updatedUser.id, updatedUser);
-      setUsers(users.map(u => (u.id === user.id ? user : u)));
+      const { avatarUrl, password, ...userToUpdate } = updatedUser;
+
+      console.log('Updating user:', userToUpdate);
+      await updateUser(id, userToUpdate);
+      console.log('Updated user:', userToUpdate);
+      
       setSelectedUser(null);
+      setUpdateFlag(prev => !prev); // Toggle updateFlag to trigger useEffect
       alert('User updated successfully');
     } catch (error) {
       console.error('Error updating user:', error);
@@ -60,9 +66,10 @@ const Users = () => {
   const handleCreate = async (newUser: Omit<User, 'id' | 'referralCode' | 'createdAt' | 'updatedAt'> & { password: string }) => {
     try {
       const createdUser = await createUser(newUser);
-      alert('User created successfully');
-      setUsers([createdUser, ...users]);
+      console.log('Created user:', createdUser);
       setCreatingUser(false);
+      setUpdateFlag(prev => !prev); // Toggle updateFlag to trigger useEffect
+      alert('User created successfully');
     } catch (error) {
       console.error('Error creating user:', error);
       alert('Failed to create user');

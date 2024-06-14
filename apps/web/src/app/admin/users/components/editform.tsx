@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -6,12 +6,20 @@ import { User } from '@/app/admin/users/components/types';
 
 interface EditFormProps {
   user: User;
-  onUpdate: (user: User) => void;
+  onUpdate: (id: string, user: Partial<User>) => void;
   onCancel: () => void;
 }
 
 const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
-  const [formData, setFormData] = useState<User>(user);
+  const [formData, setFormData] = useState<Partial<User>>({
+    displayName: user.displayName,
+    email: user.email,
+    accountType: user.accountType,
+    contactEmail: user.contactEmail,
+    role: user.role,
+    status: user.status,
+    updatedAt: user.updatedAt,
+  });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -23,7 +31,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onUpdate(formData);
+    onUpdate(user.id, formData);
   };
 
   return (
@@ -41,7 +49,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <input
                   type="text"
                   name="displayName"
-                  value={formData.displayName}
+                  value={formData.displayName || ''}
                   onChange={handleChange}
                   className="mt-1 block w-full border rounded-md p-2"
                 />
@@ -51,7 +59,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <input
                   type="email"
                   name="email"
-                  value={formData.email}
+                  value={formData.email || ''}
                   onChange={handleChange}
                   className="mt-1 block w-full border rounded-md p-2"
                 />
@@ -60,7 +68,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <label className="block text-sm font-medium text-gray-700">Account Type</label>
                 <select
                   name="accountType"
-                  value={formData.accountType}
+                  value={formData.accountType || 'EMAIL'}
                   onChange={handleChange}
                   className="mt-1 block w-full border rounded-md p-2"
                 >
@@ -75,7 +83,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <input
                   type="email"
                   name="contactEmail"
-                  value={formData.contactEmail}
+                  value={formData.contactEmail || ''}
                   onChange={handleChange}
                   className="mt-1 block w-full border rounded-md p-2"
                 />
@@ -84,7 +92,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <label className="block text-sm font-medium text-gray-700">Role</label>
                 <select
                   name="role"
-                  value={formData.role}
+                  value={formData.role || 'USER'}
                   onChange={handleChange}
                   className="mt-1 block w-full border rounded-md p-2"
                 >
@@ -97,7 +105,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <label className="block text-sm font-medium text-gray-700">Status</label>
                 <select
                   name="status"
-                  value={formData.status}
+                  value={formData.status || 'ACTIVE'}
                   onChange={handleChange}
                   className="mt-1 block w-full border rounded-md p-2"
                 >
@@ -111,7 +119,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <input
                   type="text"
                   name="updatedAt"
-                  value={new Date(formData.updatedAt).toLocaleDateString()}
+                  value={new Date(formData.updatedAt || new Date()).toLocaleDateString()}
                   readOnly
                   className="mt-1 block w-full border rounded-md p-2 bg-gray-100 cursor-not-allowed"
                 />
