@@ -1,7 +1,7 @@
 import { prisma } from '@/db.js';
 import { haversineDistance } from '@/utils/haversine.js';
 
-const MAX_DISTANCE_KM = 20;
+const MAX_DISTANCE_KM = 100;
 
 export const calculateDistance = (coord1: string, coord2: string) => {
   const [lat1, lon1] = coord1.split(' ').map(Number);
@@ -30,4 +30,19 @@ export const findNearestStore = async (userCoordinate: string) => {
     });
   }
   return nearestStore;
+};
+
+export const findStoresInRange = async (
+  userCoordinate: string,
+  range: number,
+) => {
+  const [userLat, userLon] = userCoordinate.split(',').map(Number);
+
+  const stores = await prisma.store.findMany();
+  const nearbyStores = stores.filter((store) => {
+    const [storeLat, storeLon] = store.coordinate.split(',').map(Number);
+    const distance = haversineDistance(userLat, userLon, storeLat, storeLon);
+    return distance <= range;
+  });
+  return nearbyStores;
 };
