@@ -9,6 +9,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus } from 'lucide-react';
 import React from 'react';
+import Image from 'next/image';
 
 export default function Cart() {
   return (
@@ -35,12 +36,16 @@ export default function Cart() {
                   </label>
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex items-center justify-between">
-                <p className="flex-1 mr-4">
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                  Accusantium officia ab, ducimus repudiandae dolorum et eveniet
-                  ex fugit quis eligendi eius minima sit. Reiciendis, sequi!
-                  Voluptatem consectetur mollitia harum eum?
+              <CardContent className="flex gap-3 items-center justify-between">
+                <Image
+                  src="/avatar.png"
+                  width={50}
+                  height={50}
+                  alt="product image"
+                />
+                <p>Indomie</p>
+                <p>
+                  <strong>Rp3.000</strong>
                 </p>
                 <div className="flex items-center">
                   <Button

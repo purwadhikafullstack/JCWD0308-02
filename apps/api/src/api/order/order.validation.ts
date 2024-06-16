@@ -7,5 +7,12 @@ export const OrderValidation = {
     courier: z.string(),
     service: z.string(),
     note: z.string(),
+    voucherId: z.string().uuid().optional(),
+  }),
+};
+
+export const CancelValidation = {
+  CANCEL: z.object({
+    orderId: z.string().uuid(),
   }),
 };

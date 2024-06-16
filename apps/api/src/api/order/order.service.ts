@@ -1,17 +1,18 @@
 import { prisma } from '@/db.js';
-import {
-  OrderRequest,
-  mapCourierTypeToRajaOngkir,
-  getCourierType,
-} from '@/types/order.type.js';
+import { OrderRequest, CancelOrder } from '@/types/order.type.js';
 import { ResponseError } from '@/utils/error.response.js';
 import { Validation } from '@/utils/validation.js';
-
 import { Response } from 'express';
-import { OrderValidation } from './order.validation.js';
-import { findNearestStore } from '../distance/distance.service.js';
-import { calculateShippingCost } from '../shipping/shipping.service.js';
-import { CourierType, PaymentMethod } from '@prisma/client';
+import { CancelValidation, OrderValidation } from './order.validation.js';
+import {
+  applyVoucherDiscount,
+  calculateShipping,
+  calculateTotalPriceAndWeight,
+  createOrder,
+  getUserAndAddress,
+  updateOrderItemsAndStock,
+} from '@/helpers/order/addOrderHelper.js';
+import { handleCartItems } from '@/helpers/order/handleCartItems.js';
 
 export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
@@ -19,150 +20,102 @@ export class OrderService {
       OrderValidation.ORDER,
       req,
     );
-
     const userId = res.locals.user?.id;
+    const userAddress = await getUserAndAddress(userId, orderRequest.addressId);
+    const { updatedCartItem, nearestStore } = await handleCartItems(
+      userId,
+      userAddress,
+    );
+    let { totalPrice, weight } = calculateTotalPriceAndWeight(updatedCartItem);
+
+    if (orderRequest.userVoucherId) {
+      totalPrice = await applyVoucherDiscount(
+        orderRequest.userVoucherId,
+        totalPrice,
+        updatedCartItem.length,
+      );
+    }
+    const { cost, estimation } = await calculateShipping(
+      nearestStore,
+      userAddress,
+      weight,
+      orderRequest.courier,
+    );
+    const newOrder = await createOrder(
+      orderRequest,
+      userId,
+      nearestStore,
+      updatedCartItem,
+      totalPrice,
+      cost,
+      cost,
+      estimation,
+    );
+    await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
+    return newOrder;
+  };
+
+  static getOrder = async (userId: string) => {
     const user = await prisma.user.findUnique({
       where: { id: userId },
-      select: { id: true, addresses: true },
+      select: { status: true },
     });
     if (!user) throw new ResponseError(401, 'Unauthorized');
-
-    const userAddress = user.addresses.find(
-      (address) => address.id === orderRequest.addressId,
-    );
-    if (!userAddress) throw new ResponseError(401, 'Address not found!');
-
-    const cartItems = await prisma.orderItem.findMany({
-      where: {
-        userId,
-        orderItemType: 'CART_ITEM',
-        isDeleted: false,
-      },
+    const order = await prisma.order.findMany({
+      where: { userId },
       include: {
-        stock: {
+        orderItems: {
           include: {
-            product: true,
+            stock: {
+              include: {
+                product: true,
+              },
+            },
           },
         },
       },
+      orderBy: {
+        createdAt: 'desc',
+      },
     });
-    if (cartItems.length === 0) {
-      throw new ResponseError(400, 'Cart is empty');
-    }
-    let totalPrice = 0;
-    let weight = 0;
-    for (const item of cartItems) {
-      const stock = await prisma.stock.findUnique({
-        where: { id: item.stockId },
-      });
+    return order;
+  };
 
-      if (!stock || stock.amount < item.quantity) {
-        throw new ResponseError(
-          400,
-          `Stock unavailable for item ${item.stockId}`,
-        );
-      }
-      let productPrice = 0;
-
-      if (item.isPack && item.stock.product.packPrice) {
-        productPrice = item.stock.product.packPrice;
-        weight = item.stock.product.packWeight;
-      } else if (!item.isPack && item.stock.product.price) {
-        productPrice = item.stock.product.price;
-        weight = item.stock.product.weight;
-      } else {
-        throw new ResponseError(
-          400,
-          `Price not available for item ${item.stockId}`,
-        );
-      }
-
-      totalPrice += item.quantity * productPrice;
-    }
-
-    //kalau ada diskon
-    if (orderRequest.userVoucherId) {
-      const userVoucher = await prisma.userVoucher.findUnique({
-        where: { id: orderRequest.userVoucherId },
-        include: { voucher: true },
-      });
-
-      if (userVoucher) {
-        if (userVoucher.expiresAt < new Date()) {
-          throw new ResponseError(400, 'Voucher has expired');
-        }
-        if (userVoucher.isUsed) {
-          throw new ResponseError(400, 'Voucher has already been used');
-        }
-
-        const voucher = userVoucher.voucher;
-        if (voucher.minOrderPrice && totalPrice < voucher.minOrderPrice) {
-          throw new ResponseError(
-            400,
-            `Minimum order price for this voucher is ${voucher.minOrderPrice}`,
-          );
-        }
-
-        if (voucher.minOrderItem && cartItems.length < voucher.minOrderItem) {
-          throw new ResponseError(
-            400,
-            `Minimum order items for this voucher is ${voucher.minOrderItem}`,
-          );
-        }
-
-        if (voucher.discountType === 'FIXED_DISCOUnt') {
-          totalPrice -= voucher.fixedDiscount || 0;
-        } else if (voucher.discountType === 'DISCOUNT') {
-          totalPrice -= (totalPrice * (voucher.discount || 0)) / 100;
-        }
-
-        await prisma.userVoucher.update({
-          where: { id: userVoucher.id },
-          data: { isUsed: true },
-        });
-      } else {
-        throw new ResponseError(400, 'Invalid user voucher');
-      }
-    }
-
-    //menghitung shipping cost
-    let nearestStore = await findNearestStore(userAddress.coordinate);
-    const { cost, estimation } = await calculateShippingCost(
-      +nearestStore?.cityId!,
-      +userAddress.cityId,
-      +cartItems.reduce((acc, item) => acc + item.quantity * weight, 0),
-      mapCourierTypeToRajaOngkir(getCourierType(orderRequest.courier)),
+  static cancelOrder = async (req: CancelOrder, res: Response) => {
+    const cancelOrder: CancelOrder = Validation.validate(
+      CancelValidation.CANCEL,
+      req,
     );
+    const userId = res.locals.user?.id;
+    const order = await prisma.order.findUnique({
+      where: { id: cancelOrder.orderId },
+      include: { user: true },
+    });
 
-    const addressId = orderRequest.addressId;
-    if (!addressId) {
-      throw new ResponseError(400, 'Address ID is missing');
+    if (!order || order.userId !== userId) {
+      throw new ResponseError(404, 'Order not found');
+    }
+    if (order.orderStatus !== 'AWAITING_PAYMENT') {
+      throw new ResponseError(400, 'Order cannot be canceled');
     }
 
-    const newOrder = await prisma.order.create({
-      data: {
-        userId,
-        paymentMethod: orderRequest.paymentMethod as PaymentMethod,
-        courier: getCourierType(orderRequest.courier),
-        service: orderRequest.service,
-        serviceDescription: 'Layanan Reguler',
-        estimation,
-        // storeId: nearestStore,
-        note: orderRequest.note,
-        totalPrice,
-        shippingCost: cost,
-        totalPayment: totalPrice + cost,
-        orderItems: {
-          connect: cartItems.map((item) => ({ id: item.id })),
-        },
-      } as any,
+    const orderItems = await prisma.orderItem.findMany({
+      where: { orderId: cancelOrder.orderId },
     });
+    if (orderItems.length === 0)
+      throw new ResponseError(400, 'No order items found for this order');
 
-    await prisma.orderItem.updateMany({
-      where: { id: { in: cartItems.map((item) => item.id) } },
-      data: { orderId: newOrder.id, orderItemType: 'ORDER_ITEM' },
+    for (const orderItem of orderItems) {
+      await prisma.stock.update({
+        where: { id: orderItem.stockId },
+        data: { amount: { increment: orderItem.quantity } },
+      });
+    }
+
+    const canceledOrder = await prisma.order.update({
+      where: { id: cancelOrder.orderId },
+      data: { orderStatus: 'CANCELLED' },
     });
-
-    return newOrder;
+    return canceledOrder;
   };
 }
