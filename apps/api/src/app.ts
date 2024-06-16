@@ -20,15 +20,17 @@ import { OrderRouter } from './api/order/order.router.js';
 import { StockRouter } from './api/stock/stock.router.js';
 import { AddressRouter } from './api/address/address.router.js';
 import { ProductRouter } from './api/product/product.router.js';
+import { VoucherRouter } from './api/voucher/voucher.router.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
-
+console.log('initializing app class');
 export default class App {
   private app: Express;
 
   constructor() {
+    console.log('in constructor');
     this.app = express();
     this.configure();
     this.routes();
@@ -36,10 +38,14 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors({
-      origin: 'http://localhost:3000', // Specify your frontend's URL
-      credentials: true
-    }));    this.app.use(json({ limit: '10mb' }));
+    console.log('configure');
+    this.app.use(
+      cors({
+        origin: 'http://localhost:3000', // Specify your frontend's URL
+        credentials: true,
+      }),
+    );
+    this.app.use(json({ limit: '10mb' }));
     this.app.use(urlencoded({ extended: true, limit: '10mb' }));
     this.app.use(morganMiddleware);
     this.app.use(AuthMiddleware.identifyRequest);
@@ -50,35 +56,32 @@ export default class App {
   }
 
   private routes(): void {
+    console.log('routes');
     const userRouter = new UserRouter();
     const authRouter = new AuthRouter();
     const cartRouter = new CartRouter();
     const orderRouter = new OrderRouter();
     const stockRouter = new StockRouter();
     const addressRouter = new AddressRouter();
-    const productRouter = new ProductRouter()
+    const productRouter = new ProductRouter();
+    const voucherRouter = new VoucherRouter();
 
     this.app.get('/', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
     });
 
     this.app.use('/api/users', userRouter.getRouter());
-
     this.app.use('/api/auth', authRouter.getRouter());
-
     this.app.use('/api/cart', cartRouter.getRouter());
-
     this.app.use('/api/order', orderRouter.getRouter());
-
     this.app.use('/api/stock', stockRouter.getRouter());
-
     this.app.use('/api/address', addressRouter.getRouter());
     this.app.use('/api/product', productRouter.getRouter());
-
+    this.app.use('/api/voucher', voucherRouter.getRouter());
   }
-  
 
   private handleError(): void {
+    console.log('handleError');
     this.app.use(errorMiddleware);
     // not found
     this.app.use((req: Request, res: Response, next: NextFunction) => {
@@ -101,10 +104,14 @@ export default class App {
       },
     );
   }
-
   public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
-    });
+    console.log('pong');
+    this.app
+      .listen(PORT, () => {
+        console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);
+      })
+      .on('error', (err) => {
+        console.error('Server failed to start. Error:', err);
+      });
   }
 }

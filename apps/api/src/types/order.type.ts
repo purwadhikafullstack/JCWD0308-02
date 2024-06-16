@@ -8,7 +8,11 @@ export interface OrderRequest {
   service: string;
   note?: string;
   userVoucherId?: string;
-  serviceDescription?: string;
+  // serviceDescription?: string;
+}
+
+export interface CancelOrder {
+  orderId: string;
 }
 
 export const mapCourierTypeToRajaOngkir = (

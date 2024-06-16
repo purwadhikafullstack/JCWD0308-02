@@ -13,7 +13,9 @@ export class OrderRouter {
   }
 
   private initializeRoutes(): void {
+    this.router.get('/', this.orderController.getOrder);
     this.router.post('/add-order', this.orderController.addOrder);
+    this.router.post('/cancel-order', this.orderController.cancelOrder);
   }
 
   getRouter(): Router {
