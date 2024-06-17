@@ -10,7 +10,7 @@ const Sidebar = () => {
   const menus = [
     { title: 'Dashboard', path: '/admin/dashboard', icon: <Home /> },
     { title: 'Users', path: '/admin/users', icon: <User /> },
-    { title: 'Settings', path: '/admin/settings', icon: <Settings /> },
+    { title: 'Product', path: '/admin/product', icon: <Settings /> },
     { title: 'Notifications', path: '/admin/notifications', icon: <Bell /> },
   ];
 
