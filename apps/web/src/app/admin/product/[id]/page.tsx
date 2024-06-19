@@ -88,7 +88,7 @@ const ProductDetail = () => {
               <CarouselItem key={index}>
                 <div className="relative w-full h-64">
                   <Image
-                    src={`http://localhost:8000${image.imageUrl}`}
+                    src={image.imageUrl}
                     alt={`${product.title} image ${index + 1}`}
                     fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -99,8 +99,8 @@ const ProductDetail = () => {
               </CarouselItem>
             ))}
           </CarouselContent>
-          <CarouselPrevious className="text-white bg-indigo-500 hover:bg-indigo-700 left-2" />
-          <CarouselNext className="text-white bg-indigo-500 hover:bg-indigo-700 right-2" />
+          <CarouselPrevious className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-700 cursor-pointer transition-all" />
+          <CarouselNext className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-700 cursor-pointer transition-all" />
         </Carousel>
         <div className="p-6">
           <p className="text-md text-gray-600 mb-2"><strong>Slug:</strong> {product.slug}</p>
