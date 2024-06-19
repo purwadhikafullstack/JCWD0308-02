@@ -21,6 +21,7 @@ import { StockRouter } from './api/stock/stock.router.js';
 import { AddressRouter } from './api/address/address.router.js';
 import { ProductRouter } from './api/product/product.router.js';
 import { VoucherRouter } from './api/voucher/voucher.router.js';
+import { CategoryRouter } from './api/category/category.router.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -65,6 +66,8 @@ export default class App {
     const addressRouter = new AddressRouter();
     const productRouter = new ProductRouter();
     const voucherRouter = new VoucherRouter();
+    const categoryRouter = new CategoryRouter();
+
 
     this.app.get('/', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
@@ -78,6 +81,7 @@ export default class App {
     this.app.use('/api/address', addressRouter.getRouter());
     this.app.use('/api/product', productRouter.getRouter());
     this.app.use('/api/voucher', voucherRouter.getRouter());
+    this.app.use('/api/category', categoryRouter.getRouter());
   }
 
   private handleError(): void {

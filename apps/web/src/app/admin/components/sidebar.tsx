@@ -11,8 +11,9 @@ const Sidebar = () => {
     { title: 'Dashboard', path: '/admin/dashboard', icon: <Home /> },
     { title: 'Users', path: '/admin/users', icon: <User /> },
     { title: 'Product', path: '/admin/product', icon: <Settings /> },
+    { title: 'Category', path: '/admin/category', icon: <Bell /> },
     { title: 'User Orders', path: '/admin/orders', icon: <ListOrdered /> },
-    { title: 'Notifications', path: '/admin/notifications', icon: <Bell /> },
+
   ];
 
   return (
