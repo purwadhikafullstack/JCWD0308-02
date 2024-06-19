@@ -263,7 +263,7 @@ model Product {
   images     ProductImage[]
   stock      Stock[]
   superAdmin User           @relation("SuperAdminProducts", fields: [superAdminId], references: [id], onDelete: Cascade)
-  category   Category       @relation(fields: [categoryId], references: [id])
+  category          Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }

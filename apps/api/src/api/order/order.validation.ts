@@ -11,8 +11,15 @@ export const OrderValidation = {
   }),
 };
 
-export const CancelValidation = {
-  CANCEL: z.object({
+export const OrderIdValidation = {
+  ORDER_ID: z.object({
     orderId: z.string().uuid(),
+  }),
+};
+
+export const ConfirmPaymentValidation = {
+  CONFIRM_PAYMENT: z.object({
+    orderId: z.string().uuid(),
+    isAccepted: z.boolean(),
   }),
 };

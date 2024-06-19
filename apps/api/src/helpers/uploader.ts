@@ -21,6 +21,7 @@ export const uploader = (filePrefix: string, folderName?: string) => {
       const originalNameParts = file.originalname.split('.');
       const fileExtension = originalNameParts[originalNameParts.length - 1];
       const newFileName = filePrefix + Date.now() + "." + fileExtension;
+
       cb(null, newFileName);
     },
   });

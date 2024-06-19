@@ -12,7 +12,8 @@ export const CartValidation = {
 
 export const patchCartValidation = {
   CART: z.object({
-    stockId: z.string().uuid(),
+    // stockId: z.string().uuid(),
+    productId: z.string().uuid(),
     quantity: z.number(),
   }),
 };
