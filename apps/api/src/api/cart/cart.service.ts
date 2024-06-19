@@ -4,7 +4,10 @@ import { ResponseError } from '@/utils/error.response.js';
 import { Validation } from '@/utils/validation.js';
 import { CartValidation, patchCartValidation } from './cart.validation.js';
 import { Response } from 'express';
-import { findNearestStore } from '../distance/distance.service.js';
+import {
+  findNearestStore,
+  findStoresInRange,
+} from '../distance/distance.service.js';
 
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
@@ -27,16 +30,14 @@ export class CartService {
     if (!userAddress) throw new ResponseError(401, 'Address not found!');
 
     //toko terdekat
-    const nearestStore = await findNearestStore(userAddress.coordinate);
+    const nearbyStore = await findStoresInRange(userAddress.coordinate, 20);
 
     let stock;
-    if (nearestStore) {
+    for (const store of nearbyStore) {
       stock = await prisma.stock.findFirst({
-        where: {
-          productId: cartRequest.productId,
-          storeId: nearestStore.id,
-        },
+        where: { productId: cartRequest.productId, storeId: store.id },
       });
+      if (stock) break;
     }
 
     if (!stock) {
@@ -53,12 +54,11 @@ export class CartService {
       }
     }
 
-    if (!stock) {
+    if (!stock)
       throw new ResponseError(
         400,
         'Stock not found in the nearest or central store!',
       );
-    }
 
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
@@ -99,20 +99,50 @@ export class CartService {
     );
 
     const userId = res.locals.user?.id;
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { addresses: true },
+    });
 
-    if (!userId) {
-      throw new ResponseError(401, 'Unauthorized');
+    const userAddress = user?.addresses.find(
+      (address: any) => address.id === patchCart?.addressId,
+    );
+
+    if (!userAddress) throw new ResponseError(401, 'Address not found!');
+    const nearbyStore = await findStoresInRange(userAddress.coordinate, 20);
+    let stock;
+    for (const store of nearbyStore) {
+      stock = await prisma.stock.findFirst({
+        where: { productId: patchCart.productId, storeId: store.id },
+      });
+      if (stock) break;
     }
-
+    if (!stock) {
+      const centralStore = await prisma.store.findUnique({
+        where: { slug: 'grosirun-pusat' },
+      });
+      if (centralStore) {
+        stock = await prisma.stock.findFirst({
+          where: {
+            productId: patchCart.productId,
+            storeId: centralStore.id,
+          },
+        });
+      }
+    }
+    if (!stock)
+      throw new ResponseError(
+        400,
+        'Stock not found in any nearby or central store!',
+      );
     const cartItem = await prisma.orderItem.findFirst({
       where: {
         userId,
-        ...(patchCart.stockId ? { stockId: patchCart.stockId } : {}),
+        stockId: stock.id,
         orderItemType: 'CART_ITEM',
         isDeleted: false,
       },
     });
-
     if (!cartItem) throw new ResponseError(401, 'Item not found in cart!');
 
     const newQuantity = (cartItem.quantity || 0) + (patchCart.quantity || 0);
@@ -127,7 +157,6 @@ export class CartService {
       where: { id: cartItem.id },
       data: { quantity: newQuantity, isChecked: true },
     });
-
     return updatedOrderItem;
   };
 
