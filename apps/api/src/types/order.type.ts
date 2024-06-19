@@ -11,7 +11,7 @@ export interface OrderRequest {
   // serviceDescription?: string;
 }
 
-export interface CancelOrder {
+export interface OrderId {
   orderId: string;
 }
 
@@ -42,3 +42,8 @@ export const getCourierType = (courier: string): CourierType => {
       throw new ResponseError(400, 'Invalid courier type');
   }
 };
+
+export interface ConfirmPaymentRequest {
+  orderId: string;
+  isAccepted: boolean;
+}
