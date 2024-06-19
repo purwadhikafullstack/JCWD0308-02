@@ -1,10 +1,15 @@
+import { Product } from '@/app/admin/product/components/types';
 import axios from 'axios';
 
-export const fetchProducts = async () => {
-  const response = await axios.get(`http://localhost:8000/api/product`, {
+export const fetchProducts = async (page: number = 1, limit: number = 8, filters: any = {}): Promise<{ products: Product[], total: number, page: number, limit: number }> => {
+  const query = new URLSearchParams({ page: page.toString(), limit: limit.toString(), ...filters }).toString();
+  const res = await axios.get(`http://localhost:8000/api/product?${query}`, {
     withCredentials: true,
   });
-  return response.data;
+  if (res.status !== 200) {
+    throw new Error('Failed to fetch products');
+  }
+  return res.data;
 };
 
 export const fetchProductById = async (id: string) => {

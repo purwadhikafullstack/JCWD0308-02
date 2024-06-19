@@ -13,6 +13,7 @@ const EditForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel }) => {
   const [formData, setFormData] = useState<Map<string, string | Blob>>(new Map());
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const data = new Map<string, string | Blob>();
@@ -32,6 +33,12 @@ const EditForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel }) => {
     data.set('status', product.status);
     data.set('categoryId', product.categoryId);
     setFormData(data);
+
+    // Initialize preview URLs for existing images
+    if (product.images) {
+      const urls = product.images.map(image => image.imageUrl);
+      setPreviewUrls(urls);
+    }
   }, [product]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -47,6 +54,10 @@ const EditForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel }) => {
         updatedFormData.set('images', files[0]); // handle multiple files if needed
         return updatedFormData;
       });
+
+      // Generate preview URLs
+      const urls = files.map(file => URL.createObjectURL(file));
+      setPreviewUrls(urls);
     }
   };
 
@@ -103,7 +114,7 @@ const EditForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel }) => {
                 required
               />
             </div>
-            <div>
+            <div className="col-span-2">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description
               </label>
@@ -282,6 +293,13 @@ const EditForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel }) => {
                 onChange={handleFileChange}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
               />
+            </div>
+            <div className="col-span-2 grid grid-cols-3 gap-4 mt-4">
+              {previewUrls.map((url, index) => (
+                <div key={index} className="relative w-full h-32">
+                  <img src={url} alt={`Preview ${index + 1}`} className="object-cover w-full h-full rounded-md" />
+                </div>
+              ))}
             </div>
           </div>
           <div className="flex justify-end space-x-2">
