@@ -102,6 +102,8 @@ export const createOrder = async (
   shippingCost: any,
   cost: number,
   estimation: string,
+  // estimatedDeliveryDate: any,
+  orderStatus: string,
 ) => {
   let finalTotalPrice = totalPrice;
 
@@ -118,15 +120,20 @@ export const createOrder = async (
       throw new Error(`Failed to apply voucher: ${error}`);
     }
   }
+  const storeAdmin = await prisma.storeAdmin.findFirst({
+    where: { storeId: nearestStore?.id },
+  });
   return await prisma.order.create({
     data: {
       userId,
+      orderStatus,
       paymentMethod: orderRequest.paymentMethod as PaymentMethod,
       courier: getCourierType(orderRequest.courier),
       service: orderRequest.service,
       serviceDescription: 'Layanan Reguler',
-      estimation: `${estimation} days`,
+      estimation,
       storeId: nearestStore?.id,
+      storeAdminId: storeAdmin?.id,
       note: orderRequest.note,
       totalPrice: finalTotalPrice,
       shippingCost: cost,
