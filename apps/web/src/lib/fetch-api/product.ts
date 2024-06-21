@@ -1,4 +1,3 @@
-import { Product } from '@/app/admin/product/components/types';
 import axios from 'axios';
 
 export const fetchProducts = async (page: number = 1, limit: number = 8, filters: any = {}): Promise<{ products: Product[], total: number, page: number, limit: number }> => {

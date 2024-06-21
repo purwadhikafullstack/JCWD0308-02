@@ -1,17 +1,17 @@
 import { ICallback } from '@/types/index.js';
 import { prisma } from '@/db.js';
-import { ProductFields } from '@/types/product.type.js';
+import { ProductFields, ProductUpdateRequest } from '@/types/product.type.js';
 import { ProductService } from './product.service.js';
 import { User } from 'lucia';
 
 export class ProductController {
   getProducts: ICallback = async (req, res, next) => {
     try {
-      const { page = 1, limit = 10, ...filters } = req.query;
+      const { page = 1, limit = 10, search, ...filters } = req.query;
       const pageNumber = parseInt(page as string, 10);
       const limitNumber = parseInt(limit as string, 10);
 
-      const products = await ProductService.getProducts(pageNumber, limitNumber, filters);
+      const products = await ProductService.getProducts(pageNumber, limitNumber, { ...filters, search });
       res.status(200).json(products);
     } catch (error) {
       next(error);
@@ -42,7 +42,7 @@ export class ProductController {
       const productData = { ...req.body, superAdminId: user.id };
 
       const files = req.files as Express.Multer.File[] | undefined;
-      const imageUrls = files ? files.map((file) => `/public/images/product/${file.filename}`) : [];
+      const imageUrls = files ? files.map((file) => `/public/${file.filename}`) : [];
 
       const product = await ProductService.createProduct(productData, user.id, imageUrls);
 
@@ -57,12 +57,13 @@ export class ProductController {
     try {
       const { id } = req.params;
       const user = res.locals.user as User;
-      const productData = { ...req.body, superAdminId: user.id };
+      const productData: ProductUpdateRequest = { ...req.body, superAdminId: user.id };
 
       const files = req.files as Express.Multer.File[] | undefined;
       const imageUrls = files ? files.map((file) => `/public/${file.filename}`) : [];
+      const imagesToDelete = req.body.imagesToDelete || [];
 
-      const product = await ProductService.updateProduct(id, productData, user.id, imageUrls);
+      const product = await ProductService.updateProduct(id, productData, user.id, imageUrls, imagesToDelete);
 
       res.status(200).json({ status: "OK", message: "Product Updated Successfully!", product });
     } catch (error) {
@@ -70,7 +71,6 @@ export class ProductController {
       next(error);
     }
   };
-  
 
   deleteProduct: ICallback = async (req, res, next) => {
     try {

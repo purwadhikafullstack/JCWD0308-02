@@ -1,18 +1,21 @@
 import { ResponseError } from "@/utils/error.response.js";
 import { Validation } from "@/utils/validation.js";
 import { prisma } from "@/db.js";
-import { ProductFields, ProductRequest } from "@/types/product.type.js";
+import { ProductFields, ProductRequest, ProductUpdateRequest } from "@/types/product.type.js";
 import { ProductValidation } from "./product.validation.js";
 
 export class ProductService {
   static getProducts = async (page: number, limit: number, filters: any) => {
     const where: any = {};
+    if (filters.search) {
+      where.title = { contains: filters.search };
+      delete filters.search;
+    }
     for (const [key, value] of Object.entries(filters)) {
       if (value) {
-        where[key] = { contains: value };
+        where[key] = value;
       }
     }
-
     const total = await prisma.product.count({ where });
     const products = await prisma.product.findMany({
       where,
@@ -20,7 +23,7 @@ export class ProductService {
       take: limit,
       select: {
         ...ProductFields,
-        images: true, // Pastikan field ini disertakan
+        images: true,
       },
     });
 
@@ -41,7 +44,7 @@ export class ProductService {
       select: { ...ProductFields },
     });
 
-    if (imageUrls.length) {
+    if (imageUrls.length > 0) {
       for (const imageUrl of imageUrls) {
         await prisma.productImage.create({
           data: {
@@ -61,9 +64,20 @@ export class ProductService {
     });
   };
 
-  static updateProduct = async (id: string, req: ProductRequest, superAdminId: string, imageUrls: string[]) => {
-    const updatedProduct = Validation.validate(ProductValidation.updateProduct, req);
-    await ProductService.checkProductExists(updatedProduct.title);
+  static updateProduct = async (id: string, req: ProductUpdateRequest, superAdminId: string, imageUrls: string[] = [], imagesToDelete: string[] = []) => {
+    const existingProduct = await prisma.product.findUnique({ where: { id } });
+    if (!existingProduct) {
+      throw new ResponseError(404, "Product not found");
+    }
+
+    const updatedProductData: Partial<ProductUpdateRequest> = {};
+    for (const key in req) {
+      if (req.hasOwnProperty(key) && req[key as keyof ProductUpdateRequest] !== undefined) {
+        updatedProductData[key as keyof ProductUpdateRequest] = req[key as keyof ProductUpdateRequest];
+      }
+    }
+
+    const updatedProduct = Validation.validate(ProductValidation.updateProduct, updatedProductData);
 
     const product = await prisma.product.update({
       where: { id },
@@ -71,13 +85,21 @@ export class ProductService {
       select: { ...ProductFields },
     });
 
-    if (imageUrls.length) {
+    if (imageUrls.length > 0) {
       for (const imageUrl of imageUrls) {
         await prisma.productImage.create({
           data: {
             productId: product.id,
             imageUrl: `http://localhost:8000${imageUrl}`,
           },
+        });
+      }
+    }
+
+    if (imagesToDelete.length > 0) {
+      for (const imageId of imagesToDelete) {
+        await prisma.productImage.delete({
+          where: { id: imageId },
         });
       }
     }
@@ -90,7 +112,6 @@ export class ProductService {
       },
     });
   };
-  
 
   private static checkProductExists = async (title: string) => {
     const findProduct = await prisma.product.findUnique({ where: { title } });

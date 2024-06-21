@@ -260,7 +260,7 @@ model Product {
   createdAt         DateTime  @default(now()) @map("created_at")
 
   //relation
-  images     ProductImage[]
+  images     ProductImage[]   
   stock      Stock[]
   superAdmin User           @relation("SuperAdminProducts", fields: [superAdminId], references: [id], onDelete: Cascade)
   category          Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
@@ -276,7 +276,7 @@ model ProductImage {
   createdAt DateTime @default(now()) @map("created_at")
 
   //relation
-  product Product @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("product_images")
 }

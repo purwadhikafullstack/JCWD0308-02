@@ -3,44 +3,34 @@ import { ChevronDown, Search } from 'lucide-react';
 import React, { useState } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';
-export default function SearchBar() {
-  const [categoryDropdown, setCategoryDropdown] = useState<boolean>(false);
+
+interface SearchBarProps {
+  onSearch: (query: string) => void;
+}
+
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSearchSubmit = () => {
+    onSearch(searchQuery);
+  };
+
   return (
     <div className="flex items-center justify-center my-1 px-4 gap-3">
-      <div className="relative">
-        <div
-          className="flex gap-1 items-center cursor-pointer p-3 rounded-xl hover:text-destructive"
-          onClick={() => setCategoryDropdown(!categoryDropdown)}
-        >
-          <button className="bg-transparent border-none text-sm">
-            Categories
-          </button>
-          <ChevronDown
-            className={`transition-transform ${categoryDropdown ? 'rotate-180' : ''}`}
-          />
-        </div>
-        {categoryDropdown && (
-          <div className="absolute left-0 mt-2 bg-muted border rounded-xl shadow-lg z-10 w-48">
-            <ul className="py-1">
-              <li className="hover:bg-accent hover:text-accent-foreground rounded-xl p-2">
-                FOOD
-              </li>
-              <li className="hover:bg-accent hover:text-accent-foreground rounded-xl p-2">
-                BEVERAGE
-              </li>
-              <li className="hover:bg-accent hover:text-accent-foreground rounded-xl p-2">
-                HOME AND LIVING
-              </li>
-              <li className="hover:bg-accent hover:text-accent-foreground rounded-xl p-2">
-                HEALTH
-              </li>
-            </ul>
-          </div>
-        )}
-      </div>
       <div className="relative w-full max-w-md">
-        <Input type="text" placeholder="Search" className="pr-10 w-full" />
+        <Input
+          type="text"
+          placeholder="Search"
+          value={searchQuery}
+          onChange={handleSearchChange}
+          className="pr-10 w-full"
+        />
         <Button
+          onClick={handleSearchSubmit}
           className="absolute right-2 top-1/2 transform -translate-y-1/2 rounded-full"
           variant="ghost"
           size="icon"
@@ -50,4 +40,6 @@ export default function SearchBar() {
       </div>
     </div>
   );
-}
+};
+
+export default SearchBar;

@@ -11,20 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { User } from '@/app/admin/users/components/types';
 
-type IUser = {
-  id: string;
-  displayName: string;
-  email: string;
-  contactEmail: string;
-  password: string;
-  accountType: string;
-  role: string;
-  status: string;
-  avatarUrl: string; // This is the required field
-  referralCode?: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+
 
 interface CreateFormProps {
   onCreate: (
@@ -37,16 +24,15 @@ interface CreateFormProps {
 
 const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
   const [formData, setFormData] = useState<
-    Omit<IUser, 'id' | 'referralCode' | 'createdAt' | 'updatedAt'>
+    Omit<User, 'id' | 'referralCode' | 'createdAt' | 'updatedAt'>
   >({
     displayName: '',
     email: '',
     contactEmail: '',
     password: '',
     accountType: 'EMAIL',
-    role: 'USER',
-    status: 'ACTIVE',
-    avatarUrl: '',
+    role: 'SUPER_ADMIN',
+    status: 'ACTIVE'
   });
 
   const handleChange = (
@@ -156,7 +142,6 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                 >
                   <option value="SUPER_ADMIN">Super Admin</option>
                   <option value="STORE_ADMIN">Store Admin</option>
-                  <option value="USER">User</option>
                 </select>
               </div>
               <div>
