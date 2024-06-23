@@ -1,16 +1,12 @@
 import "server-only"
 import { Mysql2Adapter } from "@lucia-auth/adapter-mysql";
 import { pool } from "./db";
-import { Lucia, User } from "lucia";
+import { Lucia, Session, User } from "lucia";
 import { cache } from "react";
 import { env } from "@/app/env";
 import { cookies } from "next/headers";
-import { PrismaClient } from "api";
 import { redirect } from "next/navigation";
 
-export interface Session extends PrismaClient.Session {
-	fresh: boolean
-}
 
 export type auth = { user: User; session: Session; } | { user: null; session: null; }
 
@@ -77,6 +73,14 @@ const authenticated = cache(async () => {
 	return request
 })
 
+const noAuthOnly = cache(async () => {
+	const request = await validateRequest()
+	if (request.session) {
+		return redirect('/')
+	}
+	return request
+})
+
 const storeAdmin = cache(async () => {
 	const request = await authenticated()
 	if (request.user.role === "USER") {
@@ -93,4 +97,4 @@ const superAdmin = cache(async () => {
 	return request
 })
 
-export const protectedRoute = { authenticated, storeAdmin, superAdmin }
+export const protectedRoute = { authenticated, storeAdmin, superAdmin, noAuthOnly }
