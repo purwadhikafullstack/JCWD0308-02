@@ -42,7 +42,7 @@ export default class App {
     console.log('configure');
     this.app.use(
       cors({
-        origin: 'http://localhost:3000', // Specify your frontend's URL
+        origin: ['http://localhost:3000', 'http://localhost:8000'], // Specify your frontend's URL
         credentials: true,
       }),
     );
