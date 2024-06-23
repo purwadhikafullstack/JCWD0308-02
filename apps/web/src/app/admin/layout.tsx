@@ -3,7 +3,7 @@ import Sidebar from './components/sidebar';
 import { protectedRoute } from '@/lib/auth';
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await protectedRoute.storeAdmin()
+  const session = await protectedRoute.superAdmin()
 
   console.log(session);
   
