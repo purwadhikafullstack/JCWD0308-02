@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { fetchCategories } from '@/lib/fetch-api/category';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Category } from '../../categories/components/types';
+import { Category } from '@/app/admin/categories/components/types';
 import Image from 'next/image';
 
 interface CreateFormProps {

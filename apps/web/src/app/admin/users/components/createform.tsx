@@ -30,6 +30,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
     email: '',
     contactEmail: '',
     password: '',
+    avatarUrl: '',
     accountType: 'EMAIL',
     role: 'SUPER_ADMIN',
     status: 'ACTIVE'
