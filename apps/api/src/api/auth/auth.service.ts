@@ -6,6 +6,8 @@ import { AuthValidation } from "./auth.validation.js"
 import { RegisterRequest, SigninRequest } from "@/types/auth.type.js"
 import { UserFields } from "@/types/user.type.js"
 import { prisma } from "@/db.js"
+import { github, google } from "@/auth.lucia.js"
+import { AuthHelper, ICreateUserByGitHub } from "./auth.helper.js"
 
 export class AuthService {
   static registerByEmail = async (req: RegisterRequest) => {
@@ -46,5 +48,27 @@ export class AuthService {
     if (!validPassword) throw new ResponseError(403, 'Incorrect email or password!')
 
     return await prisma.user.findUnique({ where: { id: findUser.id }, select: { ...UserFields } })!
+  }
+
+  static githubOAuth = async (code: string) => {
+    const tokens = await github.validateAuthorizationCode(code);
+    const githubUser = await AuthHelper.getGitHubUser(tokens.accessToken)
+    
+    const existingUser = await AuthHelper.getUserByOAuthId(githubUser)
+
+    if (existingUser) return existingUser
+
+    return await AuthHelper.createUserByGitHub(githubUser)
+  }
+
+  static googleOAuth = async (code: string, codeVerifier: string) => {
+    const tokens = await google.validateAuthorizationCode(code, codeVerifier);
+    const googleUser = await AuthHelper.getGoogleUser(tokens.accessToken)
+
+    const existingUser = await AuthHelper.getUserByOAuthId(googleUser)
+    
+    if (existingUser) return existingUser
+
+    return await AuthHelper.createUserByGoogle(googleUser)
   }
 }

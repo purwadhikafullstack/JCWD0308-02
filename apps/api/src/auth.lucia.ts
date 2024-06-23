@@ -1,8 +1,9 @@
 import { PrismaAdapter } from "@lucia-auth/adapter-prisma";
 import { Lucia } from "lucia";
 import { Prisma } from "@prisma/client";
-import { NODE_ENV } from "./config.js";
+import { GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, API_URL, NODE_ENV } from "./config.js";
 import { prisma } from "./db.js";
+import { GitHub, Google } from "arctic";
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user)
 
@@ -19,7 +20,11 @@ export const lucia = new Lucia(adapter, {
     }
   }
 })
-// const u: Prisma. = 
+
+export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET)
+
+export const google = new Google(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, `${API_URL}/api/auth/google/callback`)
+
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
