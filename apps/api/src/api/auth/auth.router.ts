@@ -21,7 +21,7 @@ export class AuthRouter {
     this.router.get('/github/callback', AuthMiddleware.noAuthOnly, this.authController.githubCallback);
     this.router.get('/google', AuthMiddleware.noAuthOnly, this.authController.google);
     this.router.get('/google/callback', AuthMiddleware.noAuthOnly, this.authController.googleCallback);
-    this.router.get('/session', AuthMiddleware.noAuthOnly, this.authController.getSession);
+    this.router.get('/session', this.authController.getSession);
   }
 
   getRouter(): Router {
