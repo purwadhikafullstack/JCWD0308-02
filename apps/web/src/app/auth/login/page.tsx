@@ -1,6 +1,10 @@
 "use client";
 import { useState } from 'react';
 import axios from 'axios';
+import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { env } from '@/app/env';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -52,6 +56,13 @@ const Login = () => {
           >
             Login
           </button>
+          <Separator />
+          <Button asChild>
+            <Link href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/github`}>GitHub</Link>
+          </Button>
+          <Button asChild>
+            <Link href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/google`}>Google</Link>
+          </Button>
         </div>
       </div>
     </div>
