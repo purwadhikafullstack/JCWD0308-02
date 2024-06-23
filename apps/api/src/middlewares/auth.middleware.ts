@@ -4,6 +4,8 @@ import { ResponseError } from "@/utils/error.response.js";
 
 export class AuthMiddleware {
   static identifyRequest: ICallback = async (req, res, next) => {
+    console.log(req.headers);
+    
     try {
       const sessionId = lucia.readSessionCookie(req.headers.cookie ?? "");
 

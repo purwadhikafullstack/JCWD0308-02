@@ -5,7 +5,12 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 
 import { cn } from '@/lib/utils';
-import Head from 'next/head';
+import Providers from './provider';
+import { validateRequest } from '@/lib/auth';
+import { cookies } from 'next/headers';
+
+export const runtime = 'nodejs' // 'nodejs' (default) | 'edge'
+export const fetchCache = 'default-no-store';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -20,25 +25,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const auth = await validateRequest();
+  console.log(auth);
+  
   return (
     <html lang="en" suppressHydrationWarning>
-      <Head>
-        <link rel="favicon" sizes="32x32" href="/favicon-rev3.ico" />
-      </Head>
       <body
         className={cn(
           'min-h-screen bg-background font-sans antialiased',
           fontSans.variable,
         )}
       >
-        <Header />
-        {children}
-        <Footer />
+        <Providers>
+          <Header />
+          {children}
+          <Footer />
+        </Providers>
       </body>
     </html>
   );

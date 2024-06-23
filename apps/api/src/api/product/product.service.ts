@@ -71,11 +71,12 @@ export class ProductService {
     }
 
     const updatedProductData: Partial<ProductUpdateRequest> = {};
-    for (const key in req) {
-      if (req.hasOwnProperty(key) && req[key as keyof ProductUpdateRequest] !== undefined) {
-        updatedProductData[key as keyof ProductUpdateRequest] = req[key as keyof ProductUpdateRequest];
+    Object.keys(req).forEach((key) => {
+      const value = req[key as keyof ProductUpdateRequest];
+      if (value !== undefined) {
+        (updatedProductData as any)[key] = value;
       }
-    }
+    });
 
     const updatedProduct = Validation.validate(ProductValidation.updateProduct, updatedProductData);
 

@@ -19,7 +19,7 @@ export const lucia = new Lucia(adapter, {
     }
   }
 })
-
+// const u: Prisma. = 
 declare module "lucia" {
   interface Register {
     Lucia: typeof lucia;
