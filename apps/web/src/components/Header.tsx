@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 import SearchBar from './partial/SearchBar';
+import { env } from '@/app/env';
 
 export const Header = () => {
   const [state, setState] = useState<boolean>(false);
@@ -43,12 +44,12 @@ export const Header = () => {
   const handleLogout = async () => {
     try {
       await axios.post(
-        'http://localhost:8000/api/auth/signout',
+        `${env.NEXT_PUBLIC_BASE_API_URL}/auth/signout`,
         {},
         { withCredentials: true },
       );
       alert('Logged out successfully');
-      window.location.href = 'http://localhost:3000/auth/login'; // Redirect to login page after logout
+      window.location.href = `${env.NEXT_PUBLIC_BASE_WEB_URL}/auth/login`; // Redirect to login page after logout
     } catch (error) {
       console.error('Error logging out:', error);
       alert('Failed to log out');
@@ -132,7 +133,7 @@ export const Header = () => {
       </div>
       <hr />
       {/* search bar */}
-      <SearchBar />
+      <SearchBar onSearch={(s) => {}} />
       <hr />
       <div className="address flex justify-between mx-5 p-2">
         <p className="flex items-center gap-2">
