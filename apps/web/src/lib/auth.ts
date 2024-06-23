@@ -6,6 +6,7 @@ import { cache } from "react";
 import { env } from "@/app/env";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import fetchSSR from "./fetchSSR";
 
 
 export type auth = { user: User; session: Session; } | { user: null; session: null; }
@@ -56,13 +57,18 @@ const setSession = (result: auth) => {
 }
 
 export const validateRequest = cache(async (): Promise<auth> => {
-	const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
+	// const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
 
-	const result = await lucia.validateSession(sessionId!);
+	// const result = await lucia.validateSession(sessionId!);
 
-	setSession(result);
+	// setSession(result);
 
-	return result;
+	// return result;
+	const res = await fetchSSR(`${env.NEXT_PUBLIC_BASE_API_URL}/auth/session`)
+	console.log(res);
+	const auth = await res.json()
+	
+	return auth
 })
 
 const authenticated = cache(async () => {
