@@ -1,22 +1,67 @@
 'use client';
-import React, { useState } from 'react';
-import CardItem from './_component/CardItem';
+import React, { useEffect, useState } from 'react';
+import { CardItem } from './_component/CardItem';
 import { Button } from '@/components/ui/button';
+import { getStore } from '@/lib/fetch-api/store';
+import { Product } from './_component/type';
+import { addCart } from '@/lib/fetch-api/cart';
+import { useAppDispatch } from '@/lib/features/hooks';
+import { addCartItem, addToCart } from '@/lib/features/cart/cartSlice';
+import { CartRequestType } from '../cart/_component/type';
 
 export default function ProductPage() {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const storeId = 'ce276990-0f7c-442e-8972-f7c8bc2e714d';
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    const fetchStoreData = async () => {
+      try {
+        const storeData = await getStore(storeId);
+        const { stocks } = storeData.data;
+        const fetchedProducts = stocks.map((stock: any) => stock.product);
+        setProducts(fetchedProducts);
+      } catch (error) {
+        console.error('Error fetching store data:', error);
+      }
+    };
+
+    fetchStoreData();
+  }, []);
 
   const handleLocationChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
   ) => {
     setSelectedLocation(event.target.value);
-    // Perform filtering or other actions based on selected location
   };
 
   const handlePriceChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedPrice(event.target.value);
-    // Perform filtering or other actions based on selected price
+  };
+
+  const handleAddToCart = (productId: string, isPack: boolean) => {
+    try {
+      const cartRequest: CartRequestType = {
+        productId,
+        quantity: 1,
+        isPack,
+        addressId: '11663abf-7a5b-4fa2-8503-53104311e924',
+      };
+      // Dispatching addCartItem directly with cartRequest
+      dispatch(addCartItem(cartRequest))
+        .unwrap()
+        .then((response) => {
+          dispatch(addToCart(response));
+          alert('Product added to cart!');
+        })
+        .catch((error) => {
+          console.error('Error adding product to cart:', error);
+        });
+    } catch (error) {
+      console.error('Error adding product to cart:', error);
+    }
   };
   return (
     <div className="flex">
@@ -67,7 +112,15 @@ export default function ProductPage() {
           </select>
         </div>
       </div>
-      <CardItem />
+      <div>
+        {products.map((product) => (
+          <CardItem
+            key={product.id}
+            product={product}
+            addToCart={handleAddToCart}
+          />
+        ))}
+      </div>
     </div>
   );
 }

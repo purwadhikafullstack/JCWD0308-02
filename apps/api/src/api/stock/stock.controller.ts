@@ -32,4 +32,23 @@ export class StockController {
       }
     }
   };
+
+  postStockId = async (req: Request, res: Response) => {
+    try {
+      const { productId, addressId } = req.body;
+      const userId = res.locals.user?.id;
+      const stockId = await StockService.postStockId(
+        productId,
+        addressId,
+        userId,
+      );
+      res.status(200).json({ stockId });
+    } catch (error) {
+      if (error instanceof ResponseError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: 'Internal Server Error' });
+      }
+    }
+  };
 }
