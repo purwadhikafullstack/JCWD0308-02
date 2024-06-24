@@ -8,11 +8,11 @@ import { Home, User, Settings, Bell, LogOut, ListOrdered } from 'lucide-react';
 const Sidebar = () => {
   const pathname = usePathname();
   const menus = [
-    { title: 'Dashboard', path: '/admin/dashboard', icon: <Home /> },
-    { title: 'Users', path: '/admin/users', icon: <User /> },
-    { title: 'Product', path: '/admin/product', icon: <Settings /> },
-    { title: 'Category', path: '/admin/category', icon: <Bell /> },
-    { title: 'User Orders', path: '/admin/orders', icon: <ListOrdered /> },
+    { title: 'Dashboard', path: '/dashboard', icon: <Home /> },
+    { title: 'Users', path: '/users', icon: <User /> },
+    { title: 'Products', path: '/products', icon: <Settings /> },
+    { title: 'Categories', path: '/categories', icon: <Bell /> },
+    { title: 'User Orders', path: '/orders', icon: <ListOrdered /> },
 
   ];
 

@@ -1,19 +1,23 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'; 
 import { fetchProducts, createProduct, updateProduct, deleteProduct } from '@/lib/fetch-api/product';
 import { fetchCategories } from '@/lib/fetch-api/category';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/partial/SearchBar';
-import EditForm from './components/editform';
-import CreateForm from './components/createform';
-import { Product } from './components/types';
-import { Category } from '../categories/components/types';
+import EditForm from './_components/editform';
+import CreateForm from './_components/createform';
+import { Product } from './_components/types';
+import { Category } from '../categories/_components/types';
 import Pagination from '@/components/partial/pagination';
-import ProductCard from './components/productcard';
+import ProductCard from './_components/productcard';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toaster, toast } from '@/components/ui/sonner';
 
 const ProductList = () => {
+  const router = useRouter();
+  const pathname = usePathname(); 
+  const searchParams = useSearchParams(); 
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -24,7 +28,7 @@ const ProductList = () => {
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(8);
   const [filters, setFilters] = useState<any>({});
-  const [searchQuery, setSearchQuery] = useState<string>(''); 
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
 
   useEffect(() => {
@@ -40,7 +44,9 @@ const ProductList = () => {
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to fetch data');
-        toast.error('Failed to fetch data');
+        toast.error('Failed to fetch data', {
+          className: 'bg-red-500 text-white',
+        });
       } finally {
         setLoading(false);
       }
@@ -49,6 +55,14 @@ const ProductList = () => {
     fetchData();
   }, [page, limit, filters, updateFlag]);
 
+  useEffect(() => {
+    const query = searchParams.get('search');
+    if (query) {
+      setSearchQuery(query);
+      setFilters((prevFilters: any) => ({ ...prevFilters, search: query }));
+    }
+  }, [searchParams]);
+
   const handleEdit = (product: Product) => {
     setSelectedProduct(product);
   };
@@ -56,49 +70,76 @@ const ProductList = () => {
   const handleCreate = async (newProduct: FormData) => {
     try {
       const createdProduct = await createProduct(newProduct);
-      toast.success('Product created successfully');
+      toast.success('Product created successfully', {
+        className: 'bg-green-500 text-white',
+      });
       setUpdateFlag(!updateFlag);
       setCreatingProduct(false);
     } catch (error) {
       console.error('Error creating product:', error);
-      toast.error('Failed to create product');
+      toast.error('Failed to create product', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
   const handleUpdate = async (updatedProduct: FormData) => {
     try {
-      const product = await updateProduct(updatedProduct.get('id') as string, updatedProduct);
-      toast.success('Product updated successfully');
-      setUpdateFlag(!updateFlag);
-      setSelectedProduct(null);
+      const productId = selectedProduct?.id;
+      if (productId) {
+        updatedProduct.append('id', productId);
+        const product = await updateProduct(productId, updatedProduct);
+        toast.success('Product updated successfully', {
+          className: 'bg-green-500 text-white',
+        });
+        setUpdateFlag(!updateFlag);
+        setSelectedProduct(null);
+      } else {
+        throw new Error('Product ID is missing');
+      }
     } catch (error) {
       console.error('Error updating product:', error);
-      toast.error('Failed to update product');
+      toast.error('Failed to update product', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteProduct(id);
-      toast.success('Product deleted successfully');
+      toast.success('Product deleted successfully', {
+        className: 'bg-green-500 text-white',
+      });
       setUpdateFlag(!updateFlag);
     } catch (error) {
       console.error('Error deleting product:', error);
-      toast.error('Failed to delete product');
+      toast.error('Failed to delete product', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
   const handleTitleClick = (id: string) => {
-    window.location.href = `/admin/product/${id}`;
+    router.push(`/products/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
+    const params = new URLSearchParams(searchParams);
+    params.set('page', newPage.toString());
+    const url = `${pathname}?${params.toString()}`;
+    router.replace(url);
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setFilters({ ...filters, search: query });
+    const params = new URLSearchParams(searchParams);
+    params.set('search', query);
+    params.set('page', '1'); // Reset to the first page when searching
+    const url = `${pathname}?${params.toString()}`;
+    router.replace(url);
   };
 
   const handleCategoryFilterChange = (categoryId: string) => {
@@ -111,6 +152,15 @@ const ProductList = () => {
     } else {
       setFilters((filters: any) => ({ ...filters, categoryId }));
     }
+    const params = new URLSearchParams(searchParams);
+    if (categoryId === 'all') {
+      params.delete('categoryId');
+    } else {
+      params.set('categoryId', categoryId);
+    }
+    params.set('page', '1'); 
+    const url = `${pathname}?${params.toString()}`;
+    router.replace(url);
   };
 
   return (
@@ -154,7 +204,7 @@ const ProductList = () => {
                 product={product}
                 onEdit={handleEdit}
                 onDelete={handleDelete}
-                onTitleClick={handleTitleClick}
+                onTitleClick={() => handleTitleClick(product.id)}
               />
             ))}
           </div>

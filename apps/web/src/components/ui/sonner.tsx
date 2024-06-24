@@ -11,7 +11,7 @@ const Toaster = ({ ...props }) => {
       theme={theme as "system" | "light" | "dark"} 
       position="top-center"
       toastOptions={{
-        duration: 2000,
+        duration: 3000,
         classNames: {
           toast:
             "group toast group-[.toaster]:bg-background group-[.toaster]:text-foreground group-[.toaster]:border-border group-[.toaster]:shadow-lg",

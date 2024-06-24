@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from './components/sidebar';
+import Sidebar from './_components/sidebar';
 import { protectedRoute } from '@/lib/auth';
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
