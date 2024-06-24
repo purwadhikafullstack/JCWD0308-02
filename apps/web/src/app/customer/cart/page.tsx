@@ -1,3 +1,4 @@
+'use client';
 import {
   Card,
   CardContent,
@@ -8,10 +9,51 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Trash2, Minus, Plus } from 'lucide-react';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import { getCart } from '@/lib/fetch-api/cart';
+import { CartItemType } from './_component/type';
+import CartItem from './_component/CartItem';
+import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
+import { setCart } from '@/lib/features/cart/cartSlice';
+import { RootState } from '@/lib/features/store';
+import { formatCurrency } from '@/lib/currency';
+import Link from 'next/link';
 
 export default function Cart() {
+  const dispatch = useAppDispatch();
+  const carts = useAppSelector((state: RootState) => state.cart.items);
+
+  useEffect(() => {
+    const fetchCartData = async () => {
+      try {
+        const cartData = await getCart();
+        dispatch(setCart(cartData.data));
+      } catch (error) {
+        console.error('Error fetching cart data:', error);
+      }
+    };
+    fetchCartData();
+  }, [dispatch]);
+
+  function calculateSubtotal(items: CartItemType[]) {
+    return items.reduce((acc, item) => {
+      if (!item.stock) {
+        console.log('no stock for item:', item.id);
+        return acc;
+      }
+
+      const price = item.isPack
+        ? item.stock.product?.packPrice ?? 0
+        : item.stock.product?.price ?? 0;
+
+      return acc + item.quantity * price;
+    }, 0);
+  }
+
+  const subtotal = useAppSelector((state: RootState) =>
+    calculateSubtotal(state.cart.items),
+  );
   return (
     <div className="container mx-auto mt-10 p-4 min-h-[40rem]">
       <div className="grid md:grid-cols-3 gap-6">
@@ -23,60 +65,9 @@ export default function Cart() {
               Select All
             </label>
           </Card>
-          <div className="flex flex-col gap-4">
-            <Card className="flex flex-col bg-card text-card-foreground shadow-md">
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Checkbox id="indomie" />
-                  <label
-                    htmlFor="indomie"
-                    className="text-xl font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-3"
-                  >
-                    Indomie
-                  </label>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="flex gap-3 items-center justify-between">
-                <Image
-                  src="/avatar.png"
-                  width={50}
-                  height={50}
-                  alt="product image"
-                />
-                <p>Indomie</p>
-                <p>
-                  <strong>Rp3.000</strong>
-                </p>
-                <div className="flex items-center">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="text-primary"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="mx-2 text-lg">1</span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="text-primary"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardContent>
-              <CardFooter className="flex justify-end">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="text-destructive"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </Button>
-              </CardFooter>
-            </Card>
-            {/* Repeat similar cards for other items */}
-          </div>
+          {carts.map((cart: any) => (
+            <CartItem key={`${cart.id}-${cart.isPack}`} cart={cart} />
+          ))}
         </div>
         {/* Summary Section */}
         <Card className="bg-card text-card-foreground shadow-lg flex flex-col h-full rounded-lg">
@@ -86,21 +77,16 @@ export default function Cart() {
           <CardContent>
             <div className="flex justify-between mb-2">
               <span>Subtotal</span>
-              <span>$45.00</span>
-            </div>
-            <div className="flex justify-between mb-2">
-              <span>Tax</span>
-              <span>$3.60</span>
-            </div>
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total</span>
-              <span>$48.60</span>
+              <span>{formatCurrency(subtotal)}</span>
             </div>
           </CardContent>
           <CardFooter className="mt-auto p-4">
-            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary-dark">
+            <Link
+              href="/customer/order"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary-dark p-3 text-center rounded-lg"
+            >
               Checkout
-            </Button>
+            </Link>
           </CardFooter>
         </Card>
       </div>

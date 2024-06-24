@@ -1,48 +1,54 @@
 import { API_URL } from './lib';
-
+import axios from 'axios';
 const URL = `${API_URL}/cart`;
-export const addToCart = async (data: any) => {
-  const res = await fetch(`${URL}/add-to-cart`, {
-    method: 'POST',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json',
-    },
+export const addCart = async (cartData: any) => {
+  const res = await axios.post(`${URL}/add-to-cart`, cartData, {
+    headers: { 'Content-Type': 'application/json' },
+    withCredentials: true,
   });
-  const result = await res.json();
-  return result;
+
+  return res.data;
 };
 
 export const getCart = async () => {
-  const res = await fetch(URL, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-    },
+  const res = await axios.get(URL, {
+    withCredentials: true,
   });
-  const result = await res.json();
-  return result;
+  return res.data;
 };
 
-export const updateCart = async (data: any) => {
-  const res = await fetch(`${URL}/update-cart`, {
-    method: 'PATCH',
-    body: JSON.stringify(data),
-    headers: {
-      'Content-Type': 'application/json',
-    },
+export const getCartItemCount = async () => {
+  const res = await axios.get(`${URL}/item-count`, {
+    withCredentials: true,
   });
-  const result = await res.json();
-  return result;
+  console.log(res.data);
+  return res.data;
 };
 
 export const deleteCart = async (cartId: any) => {
-  const res = await fetch(`${URL}/${cartId}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  const result = await res.json();
-  return result;
+  const res = await axios.delete(`${URL}/${cartId}`, { withCredentials: true });
+  return res.data;
+};
+
+export const updateCart = async (cartData: {
+  addressId: string;
+  productId: string;
+  quantity: number;
+}) => {
+  const { addressId, productId, quantity } = cartData;
+
+  try {
+    const res = await axios.patch(
+      `${URL}/update-cart`,
+      { addressId, productId, quantity },
+      {
+        headers: { 'Content-Type': 'application/json' },
+        withCredentials: true,
+      },
+    );
+
+    return res.data;
+  } catch (error) {
+    throw new Error(`Failed to update cart: ${error}`);
+  }
 };
