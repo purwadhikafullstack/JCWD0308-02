@@ -92,7 +92,7 @@ const Users = () => {
       <h2 className="text-2xl font-bold mb-4">Users</h2>
       <p>Manage your users here.</p>
       <div className="mt-4">
-        <Button onClick={() => setCreatingUser(true)} className="mb-4 bg-green-500 text-white">Create User</Button>
+        <Button onClick={() => setCreatingUser(true)} className="mb-4 bg-green-500 text-white">Create User Admin</Button>
         {loading ? (
           <p>Loading...</p>
         ) : error ? (

@@ -31,7 +31,7 @@ import {
   PaginationLink,
 } from '@/components/ui/pagination';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Category } from '../category/components/types';
+import { Category } from '@/app/admin/categories/components/types';
 
 const PaginationButton = ({ disabled, onClick, children }: any) => (
   <button
@@ -250,7 +250,7 @@ const ProductList = () => {
               <span>Previous</span>
             </PaginationButton>
             <PaginationContent>
-              {[...Array(Math.ceil(total / limit)).keys()].map((pageIndex) => (
+              {/* {[...Array(Math.ceil(total / limit)).keys()].map((pageIndex) => (
                 <PaginationItem key={pageIndex}>
                   <PaginationLink
                     href="#"
@@ -263,7 +263,7 @@ const ProductList = () => {
                     {pageIndex + 1}
                   </PaginationLink>
                 </PaginationItem>
-              ))}
+              ))} */}
             </PaginationContent>
             <PaginationButton onClick={() => handlePageChange(page + 1)} disabled={page >= Math.ceil(total / limit)}>
               <span>Next</span>

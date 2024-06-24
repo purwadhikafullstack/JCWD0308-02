@@ -1,9 +1,12 @@
 import { lucia } from "@/auth.lucia.js";
+import { WEB_URL } from "@/config.js";
 import { ICallback } from "@/types/index.js";
 import { ResponseError } from "@/utils/error.response.js";
 
 export class AuthMiddleware {
   static identifyRequest: ICallback = async (req, res, next) => {
+    console.log(req.headers);
+    
     try {
       const sessionId = lucia.readSessionCookie(req.headers.cookie ?? "");
 
@@ -41,6 +44,15 @@ export class AuthMiddleware {
   static authed: ICallback = async (req, res, next) => {
     try {
       if (!res.locals.user) throw new ResponseError(401, "Unauthorized")
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  static noAuthOnly: ICallback = async (req, res, next) => {
+    try {
+      if (res.locals.session) return res.redirect(WEB_URL)
       next()
     } catch (error) {
       next(error)

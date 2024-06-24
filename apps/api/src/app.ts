@@ -9,7 +9,7 @@ import express, {
 } from 'express';
 import cors from 'cors';
 import path from 'path';
-import { PORT } from './config.js';
+import { API_URL, PORT, WEB_URL } from './config.js';
 import { AuthMiddleware } from './middlewares/auth.middleware.js';
 import { UserRouter } from './api/user/user.router.js';
 import { morganMiddleware } from './middlewares/morgan.middleware.js';
@@ -42,7 +42,7 @@ export default class App {
     console.log('configure');
     this.app.use(
       cors({
-        origin: 'http://localhost:3000', // Specify your frontend's URL
+        origin: [API_URL, WEB_URL], // Specify your frontend's URL
         credentials: true,
       }),
     );

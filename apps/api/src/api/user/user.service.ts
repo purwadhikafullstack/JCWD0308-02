@@ -25,7 +25,7 @@ export class UserService {
     
         const user = await prisma.user.create({
           data: {
-            ...newUser, referralCode: generateId(8),avatarUrl: "avatar.png", password: hashed
+            ...newUser, referralCode: generateId(8),avatarUrl: newUser.avatarUrl || "avatar.png", password: hashed
           },
           select: { ...UserFields }
         })

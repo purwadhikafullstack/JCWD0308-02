@@ -62,7 +62,6 @@ enum Status {
 enum AccountType {
   EMAIL
   GOOGLE
-  FACEBOOK
   GITHUB
 }
 
@@ -85,9 +84,10 @@ enum PaymentMethod {
 // Define the models
 model User {
   id               String      @id @default(uuid())
+  providerId         String?     @unique @map("provider_id")
   accountType      AccountType @default(EMAIL) @map("account_type")
   email            String?     @unique
-  contactEmail     String?     @unique @map("contact_email")
+  contactEmail     String?     @map("contact_email")
   password         String?     @db.LongText
   displayName      String      @map("display_name")
   avatarUrl        String      @map("avatar_url") @db.LongText
@@ -249,7 +249,7 @@ model Product {
   packQuantity      Int       @map("pack_quantity")
   bonus             Int?
   weight            Float
-  weightPack        Float    @map("weight_pack")
+  weightPack        Float     @map("weight_pack")
   minOrderItem      Int?      @map("min_order_item")
   superAdminId      String    @map("super_admin_id")
   status            Status    @default(DRAFT)
@@ -263,7 +263,7 @@ model Product {
   images     ProductImage[]
   stock      Stock[]
   superAdmin User           @relation("SuperAdminProducts", fields: [superAdminId], references: [id], onDelete: Cascade)
-  category          Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("products")
 }
@@ -276,7 +276,7 @@ model ProductImage {
   createdAt DateTime @default(now()) @map("created_at")
 
   //relation
-  product Product @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@map("product_images")
 }

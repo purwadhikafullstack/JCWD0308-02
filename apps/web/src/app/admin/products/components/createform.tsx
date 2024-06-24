@@ -1,9 +1,10 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { fetchCategories } from '@/lib/fetch-api/category'; // Import fetchCategories
+import { fetchCategories } from '@/lib/fetch-api/category';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Category } from '@/app/admin/categories/components/types';
+import Image from 'next/image';
 
 interface CreateFormProps {
   onCreate: (product: FormData) => void;
@@ -27,14 +28,14 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
     status: 'DRAFT',
     categoryId: '',
   });
-  const [categories, setCategories] = useState<Category[]>([]); // Define categories state with type Category[]
+  const [categories, setCategories] = useState<Category[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchCategoriesData = async () => {
-      const categoriesData = await fetchCategories(); // Fetch categories from API
-      setCategories(categoriesData); // Set categories state with fetched data
+      const categoriesData = await fetchCategories();
+      setCategories(categoriesData);
       if (categoriesData.length > 0) {
         setFormData(prev => ({
           ...prev,
@@ -68,22 +69,22 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
       data.append(key, formData[key as keyof typeof formData].toString());
     });
     images.forEach((image) => {
-      data.append('images', image); // Append image file(s)
+      data.append('images', image);
     });
     onCreate(data);
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <Card className="w-[800px]">
+      <Card className="w-[900px]">
         <CardHeader>
           <CardTitle>Create Product</CardTitle>
           <CardDescription>Fill in the details to create a new product.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit}>
-            <div className="grid grid-cols-3 gap-4">
-              <div>
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-4 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Title <span className="text-red-500">*</span>
                 </label>
@@ -96,7 +97,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Slug <span className="text-red-500">*</span>
                 </label>
@@ -109,7 +110,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div className="col-span-3">
+              <div className="col-span-4">
                 <label className="block text-sm font-medium text-gray-700">
                   Description <span className="text-red-500">*</span>
                 </label>
@@ -121,7 +122,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Price <span className="text-red-500">*</span>
                 </label>
@@ -134,7 +135,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Pack Price <span className="text-red-500">*</span>
                 </label>
@@ -147,7 +148,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Discount Price
                 </label>
@@ -159,7 +160,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   className="mt-1 block w-full border rounded-md p-2"
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Discount Pack Price
                 </label>
@@ -171,7 +172,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   className="mt-1 block w-full border rounded-md p-2"
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Pack Quantity <span className="text-red-500">*</span>
                 </label>
@@ -184,7 +185,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Bonus
                 </label>
@@ -196,7 +197,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   className="mt-1 block w-full border rounded-md p-2"
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Min Order Item
                 </label>
@@ -208,7 +209,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   className="mt-1 block w-full border rounded-md p-2"
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Weight <span className="text-red-500">*</span>
                 </label>
@@ -221,7 +222,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-1">
                 <label className="block text-sm font-medium text-gray-700">
                   Weight Pack <span className="text-red-500">*</span>
                 </label>
@@ -234,7 +235,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   required
                 />
               </div>
-              <div>
+              <div className="col-span-4 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Status <span className="text-red-500">*</span>
                 </label>
@@ -251,7 +252,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   <option value="SUSPENDED">Suspended</option>
                 </select>
               </div>
-              <div className="col-span-3">
+              <div className="col-span-4 md:col-span-2">
                 <label className="block text-sm font-medium text-gray-700">
                   Category <span className="text-red-500">*</span>
                 </label>
@@ -269,7 +270,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   ))}
                 </select>
               </div>
-              <div className="col-span-3">
+              <div className="col-span-4">
                 <label className="block text-sm font-medium text-gray-700">Images</label>
                 <input
                   type="file"
@@ -278,10 +279,20 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   className="mt-1 block w-full border rounded-md p-2"
                 />
               </div>
-              <div className="col-span-3 grid grid-cols-3 gap-4 mt-4">
+              <div className="col-span-4 grid grid-cols-3 gap-4 mt-4">
                 {previewUrls.map((url, index) => (
                   <div key={index} className="relative w-full h-32">
-                    <img src={url} alt={`Preview ${index + 1}`} className="object-cover w-full h-full rounded-md" />
+                    <Image src={url} alt={`Preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
+                    <button
+                      type="button"
+                      className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                      onClick={() => {
+                        setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
+                        setImages((prev) => prev.filter((_, i) => i !== index));
+                      }}
+                    >
+                      X
+                    </button>
                   </div>
                 ))}
               </div>
