@@ -13,6 +13,7 @@ export class StockRouter {
 
   private initializeRoutes(): void {
     this.router.post('/', this.stockController.addStock);
+    this.router.post('/post-stock-id', this.stockController.postStockId);
     this.router.get('/:stockId', this.stockController.getStock);
   }
 
