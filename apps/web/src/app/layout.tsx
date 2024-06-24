@@ -8,8 +8,9 @@ import { cn } from '@/lib/utils';
 import Providers from './provider';
 import { validateRequest } from '@/lib/auth';
 import { cookies } from 'next/headers';
+import { StoreProvider } from './storeProvider';
 
-export const runtime = 'nodejs' // 'nodejs' (default) | 'edge'
+export const runtime = 'nodejs'; // 'nodejs' (default) | 'edge'
 export const fetchCache = 'default-no-store';
 
 const fontSans = FontSans({
@@ -25,7 +26,6 @@ export const metadata: Metadata = {
   },
 };
 
-
 export default async function RootLayout({
   children,
 }: {
@@ -33,7 +33,7 @@ export default async function RootLayout({
 }) {
   const auth = await validateRequest();
   console.log(auth);
-  
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body
@@ -42,11 +42,13 @@ export default async function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers>
-          <Header />
-          {children}
-          <Footer />
-        </Providers>
+        <StoreProvider>
+          <Providers>
+            <Header />
+            {children}
+            <Footer />
+          </Providers>
+        </StoreProvider>
       </body>
     </html>
   );
