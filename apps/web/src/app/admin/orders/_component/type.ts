@@ -1,3 +1,4 @@
+<<<<<<<< HEAD:apps/web/src/app/admin/orders/_component/type.ts
 export interface Order {
   id: string;
   orderStatus: string;
@@ -20,4 +21,19 @@ export interface Order {
   deletedAt: string;
   updatedAt: string;
   createdAt: string;
+========
+export interface User {
+  id: string;
+  displayName: string;
+  email: string;
+  accountType: string;
+  contactEmail: string;
+  role: string;
+  status: string;
+  referralCode: string;
+  avatarUrl: string;
+  password: string;
+  createdAt: string;
+  updatedAt: string;
+>>>>>>>> develop:apps/web/src/app/admin/users/components/types.ts
 }
