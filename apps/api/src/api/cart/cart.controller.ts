@@ -41,4 +41,13 @@ export class CartController {
       next(error);
     }
   };
+  getCartItemCount: ICallback = async (req, res, next) => {
+    try {
+      const userId = res.locals?.user?.id!;
+      const itemCount = await CartService.getCartItemCount(userId);
+      return res.status(200).json({ status: 'OK', data: itemCount });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

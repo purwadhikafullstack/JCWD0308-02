@@ -15,6 +15,7 @@ export class CartService {
       CartValidation.CART,
       req,
     );
+    console.log('cartRequest:', cartRequest);
     //hanya user yang active dan role user
     const user = await prisma.user.findUnique({
       where: { id: res.locals.user?.id },
@@ -65,6 +66,7 @@ export class CartService {
         userId: user.id,
         stockId: stock.id,
         orderItemType: 'CART_ITEM',
+        isPack: cartRequest.isPack,
         isDeleted: false,
       },
     });
@@ -89,6 +91,7 @@ export class CartService {
         isPack: cartRequest.isPack,
       },
     });
+    console.log('orderItem:', orderItem);
     return orderItem;
   };
 
@@ -143,20 +146,25 @@ export class CartService {
         isDeleted: false,
       },
     });
+
     if (!cartItem) throw new ResponseError(401, 'Item not found in cart!');
 
-    const newQuantity = (cartItem.quantity || 0) + (patchCart.quantity || 0);
-    if (newQuantity === 0) {
+    // Adjust the quantity based on the patchCart.quantity
+    const newQuantity = patchCart.quantity || 0;
+
+    if (newQuantity <= 0) {
       const existingCart = await prisma.orderItem.update({
         where: { id: cartItem.id },
         data: { isDeleted: true },
       });
       return existingCart;
     }
+
     const updatedOrderItem = await prisma.orderItem.update({
       where: { id: cartItem.id },
       data: { quantity: newQuantity, isChecked: true },
     });
+
     return updatedOrderItem;
   };
 
@@ -178,9 +186,13 @@ export class CartService {
       throw new ResponseError(404, 'Cart item not found');
     }
 
-    const deleteCart = await prisma.orderItem.delete({
+    const deleteCart = await prisma.orderItem.update({
       where: {
         id: cartItem.id,
+      },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
       },
     });
     return deleteCart;
@@ -201,11 +213,20 @@ export class CartService {
         isDeleted: false,
       },
       include: {
-        stock: true,
+        stock: {
+          include: {
+            product: { include: { images: true } },
+          },
+        },
         user: true,
       },
     });
 
     return cartItems;
+  };
+
+  static getCartItemCount = async (userId: string) => {
+    const cartItems = await CartService.getCart(userId);
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 }
