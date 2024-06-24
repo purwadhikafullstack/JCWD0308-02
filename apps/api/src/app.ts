@@ -22,6 +22,7 @@ import { AddressRouter } from './api/address/address.router.js';
 import { ProductRouter } from './api/product/product.router.js';
 import { VoucherRouter } from './api/voucher/voucher.router.js';
 import { CategoryRouter } from './api/category/category.router.js';
+import { StoreRouter } from './api/store/store.router.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -67,7 +68,7 @@ export default class App {
     const productRouter = new ProductRouter();
     const voucherRouter = new VoucherRouter();
     const categoryRouter = new CategoryRouter();
-
+    const storeRouter = new StoreRouter();
 
     this.app.get('/', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
@@ -82,6 +83,7 @@ export default class App {
     this.app.use('/api/product', productRouter.getRouter());
     this.app.use('/api/voucher', voucherRouter.getRouter());
     this.app.use('/api/category', categoryRouter.getRouter());
+    this.app.use('/api/store', storeRouter.getRouter());
   }
 
   private handleError(): void {

@@ -1,4 +1,5 @@
 'use client';
+
 import React, { useEffect, useState } from 'react';
 import {
   Table,
@@ -10,19 +11,27 @@ import {
   TableCaption,
 } from '@/components/ui/table';
 import { getAllOrders } from '@/lib/fetch-api/order';
-import { Order } from '../users/components/types';
+import { Order } from './_component/type';
+
 export default function ListOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchOrdersData = async () => {
       setLoading(true);
       setError(null);
       try {
-        const data = await getAllOrders();
-        console.log('data from admin orders:', data);
-        setOrders(data);
+        const response = await getAllOrders();
+        console.log('data from admin orders:', response);
+
+        // Ensure data is an array
+        if (response.status === 'OK' && Array.isArray(response.data)) {
+          setOrders(response.data);
+        } else {
+          throw new Error('Data is not an array or status is not OK');
+        }
       } catch (error) {
         console.error('Error fetching orders:', error);
         setError('Failed to fetch orders');
@@ -33,6 +42,7 @@ export default function ListOrdersPage() {
 
     fetchOrdersData();
   }, []);
+
   return (
     <div className="container mx-auto px-4">
       <h2 className="text-2xl font-bold mb-4">Orders</h2>
@@ -92,10 +102,18 @@ export default function ListOrdersPage() {
                       <TableCell>{order.paymentPicture}</TableCell>
                       <TableCell>{order.storeId}</TableCell>
                       <TableCell>{order.storeAdminId}</TableCell>
-                      <TableCell>{order.isDeleted}</TableCell>
-                      <TableCell>{order.deletedAt}</TableCell>
-                      <TableCell>{order.updatedAt}</TableCell>
-                      <TableCell>{order.createdAt}</TableCell>
+                      <TableCell>{order.isDeleted ? 'Yes' : 'No'}</TableCell>
+                      <TableCell>
+                        {order.deletedAt
+                          ? new Date(order.deletedAt).toLocaleDateString()
+                          : 'N/A'}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(order.updatedAt).toLocaleDateString()}
+                      </TableCell>
+                      <TableCell>
+                        {new Date(order.createdAt).toLocaleDateString()}
+                      </TableCell>
                     </TableRow>
                   ))}
                 </TableBody>

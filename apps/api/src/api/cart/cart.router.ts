@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { CartController } from './cart.controller.js';
 import { AuthMiddleware } from '@/middlewares/auth.middleware.js';
+import multer from 'multer';
 
 export class CartRouter {
   private router: Router;
@@ -13,14 +14,29 @@ export class CartRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', this.cartController.getCart);
+    const upload = multer();
+    this.router.get('/', AuthMiddleware.authed, this.cartController.getCart);
     this.router.post(
       '/add-to-cart',
       AuthMiddleware.authed,
+      upload.none(),
       this.cartController.addToCart,
     );
-    this.router.patch('/update-cart', this.cartController.updateCart);
-    this.router.delete('/:cartId', this.cartController.deleteCart);
+    this.router.patch(
+      '/update-cart',
+      AuthMiddleware.authed,
+      this.cartController.updateCart,
+    );
+    this.router.get(
+      '/item-count',
+      AuthMiddleware.authed,
+      this.cartController.getCartItemCount,
+    );
+    this.router.delete(
+      '/:cartId',
+      AuthMiddleware.authed,
+      this.cartController.deleteCart,
+    );
   }
 
   getRouter(): Router {

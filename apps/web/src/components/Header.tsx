@@ -9,6 +9,7 @@ import {
   ClipboardList,
   MapPin,
   ChevronDown,
+  PackageSearch,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
@@ -17,13 +18,29 @@ import Image from 'next/image';
 import axios from 'axios';
 import SearchBar from './partial/SearchBar';
 import { env } from '@/app/env';
+import { Badge } from './ui/badge';
+import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
+import { RootState } from '@/lib/features/store';
+import { fetchCartItemCount } from '@/lib/features/cart/cartSlice';
 
 export const Header = () => {
   const [state, setState] = useState<boolean>(false);
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const itemCount = useAppSelector((state: RootState) => state.cart.itemCount);
+  console.log(itemCount);
+  const dispatch = useAppDispatch();
+
+  useEffect(() => {
+    dispatch(fetchCartItemCount());
+  }, [dispatch]);
 
   const menus = [
     { title: 'Home', path: '/', icon: <Home className="h-5 w-5" /> },
+    {
+      title: 'Product',
+      path: '/customer/product',
+      icon: <PackageSearch className="h-5 w-5" />,
+    },
     {
       title: 'Notification',
       path: '/customer/notification',
@@ -32,14 +49,38 @@ export const Header = () => {
     {
       title: 'Cart',
       path: '/customer/cart',
-      icon: <ShoppingCart className="h-5 w-5" />,
+      icon: (
+        <div className="relative">
+          <ShoppingCart className="h-5 w-5" />
+          {itemCount > 0 && (
+            <Badge className="absolute -top-2 -right-2">{itemCount}</Badge>
+          )}
+        </div>
+      ),
     },
     {
       title: 'Orders',
       path: '/customer/order',
       icon: <ClipboardList className="h-5 w-5" />,
     },
+    {
+      title: 'Login',
+      path: '/auth/login',
+    },
   ];
+
+  // useEffect(() => {
+  //   const fetchCartItemCount = async () => {
+  //     try {
+  //       const response = await getCartItemCount();
+  //       setCartItemCount(response.data);
+  //     } catch (error) {
+  //       console.error('Error fetching cart item count:', error);
+  //     }
+  //   };
+
+  //   fetchCartItemCount();
+  // }, []);
 
   const handleLogout = async () => {
     try {
