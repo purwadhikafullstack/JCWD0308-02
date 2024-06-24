@@ -101,28 +101,19 @@ export class OrderService {
   };
 
   //for customer
-  static getOrder = async (
-    userId: string,
-    searchParams?: { date: string; orderId?: string; status?: OrderStatus },
-  ) => {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { status: true },
-    });
-    if (!user) throw new ResponseError(401, 'Unauthorized');
-    const { date, orderId, status } = searchParams || {};
-    const whereClause: any = { userId };
-    if (date) {
-      whereClause.createdAt = {
-        gte: new Date(date),
-        lt: new Date(new Date(date).setDate(new Date(date).getDate() + 1)),
-      };
-    }
-    if (orderId) whereClause.orderNumber = orderId;
-    if (status) whereClause.orderStatus = status;
+  static getOrder = async (req: Request, res: Response) => {
+    const userId = res.locals.user?.id;
+    if (!userId) throw new ResponseError(403, 'Unauthorized');
+    const { orderId, orderStatus } = req.query;
+    const filter: any = {
+      userId,
+    };
+    if (orderId) filter.id = String(orderId);
 
-    const order = await prisma.order.findMany({
-      where: whereClause,
+    if (orderStatus) filter.orderStatus = String(orderStatus);
+
+    const orders = await prisma.order.findMany({
+      where: filter,
       include: {
         orderItems: {
           include: {
@@ -138,7 +129,7 @@ export class OrderService {
         createdAt: 'desc',
       },
     });
-    return order;
+    return orders;
   };
 
   static cancelOrder = async (req: OrderId, res: Response) => {

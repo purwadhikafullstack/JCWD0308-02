@@ -14,53 +14,38 @@ export class OrderRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', AuthMiddleware.authed, this.orderController.getOrder);
-    this.router.get(
-      '/store-admin/order/:storeAdminId',
-      AuthMiddleware.storeAdmin,
-      this.orderController.getOrdersByStoreAdmin,
-    );
-    this.router.get(
-      '/super-admin/orders',
-      AuthMiddleware.superAdmin,
-      this.orderController.getAllOrders,
-    );
-    this.router.post(
-      '/add-order',
-      AuthMiddleware.authed,
-      this.orderController.addOrder,
-    );
-    this.router.post(
-      '/cancel-order',
-      AuthMiddleware.authed,
-      this.orderController.cancelOrder,
-    );
-    this.router.post(
-      '/send-order',
-      AuthMiddleware.storeAdmin,
-      this.orderController.sendUserOrders,
-    );
-    this.router.post(
-      '/confirm-order',
-      AuthMiddleware.authed,
-      this.orderController.confirmOrder,
-    );
-    this.router.post(
-      '/cancel-by-admin',
-      AuthMiddleware.storeAdmin,
-      this.orderController.cancelOrderByAdmin,
-    );
-    this.router.patch(
-      '/:orderId/payment-proof',
-      AuthMiddleware.authed,
-      uploader('payment-proof', '').single('proof'),
-      this.orderController.uploadProof,
-    );
-    this.router.post(
-      '/:orderId/confirm',
-      AuthMiddleware.superAdmin,
-      this.orderController.confirmPayment,
-    );
+    const authed = AuthMiddleware.authed;
+    const storeAdmin = AuthMiddleware.storeAdmin;
+    const superAdmin = AuthMiddleware.superAdmin;
+    const upload = uploader('payment-proof', 'orders').single('proof');
+    this.router
+      .route('/')
+      .get(authed, this.orderController.getOrder)
+      .post(authed, this.orderController.addOrder);
+
+    this.router
+      .route('/:orderId/payment-proof')
+      .post(authed, upload, this.orderController.uploadProof);
+
+    this.router
+      .route('/:orderId/cancel')
+      .post(authed, this.orderController.cancelOrder);
+
+    this.router
+      .route('/:orderId/send')
+      .post(storeAdmin, this.orderController.sendUserOrders);
+
+    this.router
+      .route('/:orderId/confirm')
+      .post(authed, this.orderController.confirmOrder);
+
+    this.router
+      .route('/admin/cancel')
+      .post(storeAdmin, this.orderController.cancelOrderByAdmin);
+
+    this.router
+      .route('/admin/orders')
+      .get(superAdmin, this.orderController.getAllOrders);
   }
 
   getRouter(): Router {

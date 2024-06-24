@@ -34,13 +34,7 @@ export class OrderController {
   };
   getOrder: ICallback = async (req, res, next) => {
     try {
-      const userId = res.locals?.user?.id!;
-      const { date, status } = req.query;
-      const orderStatus = status as OrderStatus | undefined;
-      const order = await OrderService.getOrder(userId, {
-        date: date as string,
-        status: orderStatus,
-      });
+      const order = await OrderService.getOrder(req, res);
       return res.status(200).json({ status: 'OK', data: order });
     } catch (error) {
       next(error);
