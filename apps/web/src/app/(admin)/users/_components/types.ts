@@ -7,7 +7,7 @@ export interface User {
   role: string;
   status: string;
   referralCode: string;
-  avatarUrl: string;
+  avatarUrl?: string;
   password: string;
   createdAt: string;
   updatedAt: string;

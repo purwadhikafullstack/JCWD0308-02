@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User } from '@/app/admin/users/components/types';
+import { User } from '@/app/(admin)/users/_components/types';
 
 interface EditFormProps {
   user: User;

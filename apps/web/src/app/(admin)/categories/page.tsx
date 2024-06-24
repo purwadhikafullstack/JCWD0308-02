@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { fetchCategories, deleteCategory, updateCategory, createCategory } from '@/lib/fetch-api/category';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import { Category } from './components/types';
-import CreateForm from './components/createform';
-import EditForm from './components/editform';
-import Modal from '@/components/modal/popout';
+import { Category } from './_components/types';
+import CreateForm from './_components/createform';
+import EditForm from './_components/editform';
+import { Toaster, toast } from '@/components/ui/sonner';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -16,8 +16,6 @@ const CategoryList = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [creatingCategory, setCreatingCategory] = useState<boolean>(false);
-  const [modalContent, setModalContent] = useState<string | null>(null);
-  const [modalError, setModalError] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCategoryData = async () => {
@@ -44,33 +42,35 @@ const CategoryList = () => {
 
   const handleCreate = async (categoryData: { name: string }) => {
     try {
-      // Create a Category object with placeholder values for missing properties
       const newCategory: Category = { id: '', superAdminId: '', ...categoryData };
       const createdCategory = await createCategory(newCategory);
       setCategories([createdCategory, ...categories]);
       setCreatingCategory(false);
-      setModalContent('Category created successfully!');
-      setModalError(false);
+      toast.success('Category created successfully!', {
+        className: 'bg-green-500 text-white',
+      });
     } catch (error) {
       console.error('Error creating category:', error);
-      setModalContent('Failed to create category');
-      setModalError(true);
+      toast.error('Failed to create category', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
   const handleUpdate = async (categoryData: { id: string, name: string }) => {
     try {
-      // Construct the Category object for update
       const updatedCategory: Category = { ...selectedCategory!, ...categoryData };
       const result = await updateCategory(categoryData.id, updatedCategory);
       setCategories(categories.map(cat => (cat.id === result.id ? result : cat)));
       setSelectedCategory(null);
-      setModalContent('Category updated successfully!');
-      setModalError(false);
+      toast.success('Category updated successfully!', {
+        className: 'bg-green-500 text-white',
+      });
     } catch (error) {
       console.error('Error updating category:', error);
-      setModalContent('Failed to update category');
-      setModalError(true);
+      toast.error('Failed to update category', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
@@ -78,18 +78,15 @@ const CategoryList = () => {
     try {
       await deleteCategory(id);
       setCategories(categories.filter(category => category.id !== id));
-      setModalContent('Category deleted successfully!');
-      setModalError(false);
+      toast.success('Category deleted successfully!', {
+        className: 'bg-green-500 text-white',
+      });
     } catch (error) {
       console.error('Error deleting category:', error);
-      setModalContent('Failed to delete category');
-      setModalError(true);
+      toast.error('Failed to delete category', {
+        className: 'bg-red-500 text-white',
+      });
     }
-  };
-
-  const closeModal = () => {
-    setModalContent(null);
-    setModalError(false);
   };
 
   if (loading) {
@@ -102,6 +99,7 @@ const CategoryList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Toaster />
       <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">Categories</h2>
       <Button onClick={() => setCreatingCategory(true)} className="mb-4">
         Create Category
@@ -139,9 +137,6 @@ const CategoryList = () => {
           onSave={handleUpdate}
           onCancel={() => setSelectedCategory(null)}
         />
-      )}
-      {modalContent && (
-        <Modal message={modalContent} onClose={closeModal} isError={modalError} />
       )}
     </div>
   );

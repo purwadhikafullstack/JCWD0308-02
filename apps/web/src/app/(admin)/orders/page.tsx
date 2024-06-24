@@ -10,7 +10,7 @@ import {
   TableCaption,
 } from '@/components/ui/table';
 import { getAllOrders } from '@/lib/fetch-api/order';
-import { Order } from '../users/components/types';
+import { Order } from '../users/_components/types';
 export default function ListOrdersPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(true);

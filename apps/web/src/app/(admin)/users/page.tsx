@@ -10,10 +10,11 @@ import {
   TableCell,
   TableCaption,
 } from '@/components/ui/table';
-import EditForm from './components/editform';
-import CreateForm from './components/createform';
-import { User } from '@/app/admin/users/components/types';
+import EditForm from './_components/editform';
+import CreateForm from './_components/createform';
+import { User } from '@/app/(admin)/users/_components/types';
 import { Button } from '@/components/ui/button';
+import { Toaster, toast } from '@/components/ui/sonner';
 
 const Users = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -21,7 +22,7 @@ const Users = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [creatingUser, setCreatingUser] = useState<boolean>(false);
-  const [updateFlag, setUpdateFlag] = useState<boolean>(false); // Added state to trigger useEffect
+  const [updateFlag, setUpdateFlag] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -30,7 +31,7 @@ const Users = () => {
 
       try {
         const data = await fetchUsers();
-        setUsers(data.users.sort((a: User, b: User) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())); // Sort users by most recent
+        setUsers(data.users.sort((a: User, b: User) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
       } catch (error) {
         console.error('Error fetching users:', error);
         setError('Failed to fetch users');
@@ -40,7 +41,7 @@ const Users = () => {
     };
 
     fetchUserData();
-  }, [updateFlag]); // Adding updateFlag as a dependency
+  }, [updateFlag]);
 
   const handleEdit = (user: User) => {
     setSelectedUser(user);
@@ -49,41 +50,48 @@ const Users = () => {
   const handleUpdate = async (id: string, updatedUser: Partial<User>) => {
     try {
       const { avatarUrl, password, ...userToUpdate } = updatedUser;
-
-      console.log('Updating user:', userToUpdate);
       await updateUser(id, userToUpdate);
-      console.log('Updated user:', userToUpdate);
-      
       setSelectedUser(null);
-      setUpdateFlag(prev => !prev); // Toggle updateFlag to trigger useEffect
-      alert('User updated successfully');
+      setUpdateFlag(prev => !prev);
+      toast.success('User updated successfully', {
+        className: 'bg-green-500 text-white',
+      });
     } catch (error) {
       console.error('Error updating user:', error);
-      alert('Failed to update user');
+      toast.error('Failed to update user', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
   const handleCreate = async (newUser: Omit<User, 'id' | 'referralCode' | 'createdAt' | 'updatedAt'> & { password: string }) => {
     try {
-      const createdUser = await createUser(newUser);
-      console.log('Created user:', createdUser);
+      await createUser(newUser);
       setCreatingUser(false);
-      setUpdateFlag(prev => !prev); // Toggle updateFlag to trigger useEffect
-      alert('User created successfully');
+      setUpdateFlag(prev => !prev);
+      toast.success('User created successfully', {
+        className: 'bg-green-500 text-white',
+      });
     } catch (error) {
       console.error('Error creating user:', error);
-      alert('Failed to create user');
+      toast.error('Failed to create user', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
   const handleDelete = async (id: string) => {
     try {
       await deleteUser(id);
-      alert('User deleted successfully');
       setUsers(users.filter(user => user.id !== id));
+      toast.success('User deleted successfully', {
+        className: 'bg-green-500 text-white',
+      });
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('Failed to delete user');
+      toast.error('Failed to delete user', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
@@ -148,6 +156,7 @@ const Users = () => {
           </>
         )}
       </div>
+      <Toaster />
     </div>
   );
 };

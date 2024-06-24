@@ -5,7 +5,7 @@ export interface Product {
     description: string;
     price: number;
     packPrice: number;
-    images: { imageUrl: string }[]; // Ensure images is an array of objects with imageUrl property
+    images: { imageUrl: string }[];
     discountPrice?: number;
     discountPackPrice?: number;
     packQuantity?: number;

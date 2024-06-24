@@ -9,7 +9,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { User } from '@/app/admin/users/components/types';
+import { User } from '@/app/(admin)/users/_components/types';
 
 
 
@@ -30,7 +30,6 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
     email: '',
     contactEmail: '',
     password: '',
-    avatarUrl: '',
     accountType: 'EMAIL',
     role: 'SUPER_ADMIN',
     status: 'ACTIVE'

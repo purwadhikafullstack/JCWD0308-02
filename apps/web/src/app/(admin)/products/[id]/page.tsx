@@ -1,8 +1,9 @@
-"use client"
-import React, { useEffect, useState } from 'react';
+"use client";
+import React, { useCallback, useEffect, useState } from 'react';
+import { useRouter, usePathname } from 'next/navigation';
 import { fetchProductById, updateProduct, deleteProduct } from '@/lib/fetch-api/product';
-import EditForm from '../components/editform';
-import { Product } from '../components/types';
+import EditForm from '../_components/editform';
+import { Product } from '../_components/types';
 import { Button } from '@/components/ui/button';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import {
@@ -13,30 +14,45 @@ import {
   CarouselNext,
 } from '@/components/ui/carousel';
 import Image from 'next/image';
+import { Toaster, toast } from '@/components/ui/sonner';
 
 const ProductDetail = () => {
-  const id = window.location.pathname.split('/').pop();
+  const router = useRouter();
+  const pathname = usePathname();
+  const id = pathname.split('/').pop(); 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isUpdated, setIsUpdated] = useState<boolean>(false);
 
-  useEffect(() => {
+  const fetchProduct = useCallback(async () => {
     if (id) {
-      const fetchProduct = async () => {
-        try {
-          const productData = await fetchProductById(id);
-          setProduct(productData);
-        } catch (error) {
-          setError('Failed to fetch product');
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchProduct();
+      try {
+        setLoading(true);
+        const productData = await fetchProductById(id);
+        setProduct(productData);
+      } catch (error) {
+        setError('Failed to fetch product');
+        toast.error('Failed to fetch product', {
+          className: 'bg-red-500 text-white',
+        });
+      } finally {
+        setLoading(false);
+      }
     }
   }, [id]);
+
+  useEffect(() => {
+    fetchProduct();
+  }, [fetchProduct]);
+
+  useEffect(() => {
+    if (isUpdated) {
+      fetchProduct();
+      setIsUpdated(false);
+    }
+  }, [isUpdated, fetchProduct]);
 
   const handleEdit = (product: Product) => {
     setEditingProduct(product);
@@ -44,13 +60,19 @@ const ProductDetail = () => {
 
   const handleUpdate = async (updatedProduct: FormData) => {
     try {
-      const product = await updateProduct(updatedProduct.get('id') as string, updatedProduct);
-      setProduct(product);
-      setEditingProduct(null);
-      alert('Product updated successfully');
+      await updateProduct(id as string, updatedProduct);
+      toast.success('Product updated successfully', {
+        className: 'bg-green-500 text-white',
+      });
+      setTimeout(() => {
+        setIsUpdated(true);
+        setEditingProduct(null);
+      }, 500); // Delay to ensure the toast is shown
     } catch (error) {
       console.error('Error updating product:', error);
-      alert('Failed to update product');
+      toast.error('Failed to update product', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
@@ -58,11 +80,17 @@ const ProductDetail = () => {
     if (!id) return;
     try {
       await deleteProduct(id);
-      alert('Product deleted successfully');
-      window.location.href = '/admin/product';
+      toast.success('Product deleted successfully', {
+        className: 'bg-green-500 text-white',
+      });
+      setTimeout(() => {
+        router.push('/products'); // Use router.push to navigate
+      }, 1000); // Delay to ensure the toast is shown
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert('Failed to delete product');
+      toast.error('Failed to delete product', {
+        className: 'bg-red-500 text-white',
+      });
     }
   };
 
@@ -80,6 +108,7 @@ const ProductDetail = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <Toaster />
       <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">{product.title}</h2>
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <Carousel className="relative w-full h-64" opts={{ loop: true }}>
@@ -106,11 +135,11 @@ const ProductDetail = () => {
           <p className="text-md text-gray-600 mb-2"><strong>Slug:</strong> {product.slug}</p>
           <p className="text-md text-gray-600 mb-2"><strong>Description:</strong> {product.description}</p>
           <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.price.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.price?.toLocaleString() ?? 'N/A'}</p>
             <p className="text-lg font-semibold text-green-500">Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}</p>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.packPrice.toLocaleString()}</p>
+            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.packPrice?.toLocaleString() ?? 'N/A'}</p>
             <p className="text-lg font-semibold text-green-500">Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}</p>
           </div>
           <p className="text-md text-gray-600 mb-2"><strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'} units</p>
