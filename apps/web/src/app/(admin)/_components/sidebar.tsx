@@ -1,53 +1,73 @@
 'use client';
-import React from 'react';
+
+import {
+  Boxes,
+  LayoutGrid,
+  LineChart,
+  Package,
+  PanelsTopLeft,
+  ShoppingCart,
+  Store,
+  Ticket,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import Image from 'next/image';
-import { Home, User, Settings, Bell, LogOut, ListOrdered } from 'lucide-react';
+import React from 'react';
 
-const Sidebar = () => {
+export const menu = [
+  {
+    title: 'Dashboard',
+    path: '/dashboard',
+    icon: <PanelsTopLeft className="h-4 w-4" />,
+  },
+  {
+    title: 'Analytics',
+    path: '/dashboard/analytics',
+    icon: <LineChart className="h-4 w-4" />,
+  },
+  {
+    title: 'Orders',
+    path: '/dashboard/orders',
+    icon: <ShoppingCart className="h-4 w-4" />,
+  },
+  {
+    title: 'Stocks',
+    path: '/dashboard/stocks',
+    icon: <Boxes className="h-4 w-4" />,
+  },
+  {
+    title: 'Stores',
+    path: '/dashboard/stores',
+    icon: <Store className="h-4 w-4" />,
+  },
+  {
+    title: 'Products',
+    path: '/dashboard/products',
+    icon: <Package className="h-4 w-4" />,
+  },
+  {
+    title: 'Categories',
+    path: '/dashboard/categories',
+    icon: <LayoutGrid className="h-4 w-4" />,
+  },
+  { title: 'Vouchers', path: '/orders', icon: <Ticket className="h-4 w-4" /> },
+];
+
+const SidebarMenu = () => {
   const pathname = usePathname();
-  const menus = [
-    { title: 'Dashboard', path: '/dashboard', icon: <Home /> },
-    { title: 'Users', path: '/users', icon: <User /> },
-    { title: 'Products', path: '/products', icon: <Settings /> },
-    { title: 'Categories', path: '/categories', icon: <Bell /> },
-    { title: 'User Orders', path: '/orders', icon: <ListOrdered /> },
-
-  ];
-
-  return (
-    <aside className="w-64 bg-white shadow-lg">
-      <div className="p-4 border-b">
-        <Link href="/admin/dashboard">
-          <Image
-            src="/logo-grosirun-fix.png"
-            alt="Logo"
-            width={40}
-            height={40}
-            className="h-10 mx-auto"
-          />
-        </Link>
-      </div>
-      <nav className="mt-6">
-        <ul>
-          {menus.map((menu, index) => (
-            <li
-              key={index}
-              className={`p-4 ${pathname === menu.path ? 'bg-gray-200' : ''}`}
-            >
-              <Link href={menu.path}>
-                <div className="flex items-center space-x-3">
-                  <div className="w-5 h-5">{menu.icon}</div>
-                  <span>{menu.title}</span>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </aside>
-  );
+  return menu.map((item, index) => (
+    <React.Fragment key={index}>
+      <Link
+        href={item.path}
+        className={`
+          flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary 
+          ${pathname === item.path ? 'text-primary bg-muted' : ''}`}
+      >
+        {item.icon}
+        {item.title}
+      </Link>
+    </React.Fragment>
+  ));
 };
 
-export default Sidebar;
+export default SidebarMenu;

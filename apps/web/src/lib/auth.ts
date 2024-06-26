@@ -10,7 +10,7 @@ import fetchSSR from "./fetchSSR";
 
 export interface User {
 	id: string;
-	display_name: string;
+	displayName: string;
 	role: string;
 }
 
@@ -102,4 +102,12 @@ const superAdmin = cache(async () => {
 	return request
 })
 
-export const protectedRoute = { authenticated, storeAdmin, superAdmin, noAuthOnly }
+const user = cache(async () => {
+	const request = await authenticated()
+	if (!(request.user.role === "USER")) {
+		return redirect('/')
+	}
+	return request
+})
+
+export const protectedRoute = { authenticated, storeAdmin, superAdmin, noAuthOnly, user }
