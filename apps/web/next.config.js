@@ -5,7 +5,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "**",
+        hostname: "localhost",
       },
       {
         protocol: "https",
@@ -13,6 +13,15 @@ const nextConfig = {
       },
     ],
   },
+  redirects: () => {
+    return [
+      {
+        source: '/auth/login',
+        destination: '/auth/signin',
+        permanent: false
+      }
+    ]
+  }
 }
 
 module.exports = nextConfig
