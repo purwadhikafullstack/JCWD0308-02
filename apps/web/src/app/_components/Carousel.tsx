@@ -34,7 +34,7 @@ export default function CarouselComponent() {
           ))}
         </CarouselContent>
         <CarouselPrevious className="absolute left-[-10px] top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-lg z-10" />
-        <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-lg z-10" />
+        <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white p-2 rounded-full shadow-lg" />
       </Carousel>
     </div>
   );

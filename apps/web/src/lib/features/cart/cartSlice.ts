@@ -1,7 +1,4 @@
-import {
-  CartItemType,
-  CartRequestType,
-} from '@/app/customer/cart/_component/type';
+
 import {
   deleteCart,
   getCart,
@@ -10,6 +7,7 @@ import {
   getCartItemCount,
 } from '@/lib/fetch-api/cart';
 import { postStockId } from '@/lib/fetch-api/stock';
+import { CartItemType } from '@/lib/types/cart';
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CartSlice {

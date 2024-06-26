@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import { Inter as FontSans } from 'next/font/google';
 import './globals.css';
-import { Header } from '@/components/Header';
-import { Footer } from '@/components/Footer';
-
 import { cn } from '@/lib/utils';
 import Providers from './provider';
 import { validateRequest } from '@/lib/auth';
-import { cookies } from 'next/headers';
 import { StoreProvider } from './storeProvider';
+import { getQueryClient } from './get-query-client';
+import { getUserProfile } from '@/lib/fetch-api/user/server';
+import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 
 export const runtime = 'nodejs'; // 'nodejs' (default) | 'edge'
 export const fetchCache = 'default-no-store';
@@ -33,6 +32,12 @@ export default async function RootLayout({
 }) {
   const auth = await validateRequest();
   console.log(auth);
+  const queryClient = getQueryClient();
+
+  void queryClient.prefetchQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -44,9 +49,9 @@ export default async function RootLayout({
       >
         <StoreProvider>
           <Providers>
-            <Header />
-            {children}
-            <Footer />
+            <HydrationBoundary state={dehydrate(queryClient)}>
+              {children}
+            </HydrationBoundary>
           </Providers>
         </StoreProvider>
       </body>
