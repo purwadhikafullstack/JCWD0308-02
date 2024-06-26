@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { fetchProductById, updateProduct, deleteProduct } from '@/lib/fetch-api/product';
 import EditForm from '../_components/editform';
-import { Product } from '../../../../../lib/types/product';
 import { Button } from '@/components/ui/button';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import {
@@ -15,6 +14,7 @@ import {
 } from '@/components/ui/carousel';
 import Image from 'next/image';
 import { Toaster, toast } from '@/components/ui/sonner';
+import { Product } from '@/lib/types/product';
 
 const ProductDetail = () => {
   const router = useRouter();

@@ -12,6 +12,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Category } from '@/lib/types/category';
 
+
 const updateCategorySchema = z.object({
   name: z.string().min(1, 'Name is required'),
 });

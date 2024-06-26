@@ -5,21 +5,21 @@ export interface Product {
   description: string;
   price: number;
   packPrice: number;
-  images: ProductImage[];
+  images: { imageUrl: string }[];
   discountPrice?: number;
   discountPackPrice?: number;
-  packQuantity: number;
+  packQuantity?: number;
   bonus?: number;
+  minOrderItem?: number;
   weight: number;
   weightPack: number;
-  minOrderItem?: number;
   superAdminId: string;
   status: 'DRAFT' | 'PUBLISHED' | 'INACTIVE' | 'SUSPENDED';
   categoryId: string;
   resetDiscountCode?: string;
   resetDiscountAt?: Date;
-  updatedAt: Date;
-  createdAt: Date;  
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface ProductImage {

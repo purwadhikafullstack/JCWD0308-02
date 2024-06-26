@@ -13,14 +13,11 @@ export class StoreRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get(
-      '/:storeId',
-      AuthMiddleware.authed,
-      this.storeController.getStore,
-    );
+    this.router.get('/', this.storeController.getAllStores);
+    this.router.get('/:storeId', this.storeController.getStore);
   }
 
-  getRouter(): Router {
+  public getRouter(): Router {
     return this.router;
   }
 }

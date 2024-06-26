@@ -8,7 +8,7 @@ import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import CreateForm from './_components/createform';
 import EditForm from './_components/editform';
 import { Toaster, toast } from '@/components/ui/sonner';
-import { Category } from "@/lib/types/category";
+import { Category } from '@/lib/types/category';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState<Category[]>([]);

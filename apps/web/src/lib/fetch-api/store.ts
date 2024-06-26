@@ -9,3 +9,13 @@ export const getStore = async (storeId: string) => {
   );
   return response.data;
 };
+
+export const getAllStores = async () => {
+  const response = await axios.get(
+    `http://localhost:8000/api/store`,
+    {
+      withCredentials: true,
+    },
+  );
+  return response.data;
+};
