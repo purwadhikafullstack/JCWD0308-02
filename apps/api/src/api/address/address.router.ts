@@ -14,6 +14,7 @@ export class AddressRouter {
 
   private initializeRoutes(): void {
     this.router.post('/', this.addressController.addAddress);
+    this.router.get('/', this.addressController.getAddressById);
   }
 
   getRouter(): Router {

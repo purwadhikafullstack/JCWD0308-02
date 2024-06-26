@@ -11,4 +11,12 @@ export class AddressController {
       next(error);
     }
   };
+  getAddressById: ICallback = async (req, res, next) => {
+    try {
+      const address = await AddressService.getAddressById(res);
+      return res.status(200).json({ status: 'OK', data: address });
+    } catch (error) {
+      next(error);
+    }
+  };
 }
