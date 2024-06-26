@@ -15,10 +15,11 @@ export class UserRouter {
 
   private initializeRoutes(): void {
     this.router.get('/', AuthMiddleware.superAdmin, this.userController.getUsers);
+    this.router.get('/profile', AuthMiddleware.authed, this.userController.getUserProfile);
     this.router.get('/:id', AuthMiddleware.authed, this.userController.getUserById);
-    this.router.post('/', AuthMiddleware.superAdmin, this.userController.createUserByAdmin); 
-    this.router.put('/:id', AuthMiddleware.superAdmin, this.userController.updateUserByAdmin); 
-    this.router.delete('/:id', AuthMiddleware.superAdmin, this.userController.deleteUserByAdmin); 
+    this.router.post('/', AuthMiddleware.superAdmin, this.userController.createUserByAdmin);
+    this.router.put('/:id', AuthMiddleware.superAdmin, this.userController.updateUserByAdmin);
+    this.router.delete('/:id', AuthMiddleware.superAdmin, this.userController.deleteUserByAdmin);
   }
 
   getRouter(): Router {

@@ -3,6 +3,7 @@ import { prisma } from '@/db.js';
 import { UserFields } from '@/types/user.type.js';
 import { UserService } from './user.service.js';
 import { lucia } from '@/auth.lucia.js';
+import { ResponseError } from '@/utils/error.response.js';
 
 export class UserController {
 
@@ -25,6 +26,24 @@ export class UserController {
     }
 
     return res.status(200).json(user);
+  }
+
+  getUserProfile: ICallback = async (req, res, next) => {
+    try {
+      if (!res.locals.user) throw new ResponseError(401, "Unauthorized")
+      const user = await prisma.user.findUnique({
+        where: { id: res.locals.user.id },
+        select: { ...UserFields },
+      });
+
+      if (!user) {
+        return res.status(404);
+      }
+
+      return res.status(200).json({ status: "Ok", user });
+    } catch (error) {
+      next(error)
+    }
   }
 
   createUserByAdmin: ICallback = async (req, res, next) => {

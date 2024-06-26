@@ -36,3 +36,5 @@ export interface CreateUserRequest {
   role : UserRole
   status : UserStatus
 }
+
+export type IUserProfile = typeof UserFields
