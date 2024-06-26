@@ -10,7 +10,7 @@ import SidebarMenu from './_components/sidebar';
 import { AvatarDropdown } from '@/components/shared/avatar-dropdown';
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await protectedRoute.superAdmin();
+  const session = await protectedRoute.storeAdmin();
 
   console.log(session);
 

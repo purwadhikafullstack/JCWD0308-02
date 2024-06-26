@@ -70,6 +70,7 @@ export default class App {
     const categoryRouter = new CategoryRouter();
     const storeRouter = new StoreRouter();
 
+
     this.app.get('/', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
     });

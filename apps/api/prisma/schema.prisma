@@ -289,9 +289,11 @@ model Stock {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@unique([storeId, productId])
+
   //relation
-  product   Product         @relation(fields: [productId], references: [id])
-  store     Store           @relation(fields: [storeId], references: [id])
+  product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  store     Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
   mutations StockMutation[]
   OrderItem OrderItem[]
 
@@ -310,9 +312,9 @@ model StockMutation {
   createdAt    DateTime     @default(now()) @map("created_at")
 
   //relation
-  stock Stock  @relation(fields: [stockId], references: [id])
+  stock Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
   admin User?  @relation("AdminStockMutations", fields: [adminId], references: [id], onDelete: Cascade)
-  order Order? @relation("OrderStockMutations", fields: [orderId], references: [id])
+  order Order? @relation("OrderStockMutations", fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("stock_mutation")
 }
@@ -344,7 +346,7 @@ model Order {
   orderItems    OrderItem[]
   user          User            @relation("UserOrders", fields: [userId], references: [id], onDelete: Cascade)
   storeAdmin    User?           @relation("StoreAdminOrders", fields: [storeAdminId], references: [id], onDelete: Cascade)
-  store         Store?          @relation(fields: [storeId], references: [id])
+  store         Store?          @relation(fields: [storeId], references: [id], onDelete: Cascade)
   StockMutation StockMutation[] @relation("OrderStockMutations")
 
   @@map("orders")
@@ -367,8 +369,8 @@ model OrderItem {
 
   //relation
   user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  order Order? @relation(fields: [orderId], references: [id])
-  stock Stock  @relation(fields: [stockId], references: [id])
+  order Order? @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  stock Stock  @relation(fields: [stockId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }
@@ -412,7 +414,7 @@ model UserVoucher {
   createdAt   DateTime @default(now()) @map("created_at")
 
   //relation
-  voucher Voucher @relation(fields: [voucherId], references: [id])
+  voucher Voucher @relation(fields: [voucherId], references: [id], onDelete: Cascade)
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_vouchers")
