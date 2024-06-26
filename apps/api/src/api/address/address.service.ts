@@ -34,4 +34,12 @@ export class AddressService {
       throw new ResponseError(404, 'Stock not found!');
     }
   };
+
+  static getAddressById = async (res: Response) => {
+    const userId = res.locals.user?.id;
+    const addresses = await prisma.userAddress.findMany({
+      where: { userId },
+    });
+    return addresses;
+  };
 }

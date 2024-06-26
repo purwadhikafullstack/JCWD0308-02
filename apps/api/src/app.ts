@@ -23,6 +23,7 @@ import { ProductRouter } from './api/product/product.router.js';
 import { VoucherRouter } from './api/voucher/voucher.router.js';
 import { CategoryRouter } from './api/category/category.router.js';
 import { StoreRouter } from './api/store/store.router.js';
+import { ShippingRouter } from './api/shipping/shipping.router.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -32,7 +33,6 @@ export default class App {
   private app: Express;
 
   constructor() {
-    console.log('in constructor');
     this.app = express();
     this.configure();
     this.routes();
@@ -40,7 +40,6 @@ export default class App {
   }
 
   private configure(): void {
-    console.log('configure');
     this.app.use(
       cors({
         origin: [API_URL, WEB_URL], // Specify your frontend's URL
@@ -58,7 +57,6 @@ export default class App {
   }
 
   private routes(): void {
-    console.log('routes');
     const userRouter = new UserRouter();
     const authRouter = new AuthRouter();
     const cartRouter = new CartRouter();
@@ -69,6 +67,7 @@ export default class App {
     const voucherRouter = new VoucherRouter();
     const categoryRouter = new CategoryRouter();
     const storeRouter = new StoreRouter();
+    const shippingRouter = new ShippingRouter();
 
 
     this.app.get('/', (req: Request, res: Response) => {
@@ -85,10 +84,10 @@ export default class App {
     this.app.use('/api/voucher', voucherRouter.getRouter());
     this.app.use('/api/category', categoryRouter.getRouter());
     this.app.use('/api/store', storeRouter.getRouter());
+    this.app.use('/api/shipping', shippingRouter.getRouter());
   }
 
   private handleError(): void {
-    console.log('handleError');
     this.app.use(errorMiddleware);
     // not found
     this.app.use((req: Request, res: Response, next: NextFunction) => {
@@ -112,7 +111,6 @@ export default class App {
     );
   }
   public start(): void {
-    console.log('pong');
     this.app
       .listen(PORT, () => {
         console.log(`  ➜  [API] Local:   http://localhost:${PORT}/`);

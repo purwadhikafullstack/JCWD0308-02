@@ -1,46 +1,18 @@
+import { API_URL } from './lib';
 import axios from 'axios';
+const URL = `${API_URL}/shipping`;
 
-export const calculateShippingCost = async (
-  origin: number,
-  destination: number,
-  weight: number,
-  courier: string,
-) => {
-  const url = 'https://api.rajaongkir.com/starter/cost';
-  const apiKey = process.env.API_KEY;
-
-  if (!apiKey) {
-    console.error('There is no API KEY');
-    return;
-  }
-
-  const headers = {
-    key: apiKey,
-    'Content-Type': 'application/x-www-form-urlencoded',
-  };
-
-  const body = new URLSearchParams({
-    origin: String(origin),
-    destination: String(destination),
-    weight: String(weight),
-    courier,
-  });
-
-  console.log('Request Body:', body.toString());
-
+export const calculateShippingCost = async (data: any) => {
   try {
-    const response = await axios.post(url, body, { headers });
-    console.log('Response Status:', response.status);
-
-    const data = response.data;
-    console.log(data);
-
-    const cost = data.rajaongkir.results[0].costs[0].cost[0].value;
-    const estimation = data.rajaongkir.results[0].costs[0].cost[0].etd;
-
-    return { cost, estimation };
+    console.log('Sending request to backend:', data);
+    const response = await axios.post(URL, data, {
+      headers: { 'Content-Type': 'application/json' },
+      withCredentials: true,
+    });
+    console.log('Response from backend:', response.data);
+    return response.data;
   } catch (error) {
-    console.error('Error calculating shipping cost:', error);
+    console.error('Failed to fetch shipping cost:', error);
     throw error;
   }
 };

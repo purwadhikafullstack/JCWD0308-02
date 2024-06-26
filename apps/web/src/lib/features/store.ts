@@ -1,8 +1,10 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import cartReducer from './cart/cartSlice';
+import addressReducer from './address/addressSlice';
 
 const rootReducer = combineReducers({
   cart: cartReducer,
+  address: addressReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

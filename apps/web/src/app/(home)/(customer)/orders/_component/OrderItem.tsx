@@ -6,18 +6,16 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
+import { CartItemType } from '@/lib/types/cart';
 
 interface CartItemProps {
-  cart: any;
+  cart: CartItemType;
 }
 const OrderItem: React.FC<CartItemProps> = ({ cart }) => {
-  //   console.log('cart title:', cart.title);
-  //   console.log('cart desc:', cart.description);
-  //   console.log(cart);
   return (
     <div>
       <Card
-        key={cart.id}
+        key={`${cart.id}-${cart.isPack}`}
         className="bg-card text-card-foreground shadow-lg rounded-lg"
       >
         <CardHeader className="p-4">
