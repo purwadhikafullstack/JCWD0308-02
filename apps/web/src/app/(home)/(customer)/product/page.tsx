@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { getStore } from '@/lib/fetch-api/store';
 import { Product } from '../../../../lib/types/product';
 import { addCart } from '@/lib/fetch-api/cart';
-import { useAppDispatch } from '@/lib/features/hooks';
+import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
 import { addCartItem, addToCart } from '@/lib/features/cart/cartSlice';
 import { CartRequestType } from '../../../../lib/types/cart';
+import { selectSelectedAddressId } from '@/lib/features/address/addressSlice';
 
 export default function ProductPage() {
   const [selectedLocation, setSelectedLocation] = useState('');
@@ -15,6 +16,7 @@ export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const storeId = 'ce276990-0f7c-442e-8972-f7c8bc2e714d';
   const dispatch = useAppDispatch();
+  const selectAddressId = useAppSelector(selectSelectedAddressId);
 
   useEffect(() => {
     const fetchStoreData = async () => {
@@ -47,7 +49,7 @@ export default function ProductPage() {
         productId,
         quantity: 1,
         isPack,
-        addressId: '11663abf-7a5b-4fa2-8503-53104311e924',
+        addressId: selectAddressId ?? ``,
       };
       // Dispatching addCartItem directly with cartRequest
       dispatch(addCartItem(cartRequest))

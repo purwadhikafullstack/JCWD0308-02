@@ -8,37 +8,39 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { calculateShippingCost } from '@/lib/fetch-api/shipping';
-const Summary = () => {
-  const [shippingCost, setShippingCost] = useState<number | null>(null);
-  const [shippingEstimation, setShippingEstimation] = useState<string | null>(
-    null,
-  );
-  const [nearestStore, setNearestStore] = useState<string>('');
-  const [userAddress, setUserAddress] = useState<string>('');
-  const [weight, setWeight] = useState<number>();
-  const [shippingCourier, setShippingCourier] = useState<string>('');
+import { formatCurrency } from '@/lib/currency';
 
-  // useEffect(() => {
-  //     const calculateTotals = async () => {
-  //       try {
-  //         const { cost, estimation } = await calculateShippingCost(
-  //           nearestStore,
-  //           userAddress,
-  //           weight,
-  //           shippingCourier
-  //         );
-  //         setShippingCost(cost);
-  //       } catch (error) {
-  //         console.error('Failed to calculate shipping:', error);
-  //       }
-  //     };
+interface SummaryProps {
+  selectedItems: any[];
+  selectedAddress: any;
+  shippingCost: number | null;
+}
+const Summary: React.FC<SummaryProps> = ({
+  selectedItems,
+  selectedAddress,
+  shippingCost,
+}) => {
+  console.log(selectedItems);
+  const calculateSubtotal = () => {
+    let subtotal = 0;
+    selectedItems.forEach((item) => {
+      let itemPrice = item.isPack
+        ? item.stock.product.packPrice
+        : item.stock.product.price;
 
-  //     if (shippingCourier && userAddress) {
-  //       calculateTotals();
-  //     }
-  //   }, [shippingCourier, userAddress, nearestStore, weight]);
+      if (item.quantity && typeof itemPrice === 'number' && !isNaN(itemPrice)) {
+        subtotal += item.quantity * itemPrice;
+      } else {
+        console.warn(`Invalid item found: ${JSON.stringify(item)}`);
+      }
+    });
+    return subtotal;
+  };
 
+  const subtotal = calculateSubtotal();
+  const total = (shippingCost || 0) + subtotal;
+
+  console.log(subtotal);
   return (
     <Card className="bg-card text-card-foreground shadow-lg flex flex-col h-full rounded-lg">
       <CardHeader className="bg-primary text-primary-foreground rounded-t-lg">
@@ -48,19 +50,17 @@ const Summary = () => {
         <h1 className="text-2xl font-bold mb-4">Order Details</h1>
         <div className="flex justify-between mb-2">
           <span>Subtotal</span>
-          <span>$45.00</span>
-        </div>
-        <div className="flex justify-between mb-2">
-          <span>Tax</span>
-          <span>$3.60</span>
+          <span>{formatCurrency(subtotal)}</span>
         </div>
         <div className="flex justify-between mb-2">
           <span>Shipping</span>
-          <span>$5.00</span>
+          <span>
+            {shippingCost !== null ? formatCurrency(shippingCost) : 0}
+          </span>
         </div>
         <div className="flex justify-between font-bold text-lg">
           <span>Total</span>
-          <span>$53.60</span>
+          <span>{formatCurrency(total)}</span>
         </div>
         <hr className="my-4 border-primary" />
         <h1 className="text-2xl font-bold mb-4">Shipping Information</h1>
@@ -70,7 +70,10 @@ const Summary = () => {
         </div>
         <div className="flex justify-between mb-2">
           <span>Address</span>
-          <span className="ml-3">Jalan jalani saja dulu no.sekian</span>
+          <span className="ml-3">
+            {' '}
+            {selectedAddress ? selectedAddress.address : 'No address selected'}
+          </span>
         </div>
         <h1 className="text-2xl font-bold mb-4">Customer Information</h1>
         <div className="flex justify-between mb-2">

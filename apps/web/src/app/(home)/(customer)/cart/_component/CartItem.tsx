@@ -20,15 +20,18 @@ import {
 } from '@/lib/features/cart/cartSlice';
 import { RootState } from '@/lib/features/store';
 import { formatCurrency } from '@/lib/currency';
+import { CartItemType } from '@/lib/types/cart';
 
 interface CartItemProps {
-  cart: any;
+  cart: CartItemType;
+  isSelected: boolean;
+  onSelect: (itemId: string) => void;
 }
-const CartItem: React.FC<CartItemProps> = ({ cart }) => {
+const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
   const error = useAppSelector((state: RootState) => state.cart.error);
-  // Synchronize local quantity state with Redux state
+
   useEffect(() => {
     setQuantity(cart.quantity);
   }, [cart.quantity]);
@@ -84,7 +87,12 @@ const CartItem: React.FC<CartItemProps> = ({ cart }) => {
       <Card className="flex flex-col bg-card text-card-foreground shadow-md mb-4">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Checkbox id={cart.id} />
+            <Checkbox
+              id={cart.id}
+              checked={isSelected}
+              onCheckedChange={() => onSelect(cart.id)}
+              onChange={() => onSelect(cart.id)}
+            />
             <label
               htmlFor={cart.id}
               className="text-xl font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-3"
