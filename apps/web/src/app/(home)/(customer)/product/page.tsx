@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from 'react';
 import { CardItem } from './_component/CardItem';
 import { Button } from '@/components/ui/button';
-import { getStore } from '@/lib/fetch-api/store';
-import { Product } from '../../../../lib/types/product';
+import { getStore } from '@/lib/fetch-api/store/client';
+import { Product } from '@/lib/types/product';
 import { addCart } from '@/lib/fetch-api/cart';
 import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
 import { addCartItem, addToCart } from '@/lib/features/cart/cartSlice';
@@ -22,7 +22,7 @@ export default function ProductPage() {
     const fetchStoreData = async () => {
       try {
         const storeData = await getStore(storeId);
-        const { stocks } = storeData.data;
+        const { stocks } = storeData.store;
         const fetchedProducts = stocks.map((stock: any) => stock.product);
         setProducts(fetchedProducts);
       } catch (error) {

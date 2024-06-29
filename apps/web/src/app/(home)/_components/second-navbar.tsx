@@ -26,7 +26,7 @@ export default function SecondNavbar() {
   return (
     <div>
       <hr />
-      <div className="address flex justify-between mx-5 p-2 bg-background">
+      <div className="hidden sm:flex container mx-auto address justify-between p-2 bg-background">
         <p className="flex items-center gap-2">
           <ChevronDown className="h-5 w-5" />
           From <strong>Grosirun Pusat</strong>

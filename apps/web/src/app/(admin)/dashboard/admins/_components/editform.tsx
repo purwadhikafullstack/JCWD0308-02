@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from '@/lib/types/user';
+import { StoreSelector } from '@/app/(admin)/_components/store-selector';
 
 interface EditFormProps {
   user: User;
@@ -123,6 +124,12 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                   readOnly
                   className="mt-1 block w-full border rounded-md p-2 bg-gray-100 cursor-not-allowed"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Store
+                </label>
+                <StoreSelector disable={formData.role === "SUPER_ADMIN"} className='mt-1' />
               </div>
             </div>
             <CardFooter className="mt-4 flex justify-end space-x-4">

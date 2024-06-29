@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'; 
 import { fetchStocks, createStock } from '@/lib/fetch-api/stock';
 import { fetchProducts } from '@/lib/fetch-api/product';
-import { getAllStores } from '@/lib/fetch-api/store';
 import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/partial/SearchBar';
 import CreateForm from './_components/createform';
@@ -14,6 +13,8 @@ import { Toaster, toast } from '@/components/ui/sonner';
 import { Stock } from '@/lib/types/stock';
 import { Product } from '@/lib/types/product';
 import { Store } from '@/lib/types/store';
+import { getAllStores } from '@/lib/fetch-api/store/client';
+import { StoreSelector } from '@/app/(admin)/_components/store-selector';
 
 const StockList = () => {
   const router = useRouter();
@@ -145,7 +146,8 @@ const StockList = () => {
         </Button>
         <div className="flex space-x-4">
           <div className="w-48">
-            <Select onValueChange={handleStoreFilterChange}>
+            <StoreSelector />
+            {/* <Select onValueChange={handleStoreFilterChange}>
               <SelectTrigger aria-label="Store Filter">
                 <SelectValue placeholder="Select a store" />
               </SelectTrigger>
@@ -160,7 +162,7 @@ const StockList = () => {
                   ))}
                 </SelectGroup>
               </SelectContent>
-            </Select>
+            </Select> */}
           </div>
         </div>
       </div>

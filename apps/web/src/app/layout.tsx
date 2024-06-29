@@ -8,6 +8,10 @@ import { StoreProvider } from './storeProvider';
 import { getQueryClient } from './get-query-client';
 import { getUserProfile } from '@/lib/fetch-api/user/server';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { getStores } from '@/lib/fetch-api/store/server';
+import { Toaster } from '@/components/ui/sonner';
+import { getProvinces } from '@/lib/fetch-api/province/server';
+import { getCities } from '@/lib/fetch-api/city/server';
 
 export const runtime = 'nodejs'; // 'nodejs' (default) | 'edge'
 export const fetchCache = 'default-no-store';
@@ -34,10 +38,27 @@ export default async function RootLayout({
   console.log(auth);
   const queryClient = getQueryClient();
 
-  void queryClient.prefetchQuery({
+  queryClient.prefetchQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,
   });
+
+  
+  queryClient.prefetchQuery({
+    queryKey: ["stores"],
+    queryFn: getStores
+  })
+
+  
+  queryClient.prefetchQuery({
+    queryKey: ["provinces"],
+    queryFn: getProvinces
+  })
+  
+  queryClient.prefetchQuery({
+    queryKey: ["cities", 0],
+    queryFn: () => getCities(0)
+  })
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -51,6 +72,7 @@ export default async function RootLayout({
           <Providers>
             <HydrationBoundary state={dehydrate(queryClient)}>
               {children}
+              <Toaster />
             </HydrationBoundary>
           </Providers>
         </StoreProvider>

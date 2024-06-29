@@ -18,73 +18,99 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Check, ChevronsUpDown, Store } from 'lucide-react';
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { getSelectedStore, getStores } from '@/lib/fetch-api/store/client';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { useRouter } from 'next/navigation';
+import { changeStore } from './action';
 
-const frameworks = [
-  {
-    value: 'GrosiRunp',
-    label: 'GrosiRun Pusat',
-  },
-  {
-    value: 'GrosiRunBDG',
-    label: 'GrosiRun Bandung',
-  },
-  {
-    value: 'GrosiRunJKT',
-    label: 'GrosiRun Jakarta',
-  },
-  {
-    value: 'GrosiRunBSD',
-    label: 'GrosiRun BSD',
-  },
-  {
-    value: 'GrosiRunDPK',
-    label: 'GrosiRun Depok',
-  },
-];
-export const StoreSelector = () => {
+export const StoreSelector = ({ storeId, className, disable }: { storeId?: string, className?: string, disable?: boolean }) => {
+  const router = useRouter();
+  const stores = useSuspenseQuery({
+    queryKey: ['stores'],
+    queryFn: getStores,
+  });
+
+  const selectedStore = useSuspenseQuery({
+    queryKey: ['store'],
+    queryFn: getSelectedStore,
+  });
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
+
   const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState('GrosiRunp');
+
+  const superAdminOnly = userProfile.data?.user?.role === 'SUPER_ADMIN';
+
+  const handleChangeStore = useMutation({
+    mutationFn: async (storeId: string) => {
+      await changeStore(storeId);
+    },
+  });
+
+  // if(!selectedStore.data.store) {
+  //   // router.refresh()
+  //   router.push('/auth/signin')
+  // }
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
+          disabled={!superAdminOnly || disable}
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-full justify-between"
+          className={cn("w-full justify-between", className)}
         >
-          <div className='flex items-center gap-2'>
+          <div className="flex items-center gap-2">
             <Store className="h-4 w-4" />
-            {value
-              ? frameworks.find((framework) => framework.value === value)?.label
-              : 'Select framework...'}
+            <span className='max-w-28 truncate'>
+              {selectedStore?.data?.store?.id
+                ? stores.data.stores.find(
+                    (store) => store.id === selectedStore?.data?.store?.id,
+                  )?.name
+                : 'Select store...'}
+            </span>
           </div>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>
-          <CommandInput placeholder="Search framework..." />
+          <CommandInput placeholder="Search store..." />
           <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
+            <CommandEmpty>No store found.</CommandEmpty>
             <CommandGroup>
-              {frameworks.map((framework) => (
+              {stores.data.stores.map((store) => (
                 <CommandItem
-                  key={framework.value}
-                  value={framework.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? '' : currentValue);
+                  key={store.id}
+                  value={store.id}
+                  onSelect={async (currentValue) => {
+                    console.log('hi');
+
+                    // setValue(currentValue === value ? (selectedStore.data.store.id || '') : currentValue);
+                    await handleChangeStore.mutateAsync(
+                      currentValue === selectedStore?.data?.store?.id
+                        ? selectedStore?.data?.store?.id || ''
+                        : currentValue,
+                    );
+                    console.log('hi');
                     setOpen(false);
                   }}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      value === framework.value ? 'opacity-100' : 'opacity-0',
+                      selectedStore?.data?.store?.id === store.id
+                        ? 'opacity-100'
+                        : 'opacity-0',
                     )}
                   />
-                  {framework.label}
+                  {store.name}
                 </CommandItem>
               ))}
             </CommandGroup>

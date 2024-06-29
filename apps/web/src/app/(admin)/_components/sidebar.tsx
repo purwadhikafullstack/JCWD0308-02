@@ -9,6 +9,7 @@ import {
   ShoppingCart,
   Store,
   Ticket,
+  Users,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -39,6 +40,11 @@ export const menu = [
     title: 'Stores',
     path: '/dashboard/stores',
     icon: <Store className="h-4 w-4" />,
+  },
+  {
+    title: 'Admins',
+    path: '/dashboard/admins',
+    icon: <Users className="h-4 w-4" />,
   },
   {
     title: 'Products',
