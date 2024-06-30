@@ -1,25 +1,27 @@
-"use client";
+"use client"
 import React, { useEffect, useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'; 
-import { fetchStocks, createStock } from '@/lib/fetch-api/stock';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import { fetchStocks, createStock, deleteStock } from '@/lib/fetch-api/stock';
 import { fetchProducts } from '@/lib/fetch-api/product';
-import { Button } from '@/components/ui/button';
 import SearchBar from '@/components/partial/SearchBar';
-import CreateForm from './_components/createform';
 import Pagination from '@/components/partial/pagination';
-import StockCard from './_components/stockcard';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Toaster, toast } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/sonner';
+
 import { Stock } from '@/lib/types/stock';
 import { Product } from '@/lib/types/product';
 import { Store } from '@/lib/types/store';
+import { showSuccess } from '@/components/toast/toastutils';
+import { handleApiError } from '@/components/toast/errorapi';
 import { getAllStores } from '@/lib/fetch-api/store/client';
-import { StoreSelector } from '@/app/(admin)/_components/store-selector';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import CreateForm from './_components/createform';
+import StockTable from './_components/stocktable';
 
 const StockList = () => {
   const router = useRouter();
-  const pathname = usePathname(); 
-  const searchParams = useSearchParams(); 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [stores, setStores] = useState<Store[]>([]);
@@ -38,7 +40,6 @@ const StockList = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const [stockData, productData, storeData] = await Promise.all([
           fetchStocks(page, limit, filters),
@@ -47,24 +48,14 @@ const StockList = () => {
         ]);
         setStocks(stockData.stocks || []);
         setTotal(stockData.total || 0);
-        // setProducts(productData.products || []);
-        setStores(storeData.data || []);  // Mengubah untuk mengambil `data` dari storeData
-
-        console.log('Stocks:', stockData.stocks);
-        console.log('Products:', productData.products);
-        console.log('Stores:', storeData.data);
-
+        setProducts(productData.products || []);
+        setStores(storeData.data || []);
       } catch (error) {
-        console.error('Error fetching data:', error);
-        setError('Failed to fetch data');
-        toast.error('Failed to fetch data', {
-          className: 'bg-red-500 text-white',
-        });
+        handleApiError(error, 'Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
-
     fetchData();
   }, [page, limit, filters, updateFlag]);
 
@@ -79,21 +70,26 @@ const StockList = () => {
   const handleCreate = async (newStock: any) => {
     try {
       const createdStock = await createStock(newStock);
-      toast.success('Stock created successfully', {
-        className: 'bg-green-500 text-white',
-      });
+      showSuccess('Stock created successfully');
       setUpdateFlag(!updateFlag);
       setCreatingStock(false);
     } catch (error) {
-      console.error('Error creating stock:', error);
-      toast.error('Failed to create stock', {
-        className: 'bg-red-500 text-white',
-      });
+      handleApiError(error, 'Failed to create stock');
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteStock(id);
+      showSuccess('Stock deleted successfully');
+      setUpdateFlag(!updateFlag);
+    } catch (error) {
+      handleApiError(error, 'Failed to delete stock');
     }
   };
 
   const handleTitleClick = (id: string) => {
-    router.push(`/stocks/${id}`);
+    router.push(`/dashboard/stocks/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -109,7 +105,7 @@ const StockList = () => {
     setFilters({ ...filters, search: query });
     const params = new URLSearchParams(searchParams);
     params.set('search', query);
-    params.set('page', '1'); // Reset to the first page when searching
+    params.set('page', '1');
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
@@ -129,7 +125,7 @@ const StockList = () => {
     } else {
       params.delete('storeId');
     }
-    params.set('page', '1'); // Reset to the first page when filtering
+    params.set('page', '1');
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
@@ -146,8 +142,7 @@ const StockList = () => {
         </Button>
         <div className="flex space-x-4">
           <div className="w-48">
-            <StoreSelector />
-            {/* <Select onValueChange={handleStoreFilterChange}>
+            <Select onValueChange={handleStoreFilterChange}>
               <SelectTrigger aria-label="Store Filter">
                 <SelectValue placeholder="Select a store" />
               </SelectTrigger>
@@ -162,7 +157,7 @@ const StockList = () => {
                   ))}
                 </SelectGroup>
               </SelectContent>
-            </Select> */}
+            </Select>
           </div>
         </div>
       </div>
@@ -172,15 +167,11 @@ const StockList = () => {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {stocks.map((stock) => (
-              <StockCard
-                key={stock.id}
-                stock={stock}
-                onTitleClick={() => handleTitleClick(stock.id)}
-              />
-            ))}
-          </div>
+          <StockTable
+            stocks={stocks}
+            handleTitleClick={handleTitleClick}
+            handleDelete={handleDelete}
+          />
           {creatingStock && (
             <CreateForm onCreate={handleCreate} onCancel={() => setCreatingStock(false)} products={products} stores={stores} />
           )}

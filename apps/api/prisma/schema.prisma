@@ -42,7 +42,7 @@ enum VoucherType {
 }
 
 enum DiscountType {
-  FIXED_DISCOUnt
+  FIXED_DISCOUNT
   DISCOUNT
 }
 
@@ -84,7 +84,7 @@ enum PaymentMethod {
 // Define the models
 model User {
   id               String      @id @default(uuid())
-  providerId         String?     @unique @map("provider_id")
+  providerId       String?     @unique @map("provider_id")
   accountType      AccountType @default(EMAIL) @map("account_type")
   email            String?     @unique
   contactEmail     String?     @map("contact_email")
@@ -113,6 +113,7 @@ model User {
   categories       Category[]      @relation("SuperAdminCategories")
   StoreAdminOrders Order[]         @relation("StoreAdminOrders")
   adminVouchers    Voucher[]       @relation("AdminVouchers")
+  storeAdminVouchers Voucher[]     @relation("StoreAdminVouchers")
   sessions         Session[]
 
   @@map("users")
@@ -205,6 +206,7 @@ model Store {
   orders      Order[]
   superAdmin  User         @relation("SuperAdminStores", fields: [superAdminId], references: [id])
   City        City         @relation(fields: [cityId], references: [id])
+  vouchers    Voucher[]    @relation("StoreVouchers")
 
   @@map("stores")
 }
@@ -289,7 +291,7 @@ model Stock {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@unique([storeId, productId])
+  @@unique([storeId, productId], name: "stock_store_id_product_id_key")
 
   //relation
   product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
@@ -380,7 +382,9 @@ model Voucher {
   name          String
   code          String?      @unique
   description   String?
-  superAdminId  String       @map("super_admin_id")
+  superAdminId  String?      @map("super_admin_id")
+  storeAdminId  String?      @map("store_admin_id")
+  storeId       String?      @map("store_id")
   isClaimable   Boolean      @default(false) @map("is_claimable")
   isPrivate     Boolean      @default(false) @map("is_private")
   voucherType   VoucherType  @map("voucher_type")
@@ -394,11 +398,13 @@ model Voucher {
   expiresAt     DateTime     @map("expires_at")
   updatedAt     DateTime     @updatedAt @map("updated_at")
   createdAt     DateTime     @default(now()) @map("created_at")
+  imageUrl      String?      @map("image_url")
 
   //relation
-  superAdmin   User          @relation("AdminVouchers", fields: [superAdminId], references: [id], onDelete: Cascade)
-  userVouchers UserVoucher[]
-  // User         User
+  superAdmin    User?          @relation("AdminVouchers", fields: [superAdminId], references: [id], onDelete: Cascade)
+  storeAdmin    User?          @relation("StoreAdminVouchers", fields: [storeAdminId], references: [id], onDelete: Cascade)
+  store         Store?         @relation("StoreVouchers", fields: [storeId], references: [id], onDelete: Cascade)
+  userVouchers  UserVoucher[]
 
   @@map("vouchers")
 }

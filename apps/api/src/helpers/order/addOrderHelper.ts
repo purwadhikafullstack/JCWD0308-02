@@ -53,7 +53,7 @@ export const applyVoucherDiscount = async (
     );
   }
 
-  if (voucher.discountType === 'FIXED_DISCOUnt') {
+  if (voucher.discountType === 'FIXED_DISCOUNT') {
     totalPrice -= voucher.fixedDiscount || 0;
   } else if (voucher.discountType === 'DISCOUNT') {
     totalPrice -= (totalPrice * (voucher.discount || 0)) / 100;

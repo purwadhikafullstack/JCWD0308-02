@@ -94,17 +94,6 @@ export class AuthHelper {
       (await this.getGitHubUserData(token)).json(),
       (await this.getGitHubUserEmail(token)).json(),
     ]);
-    // const githubUserResponse = await fetch('https://api.github.com/user', {
-    //   headers: { Authorization: `Bearer ${token}` },
-    // });
-    // const githubUserEmailResponse = await fetch(
-    //   'https://api.github.com/user/emails',
-    //   {
-    //     headers: { Authorization: `Bearer ${token}` },
-    //   },
-    // );
-    // const githubUser = await githubUserResponse.json();
-    // const githubUserEmail = await githubUserEmailResponse.json();
 
     return {
       accountType: 'GITHUB',

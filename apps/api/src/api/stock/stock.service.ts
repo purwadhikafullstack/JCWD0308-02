@@ -11,8 +11,8 @@ export class StockService {
 
     if (search) {
       where.OR = [
-        { product: { title: { contains: search, mode: 'insensitive' } } },
-        { store: { name: { contains: search, mode: 'insensitive' } } },
+        { product: { title: { contains: search } } },
+        { store: { name: { contains: search } } },
       ];
     }
     if (storeId) {
@@ -37,7 +37,10 @@ export class StockService {
       where: { id },
       include: {
         product: { select: { title: true } },
-        store: { select: { name: true } },
+        store: { select: { name: true } }, 
+        mutations: {
+          orderBy: { createdAt: 'desc' },
+        },
       },
     });
 
@@ -178,4 +181,5 @@ export class StockService {
 
     return stock.id;
   };
+
 }
