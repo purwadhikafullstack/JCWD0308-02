@@ -48,9 +48,7 @@ export class UserController {
 
   createUserByAdmin: ICallback = async (req, res, next) => {
     try {
-      const user = await UserService.createUser(req.body)
-
-
+      const user = await UserService.createUser(req.body, res)
       return res
         .status(201)
         .json({ status: "OK", message: "Good Job Admin! New User Created!", user })
@@ -62,7 +60,7 @@ export class UserController {
   updateUserByAdmin: ICallback = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const user = await UserService.updateUser(id, req.body);
+      const user = await UserService.updateUser(id, req.body, res);
 
       return res.status(200).json({ status: "OK", message: "User Updated Successfully", user });
     } catch (error) {

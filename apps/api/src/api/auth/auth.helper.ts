@@ -1,7 +1,7 @@
 import { GITHUB_OAUTH_URL, GOOGLE_OAUTH_URL, NODE_ENV } from '@/config.js';
 import { prisma } from '@/db.js';
 import { AccountType, Prisma } from '@prisma/client';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { generateId } from 'lucia';
 import { CookieAttributes, parseCookies, serializeCookie } from 'oslo/cookie';
 
@@ -61,6 +61,16 @@ export class AuthHelper {
     return fetch(`${GITHUB_OAUTH_URL}/user`, {
       headers: { Authorization: `Bearer ${token}` },
     });
+  };
+
+  static setStoreIdCookie = (res: Response, storeId: string) => {
+    res.appendHeader("Set-Cookie", serializeCookie('storeId', storeId!, {
+      path: '/',
+      secure: NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'lax',
+    }))
   };
 
   static getGoogleUserData = async (token: string) => {

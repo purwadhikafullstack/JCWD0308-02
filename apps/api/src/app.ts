@@ -8,6 +8,7 @@ import express, {
   NextFunction,
 } from 'express';
 import cors from 'cors';
+import cookieParser from "cookie-parser";
 import path from 'path';
 import { API_URL, PORT, WEB_URL } from './config.js';
 import { AuthMiddleware } from './middlewares/auth.middleware.js';
@@ -24,6 +25,8 @@ import { VoucherRouter } from './api/voucher/voucher.router.js';
 import { CategoryRouter } from './api/category/category.router.js';
 import { StoreRouter } from './api/store/store.router.js';
 import { ShippingRouter } from './api/shipping/shipping.router.js';
+import { ProvinceRouter } from './api/province/province.router.js';
+import { CityRouter } from './api/city/city.router.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -47,9 +50,12 @@ export default class App {
       }),
     );
     this.app.use(json({ limit: '10mb' }));
+    this.app.use(cookieParser());
     this.app.use(urlencoded({ extended: true, limit: '10mb' }));
     this.app.use(morganMiddleware);
     this.app.use(AuthMiddleware.identifyRequest);
+    this.app.use(AuthMiddleware.identifyStoreAdmin);
+    this.app.use(AuthMiddleware.identifySuperAdmin);
     this.app.use(
       '/public',
       express.static(path.join(__dirname, '../../api/public')),
@@ -68,6 +74,8 @@ export default class App {
     const categoryRouter = new CategoryRouter();
     const storeRouter = new StoreRouter();
     const shippingRouter = new ShippingRouter();
+    const proviceRouter = new ProvinceRouter();
+    const cityRouter = new CityRouter();
 
 
     this.app.get('/', (req: Request, res: Response) => {
@@ -83,8 +91,10 @@ export default class App {
     this.app.use('/api/product', productRouter.getRouter());
     this.app.use('/api/voucher', voucherRouter.getRouter());
     this.app.use('/api/category', categoryRouter.getRouter());
-    this.app.use('/api/store', storeRouter.getRouter());
+    this.app.use('/api/stores', storeRouter.getRouter());
     this.app.use('/api/shipping', shippingRouter.getRouter());
+    this.app.use('/api/province', proviceRouter.getRouter());
+    this.app.use('/api/city', cityRouter.getRouter());
   }
 
   private handleError(): void {

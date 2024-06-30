@@ -13,7 +13,7 @@ import {
 import EditForm from './_components/editform';
 import CreateForm from './_components/createform';
 import { Button } from '@/components/ui/button';
-import { Toaster, toast } from '@/components/ui/sonner';
+import { toast } from '@/components/ui/sonner';
 import { User } from '@/lib/types/user';
 
 const Users = () => {
@@ -156,7 +156,6 @@ const Users = () => {
           </>
         )}
       </div>
-      <Toaster />
     </div>
   );
 };

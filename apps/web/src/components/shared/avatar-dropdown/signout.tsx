@@ -8,17 +8,18 @@ import { useRouter } from 'next/navigation';
 
 export const Signout = () => {
   const router = useRouter();
-  const { mutate } = useMutation({
+  const { mutateAsync } = useMutation({
     mutationFn: signout,
     onSuccess: () => {
+      router.refresh();
       router.push('/auth/signin');
     },
   });
   return (
     <form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
-        mutate();
+        await mutateAsync();
       }}
       className="flex-1"
       method="POST"

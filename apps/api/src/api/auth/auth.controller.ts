@@ -3,8 +3,11 @@ import { AuthService } from './auth.service.js';
 import { github, google, lucia } from '@/auth.lucia.js';
 import { ResponseError } from '@/utils/error.response.js';
 import { generateCodeVerifier, generateState } from 'arctic';
-import { WEB_URL } from '@/config.js';
+import { NODE_ENV, WEB_URL } from '@/config.js';
 import { AuthHelper, createOAuthCookie } from './auth.helper.js';
+import { StoreService } from '../store/store.service.js';
+import { prisma } from '@/db.js';
+import { serializeCookie } from 'oslo/cookie';
 
 export class AuthController {
   createUserByEmail: ICallback = async (req, res, next) => {
@@ -31,6 +34,16 @@ export class AuthController {
 
       const session = await lucia.createSession(user!.id, {});
 
+      if (user?.role === "STORE_ADMIN") {
+        const store = await prisma.storeAdmin.findUnique({ where: { storeAdminId: user!.id } })
+        AuthHelper.setStoreIdCookie(res, store?.storeId!)
+      }
+
+      if (user?.role === "SUPER_ADMIN") {
+        const store = await prisma.store.findFirst({ orderBy: { createdAt: 'asc' } })
+        AuthHelper.setStoreIdCookie(res, store?.id!)
+      }
+
       return res
         .status(200)
         .appendHeader(
@@ -55,6 +68,7 @@ export class AuthController {
           'Set-Cookie',
           lucia.createBlankSessionCookie().serialize(),
         )
+        .clearCookie('storeId')
         .json({ status: 'OK', message: 'Signout Success' });
     } catch (error) {
       next(error);

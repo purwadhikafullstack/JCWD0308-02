@@ -6,6 +6,8 @@ import {
   setSelectedAddressId,
 } from '@/lib/features/address/addressSlice';
 import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { ChevronDown, MapPin } from 'lucide-react';
 import React, { useEffect } from 'react';
 
@@ -23,10 +25,17 @@ export default function SecondNavbar() {
     dispatch(setSelectedAddressId(addressId));
   };
 
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
+
+  if (userProfile.data?.user.role !== 'USER') return null;
+
   return (
     <div>
       <hr />
-      <div className="address flex justify-between mx-5 p-2 bg-background">
+      <div className="hidden sm:flex container mx-auto address justify-between p-2 bg-background">
         <p className="flex items-center gap-2">
           <ChevronDown className="h-5 w-5" />
           From <strong>Grosirun Pusat</strong>

@@ -17,6 +17,7 @@ export const lucia = new Lucia(adapter, {
     return {
       displayName: attributes.displayName,
       role: attributes.role,
+      status: attributes.status,
     }
   }
 })

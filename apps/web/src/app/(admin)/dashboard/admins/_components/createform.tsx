@@ -9,8 +9,8 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User } from '@/lib/types/user';
-
-
+import { StoreSelector } from '@/app/(admin)/_components/store-selector';
+import { Label } from '@/components/ui/label';
 
 interface CreateFormProps {
   onCreate: (
@@ -31,7 +31,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
     password: '',
     accountType: 'EMAIL',
     role: 'SUPER_ADMIN',
-    status: 'ACTIVE'
+    status: 'ACTIVE',
   });
 
   const handleChange = (
@@ -157,6 +157,12 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
                   <option value="INACTIVE">Inactive</option>
                   <option value="SUSPENDED">Suspended</option>
                 </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Store
+                </label>
+                <StoreSelector disable={formData.role === "SUPER_ADMIN"} className='mt-1' />
               </div>
             </div>
             <CardFooter className="mt-4 flex justify-end space-x-4">
