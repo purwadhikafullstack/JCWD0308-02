@@ -1,11 +1,14 @@
-"use client";
 import React, { useEffect } from 'react';
+import { useForm, FormProvider } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useFormData } from './useformdata';
 import FormFields from './formfields';
 import { Product } from '@/lib/types/product';
 import { Store } from '@/lib/types/store';
+import { FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { stockSchema } from './validation';
 
 interface CreateFormProps {
   onCreate: (stock: any) => void;
@@ -15,53 +18,98 @@ interface CreateFormProps {
 }
 
 const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel, products, stores }) => {
-  const { formData, handleChange, setFormData } = useFormData({
-    storeId: '',
-    productId: '',
-    amount: 0,
-    description: '',
+  const methods = useForm({
+    resolver: zodResolver(stockSchema),
+    defaultValues: {
+      storeId: stores.length > 0 ? stores[0].id : '',
+      productId: products.length > 0 ? products[0].id : '',
+      amount: '',
+      description: '',
+    }
   });
+
+  const { setValue, handleSubmit, formState: { errors } } = methods;
 
   useEffect(() => {
     if (products.length > 0) {
-      setFormData((prev: typeof formData) => ({
-        ...prev,
-        productId: products[0].id,
-      }));
+      setValue('productId', products[0].id);
     }
     if (stores.length > 0) {
-      setFormData((prev: typeof formData) => ({
-        ...prev,
-        storeId: stores[0].id,
-      }));
+      setValue('storeId', stores[0].id);
     }
-  }, [products, stores, setFormData]);
+  }, [products, stores, setValue]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Convert amount to number before submitting
+  const handleProductChange = (value: string) => {
+    setValue('productId', value);
+  };
+
+  const handleStoreChange = (value: string) => {
+    setValue('storeId', value);
+  };
+
+  const onSubmit = (data: any) => {
     const updatedFormData = {
-      ...formData,
-      amount: parseInt(formData.amount as unknown as string, 10),
+      ...data,
+      amount: parseInt(data.amount, 10),
     };
     onCreate(updatedFormData);
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <Card className="w-[900px]">
+    <div className="fixed inset-0 flex items-center justify-center">
+      <Card>
         <CardHeader>
           <CardTitle>Create Stock</CardTitle>
           <CardDescription>Fill in the details to create a new stock.</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit}>
-            <FormFields formData={formData} handleChange={handleChange} products={products} stores={stores} />
-            <CardFooter className="mt-4 flex justify-end space-x-4">
-              <Button type="button" onClick={onCancel} className="px-4 py-2 border rounded bg-gray-300">Cancel</Button>
-              <Button type="submit" className="px-4 py-2 border rounded bg-blue-500 text-white">Create</Button>
-            </CardFooter>
-          </form>
+          <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)}>
+              <FormItem>
+                <FormLabel>Product</FormLabel>
+                <FormControl>
+                  <Select onValueChange={handleProductChange} defaultValue={products[0].id} >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a product"  />
+                    </SelectTrigger>
+                    <SelectContent >
+                      {products.map((product) => (
+                        <SelectItem key={product.id} value={product.id} >
+                          {product.title} 
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                {errors.productId && <FormMessage>{errors.productId.message}</FormMessage>}
+              </FormItem>
+              <FormItem>
+                <FormLabel>Store</FormLabel>
+                <FormControl>
+                  <Select onValueChange={handleStoreChange} defaultValue={stores[0].id}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a store" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {stores.map((store) => (
+                        <SelectItem key={store.id} value={store.id} >
+                          {store.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                {errors.storeId && <FormMessage>{errors.storeId.message}</FormMessage>}
+              </FormItem>
+              <FormFields />
+              <CardFooter className="mt-4 flex justify-center space-x-4">
+                <Button type="button" onClick={onCancel} variant="secondary">
+                  Cancel
+                </Button>
+                <Button type="submit">Create</Button>
+              </CardFooter>
+            </form>
+          </FormProvider>
         </CardContent>
       </Card>
     </div>
