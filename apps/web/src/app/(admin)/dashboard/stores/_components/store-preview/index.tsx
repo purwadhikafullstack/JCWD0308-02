@@ -1,58 +1,19 @@
 'use client';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from '@/components/ui/pagination';
-import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getSelectedStore } from '@/lib/fetch-api/store/client';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { Store } from '@/lib/types/store';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CopyIcon,
-  CreditCardIcon,
-  FileIcon,
-  Link2,
-  ListFilterIcon,
-  MoveVerticalIcon,
-  TruckIcon,
-} from 'lucide-react';
+import { Link2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-// import UpdateStore from '../update-store';
 const UpdateStore = dynamic(() => import('../update-store'), { ssr: false });
 
 export default function StorePreview({ store }: { store: Store }) {

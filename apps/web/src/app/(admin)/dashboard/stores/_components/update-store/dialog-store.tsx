@@ -1,11 +1,8 @@
-import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UpdateStoreForm } from './store-form';

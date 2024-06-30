@@ -1,45 +1,41 @@
 'use client';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Progress } from '@/components/ui/progress';
-import {
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { getStoreAdmin, getStores } from '@/lib/fetch-api/store/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { FileIcon, ListFilterIcon } from 'lucide-react';
-import Image from 'next/image';
 import React from 'react';
 import StoreAdminItem from './store-admin-item';
-import { useParams } from 'next/navigation';
+import { StoreAdmin } from '@/lib/types/store';
+import fetchAPI from '@/lib/fetchAPI';
+import { env } from '@/app/env';
 
-export default function StoreAdminList() {
-  const params = useParams();
+export default function StoreAdminList({
+  header,
+  storeId,
+}: {
+  storeId: string;
+  header: Headers;
+}) {
   const storeAdmins = useSuspenseQuery({
-    queryKey: ['store', params.storeId, 'admin'],
-    queryFn: () => getStoreAdmin(params.storeId as string),
+    queryKey: ['store', storeId, 'admin'],
+    queryFn: async (): Promise<{ admins: StoreAdmin[] | null }> =>
+      (
+        await fetchAPI(
+          `${env.NEXT_PUBLIC_BASE_API_URL}/stores/${storeId}/admin?client=true`,
+          { headers: header },
+        )
+      ).json(),
   });
   return (
     <Card x-chunk="dashboard-06-chunk-0">
