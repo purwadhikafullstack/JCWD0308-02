@@ -1,6 +1,5 @@
 import {
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -18,26 +17,15 @@ import { getProvinces } from '@/lib/fetch-api/province/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { SetStateAction } from 'react';
 import { UseFormReturn } from 'react-hook-form';
+import { FormSchema } from '../validation';
+import { z } from 'zod';
 
 export default function FieldProvince({
   setProvinceId,
   errorMessage,
   form,
 }: {
-  form: UseFormReturn<
-    {
-      address: string;
-      name: string;
-      slug: string;
-      file: FileList;
-      status: 'DRAFT' | 'INACTIVE' | 'PUBLISHED' | 'SUSPENDED';
-      provinceId: string;
-      cityId: string;
-      coordinate: string;
-    },
-    any,
-    undefined
-  >;
+  form: UseFormReturn<z.input<typeof FormSchema>>
   errorMessage: string[] | undefined;
   setProvinceId: (value: SetStateAction<number>) => void
 }) {

@@ -6,7 +6,6 @@ import {
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from '@/components/ui/drawer';
 import { CreateStoreForm } from './store-form';
 import { ScrollArea } from '@/components/ui/scroll-area';

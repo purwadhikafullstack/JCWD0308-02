@@ -9,6 +9,8 @@ import {
 import { Input } from '@/components/ui/input';
 import Map from '@/components/ui/map';
 import { UseFormReturn } from 'react-hook-form';
+import { FormSchema } from '../validation';
+import { z } from 'zod';
 
 export default function FieldCoordinate({
   latitude,
@@ -16,20 +18,7 @@ export default function FieldCoordinate({
   errorMessage,
   form,
 }: {
-  form: UseFormReturn<
-    {
-      address: string;
-      name: string;
-      slug: string;
-      file: FileList;
-      status: 'DRAFT' | 'INACTIVE' | 'PUBLISHED' | 'SUSPENDED';
-      provinceId: string;
-      cityId: string;
-      coordinate: string;
-    },
-    any,
-    undefined
-  >;
+  form: UseFormReturn<z.input<typeof FormSchema>>
   errorMessage: string[] | undefined;
   latitude: number;
   longitude: number;

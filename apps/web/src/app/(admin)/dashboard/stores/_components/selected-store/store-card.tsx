@@ -1,6 +1,4 @@
 'use client';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardDescription,
@@ -8,12 +6,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { getSelectedStore } from '@/lib/fetch-api/store/client';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Link2, MapPinned } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 const CreateNewStore = dynamic(() => import('../create-new-store'), {
   ssr: false,
 });

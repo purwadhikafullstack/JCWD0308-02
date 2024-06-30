@@ -1,11 +1,8 @@
-import { Button } from '@/components/ui/button';
 import {
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog';
 import { CreateStoreForm } from './store-form';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -18,7 +15,7 @@ export default function DialogStore({
   return (
     <>
       <DialogContent className="min-h-max  sm:max-w-2xl">
-        <DialogHeader className='p-2'>
+        <DialogHeader className="p-2">
           <DialogTitle>Create new store</DialogTitle>
           <DialogDescription>
             Create new store here. Click save when you&apos;re done.

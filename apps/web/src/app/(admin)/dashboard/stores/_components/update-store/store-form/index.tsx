@@ -90,7 +90,7 @@ export function UpdateStoreForm({
           form={form}
           errorMessage={createNewStore?.error?.errors?.fieldErrors?.status}
         />
-        <Submit type="submit">Submit</Submit>
+        <Submit type="submit">Save new changes</Submit>
       </form>
     </Form>
   );

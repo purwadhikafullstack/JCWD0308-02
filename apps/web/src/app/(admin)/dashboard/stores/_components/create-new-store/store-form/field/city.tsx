@@ -16,26 +16,15 @@ import {
 import { getCities } from '@/lib/fetch-api/city/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { UseFormReturn } from 'react-hook-form';
+import { FormSchema } from '../validation';
+import { z } from 'zod';
 
 export default function FieldCity({
   provinceId,
   errorMessage,
   form,
 }: {
-  form: UseFormReturn<
-    {
-      address: string;
-      name: string;
-      slug: string;
-      file: FileList;
-      status: 'DRAFT' | 'INACTIVE' | 'PUBLISHED' | 'SUSPENDED';
-      provinceId: string;
-      cityId: string;
-      coordinate: string;
-    },
-    any,
-    undefined
-  >;
+  form: UseFormReturn<z.input<typeof FormSchema>>
   errorMessage: string[] | undefined;
   provinceId: number;
 }) {

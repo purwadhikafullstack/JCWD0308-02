@@ -14,26 +14,14 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { UseFormReturn } from 'react-hook-form';
-import { STATUS } from '../validation';
+import { FormSchema, STATUS } from '../validation';
+import { z } from 'zod';
 
 export default function FieldStatus({
   errorMessage,
   form,
 }: {
-  form: UseFormReturn<
-    {
-      address: string;
-      name: string;
-      slug: string;
-      file: FileList;
-      status: 'DRAFT' | 'INACTIVE' | 'PUBLISHED' | 'SUSPENDED';
-      provinceId: string;
-      cityId: string;
-      coordinate: string;
-    },
-    any,
-    undefined
-  >;
+  form: UseFormReturn<z.input<typeof FormSchema>>;
   errorMessage: string[] | undefined;
 }) {
   return (

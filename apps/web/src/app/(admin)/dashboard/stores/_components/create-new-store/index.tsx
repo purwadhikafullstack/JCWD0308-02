@@ -1,31 +1,9 @@
 'use client';
-
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { useMediaQuery } from '@uidotdev/usehooks';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from '@/components/ui/drawer';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { CreateStoreForm } from './store-form';
+import { Dialog, DialogTrigger } from '@/components/ui/dialog';
+import { Drawer, DrawerTrigger } from '@/components/ui/drawer';
 import dynamic from 'next/dynamic';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { useEffect, useState } from 'react';
 
 const DrawerStore = dynamic(() => import('./drawer-store'));
