@@ -53,6 +53,7 @@ export const applyVoucherDiscount = async (
       `Minimum order items for this voucher is ${voucher.minOrderItem}`,
     );
   }
+
   let discountProducts = 0;
   let discountShippingCost = 0;
   if (voucher.voucherType === 'PRODUCT') {

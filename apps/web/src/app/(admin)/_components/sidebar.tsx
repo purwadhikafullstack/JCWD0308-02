@@ -56,7 +56,11 @@ export const menu = [
     path: '/dashboard/categories',
     icon: <LayoutGrid className="h-4 w-4" />,
   },
-  { title: 'Vouchers', path: '/orders', icon: <Ticket className="h-4 w-4" /> },
+  { title: 'Vouchers', 
+    path: '/dashboard/vouchers', 
+    icon: <Ticket className="h-4 w-4" /> 
+    
+  },
 ];
 
 const SidebarMenu = () => {
