@@ -291,7 +291,7 @@ model Stock {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@unique([storeId, productId])
+  @@unique([storeId, productId], name: "stock_store_id_product_id_key")
 
   //relation
   product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
