@@ -31,8 +31,5 @@
     "hooks": {
       "pre-commit": "npx lint-staged"
     }
-  },
-  "dependencies": {
-    "midtrans-client": "^1.3.1"
   }
 }

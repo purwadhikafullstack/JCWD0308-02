@@ -57,13 +57,13 @@ export const applyVoucherDiscount = async (
   let discountProducts = 0;
   let discountShippingCost = 0;
   if (voucher.voucherType === 'PRODUCT') {
-    if (voucher.discountType === 'FIXED_DISCOUnt') {
+    if (voucher.discountType === 'FIXED_DISCOUNT') {
       discountProducts = voucher.fixedDiscount || 0;
     } else if (voucher.discountType === 'DISCOUNT') {
       discountProducts = (totalPrice * (voucher.discount || 0)) / 100;
     }
   } else if (voucher.voucherType === 'SHIPPING_COST') {
-    if (voucher.discountType === 'FIXED_DISCOUnt') {
+    if (voucher.discountType === 'FIXED_DISCOUNT') {
       discountShippingCost = voucher.fixedDiscount || 0;
     } else if (voucher.discountType === 'DISCOUNT') {
       discountShippingCost = (shippingCost * (voucher.discount || 0)) / 100;
