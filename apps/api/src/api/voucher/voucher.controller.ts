@@ -1,11 +1,79 @@
 import { ICallback } from '@/types/index.js';
 import { VoucherService } from './voucher.service.js';
+import { User } from 'lucia';
 
 export class VoucherController {
+  
+  getVouchers: ICallback = async (req, res, next) => {
+    try {
+      const { page = 1, limit = 10, search, ...filters } = req.query;
+      const pageNumber = parseInt(page as string, 10);
+      const limitNumber = parseInt(limit as string, 10);
+
+      const vouchers = await VoucherService.getVouchers(pageNumber, limitNumber, { ...filters, search });
+      res.status(200).json(vouchers);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createVoucher: ICallback = async (req, res, next) => {
     try {
-      const voucher = await VoucherService.creaateVoucher(req.body);
-      res.status(201).json(voucher);
+      const user = res.locals.user as User;
+      const { superAdminId, storeAdminId, storeId, ...voucherData } = req.body;
+
+      const file = req.file as Express.Multer.File | undefined;
+      const imageUrl = file ? `/public/${file.filename}` : undefined;
+      
+      const voucher = await VoucherService.createVoucher(
+        {
+          ...voucherData,
+          superAdminId: user.role === 'SUPER_ADMIN' ? user.id : superAdminId,
+          storeAdminId: user.role === 'STORE_ADMIN' ? user.id : storeAdminId,
+          storeId,
+        },
+        user.id,
+        imageUrl
+      );
+
+      res.status(201).json({ status: 'OK', message: 'Voucher Created Successfully', voucher });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateVoucher: ICallback = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const user = res.locals.user as User;
+      const { superAdminId, storeAdminId, storeId, ...voucherData } = req.body;
+
+      const file = req.file as Express.Multer.File | undefined;
+      const imageUrl = file ? `/public/${file.filename}` : undefined;
+
+      const voucher = await VoucherService.updateVoucher(
+        id,
+        {
+          ...voucherData,
+          superAdminId: user.role === 'SUPER_ADMIN' ? user.id : superAdminId,
+          storeAdminId: user.role === 'STORE_ADMIN' ? user.id : storeAdminId,
+          storeId,
+        },
+        user.id,
+        imageUrl
+      );
+
+      res.status(200).json({ status: 'OK', message: 'Voucher Updated Successfully', voucher });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteVoucher: ICallback = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      await VoucherService.deleteVoucher(id);
+      res.status(200).json({ status: 'OK', message: 'Voucher Deleted Successfully' });
     } catch (error) {
       next(error);
     }
@@ -24,14 +92,6 @@ export class VoucherController {
     }
   };
 
-  getVoucher: ICallback = async (req, res, next) => {
-    try {
-      const vouchers = await VoucherService.getVouchers();
-      res.status(200).json(vouchers);
-    } catch (error) {
-      next(error);
-    }
-  };
 
   getUserVouchers: ICallback = async (req, res, next) => {
     try {
