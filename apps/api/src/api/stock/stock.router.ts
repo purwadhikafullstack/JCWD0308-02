@@ -14,12 +14,27 @@ export class StockRouter {
 
   private initializeRoutes(): void {
     this.router.get('/', AuthMiddleware.authed, this.stockController.getStocks);
-    this.router.get('/:id', AuthMiddleware.authed, this.stockController.getStockById);
-    this.router.post('/', AuthMiddleware.storeAdmin, this.stockController.createStock);
-    this.router.put('/:id', AuthMiddleware.storeAdmin, this.stockController.updateStockAmount);
-    this.router.delete('/:id', AuthMiddleware.storeAdmin, this.stockController.deleteStock);
-    // this.router.post('/post-stock-id', this.stockController.postStockId);
-
+    this.router.get(
+      '/:id',
+      AuthMiddleware.authed,
+      this.stockController.getStockById,
+    );
+    this.router.post(
+      '/',
+      AuthMiddleware.storeAdmin,
+      this.stockController.createStock,
+    );
+    this.router.put(
+      '/:id',
+      AuthMiddleware.storeAdmin,
+      this.stockController.updateStockAmount,
+    );
+    this.router.delete(
+      '/:id',
+      AuthMiddleware.storeAdmin,
+      this.stockController.deleteStock,
+    );
+    this.router.post('/post-stock-id', this.stockController.postStockId);
   }
 
   public getRouter(): Router {

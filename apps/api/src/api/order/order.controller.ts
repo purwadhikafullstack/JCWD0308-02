@@ -14,27 +14,26 @@ export class OrderController {
       next(error);
     }
   };
-  getOrdersByStoreAdmin: ICallback = async (req, res, next) => {
-    try {
-      const { storeAdminId } = req.params;
-      const order = await OrderService.getOrdersByStoreAdmin(storeAdminId);
-      return res.status(201).json({ status: 'OK', data: order });
-    } catch (error) {
-      next(error);
-    }
-  };
-  getAllOrders: ICallback = async (req, res, next) => {
-    try {
-      const { storeId } = req.params;
-      const order = await OrderService.getAllOrders(storeId);
-      return res.status(201).json({ status: 'OK', data: order });
-    } catch (error) {
-      next(error);
-    }
-  };
   getOrder: ICallback = async (req, res, next) => {
     try {
-      const order = await OrderService.getOrder(req, res);
+      const { orderId } = req.params;
+      const order = await OrderService.getOrder(orderId);
+      return res.status(200).json({ status: 'OK', data: order });
+    } catch (error) {
+      next(error);
+    }
+  };
+  getOrderByStatus: ICallback = async (req, res, next) => {
+    try {
+      const userId = res.locals.user?.id;
+      const { status } = req.params;
+      const { orderId, date } = req.query;
+      const order = await OrderService.getOrderByStatus(
+        userId,
+        status as OrderStatus,
+        orderId as string,
+        date as string,
+      );
       return res.status(200).json({ status: 'OK', data: order });
     } catch (error) {
       next(error);
@@ -64,37 +63,10 @@ export class OrderController {
       next(error);
     }
   };
-  confirmPayment: ICallback = async (req, res, next) => {
-    try {
-      const confirmPaymentRequest: ConfirmPaymentRequest = req.body;
-      const result = await OrderService.confirmPayment(
-        confirmPaymentRequest,
-        res,
-      );
-      return res.status(200).json({ status: 'OK', data: result });
-    } catch (error) {
-      next(error);
-    }
-  };
-  sendUserOrders: ICallback = async (req, res, next) => {
-    try {
-      const order = await OrderService.sendUserOrders(req.body, res);
-      return res.status(200).json({ status: 'OK', data: order });
-    } catch (error) {
-      next(error);
-    }
-  };
+
   confirmOrder: ICallback = async (req, res, next) => {
     try {
       const order = await OrderService.confirmOrder(req.body, res);
-      return res.status(200).json({ status: 'OK', data: order });
-    } catch (error) {
-      next(error);
-    }
-  };
-  cancelOrderByAdmin: ICallback = async (req, res, next) => {
-    try {
-      const order = await OrderService.cancelOrderByAdmin(req.body, res);
       return res.status(200).json({ status: 'OK', data: order });
     } catch (error) {
       next(error);

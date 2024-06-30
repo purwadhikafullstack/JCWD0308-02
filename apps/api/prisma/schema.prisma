@@ -291,14 +291,13 @@ model Stock {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@unique([storeId, productId], name: "stock_store_id_product_id_key")
-
   //relation
   product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   store     Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
   mutations StockMutation[]
   OrderItem OrderItem[]
 
+  @@unique([storeId, productId])
   @@map("stock")
 }
 
@@ -340,6 +339,7 @@ model Order {
   storeId              String?       @map("store_id")
   storeAdminId         String?       @map("store_admin_id")
   isDeleted            Boolean       @default(false) @map("is_deleted")
+  paymentLink          String?       @map("payment_link")
   deletedAt            DateTime?     @map("deleted_at")
   updatedAt            DateTime      @updatedAt @map("updated_at")
   createdAt            DateTime      @default(now()) @map("created_at")

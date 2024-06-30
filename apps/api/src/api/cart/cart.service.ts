@@ -169,10 +169,6 @@ export class CartService {
   };
 
   static deleteCart = async (cartId: string, userId: string) => {
-    if (!userId) {
-      throw new ResponseError(401, 'Unauthorized');
-    }
-
     const cartItem = await prisma.orderItem.findFirst({
       where: {
         id: cartId,

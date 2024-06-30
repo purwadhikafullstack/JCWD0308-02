@@ -1,4 +1,6 @@
 export interface Order {
+  orderItems: any;
+  data: any;
   id: string;
   orderStatus: string;
   userId: string;
@@ -8,6 +10,7 @@ export interface Order {
   estimation: string;
   note: string;
   paymentMethod: string;
+  paymentLink: string;
   totalPrice: number;
   shippingCost: number;
   discountProducts: number;
@@ -20,4 +23,14 @@ export interface Order {
   deletedAt: string;
   updatedAt: string;
   createdAt: string;
+}
+
+export interface OrderStatusMap {
+  awaiting_payment: Order[];
+  awaiting_confirmation: Order[];
+  process: Order[];
+  shipping: Order[];
+  delivered: Order[];
+  confirmed: Order[];
+  cancelled: Order[];
 }

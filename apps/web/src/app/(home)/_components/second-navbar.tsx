@@ -30,7 +30,7 @@ export default function SecondNavbar() {
     queryFn: getUserProfile,
   });
 
-  if (userProfile.data?.user.role !== 'USER') return null;
+  // if (userProfile.data?.user.role !== 'USER') return null;
 
   return (
     <div>

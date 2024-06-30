@@ -14,7 +14,7 @@ export default function ProductPage() {
   const [selectedLocation, setSelectedLocation] = useState('');
   const [selectedPrice, setSelectedPrice] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
-  const storeId = 'ce276990-0f7c-442e-8972-f7c8bc2e714d';
+  const storeId = '55cf37a0-85f5-4963-b18c-6c50204e82ae';
   const dispatch = useAppDispatch();
   const selectAddressId = useAppSelector(selectSelectedAddressId);
 
@@ -50,6 +50,7 @@ export default function ProductPage() {
         quantity: 1,
         isPack,
         addressId: selectAddressId ?? ``,
+        // addressId,
       };
       // Dispatching addCartItem directly with cartRequest
       dispatch(addCartItem(cartRequest))

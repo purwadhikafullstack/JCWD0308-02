@@ -25,6 +25,7 @@ export const getUserAndAddress = async (userId: any, addressId: any) => {
 export const applyVoucherDiscount = async (
   userVoucherId: string,
   totalPrice: number,
+  shippingCost: number,
   cartItemsLength: number,
 ) => {
   const userVoucher = await prisma.userVoucher.findUnique({
@@ -53,10 +54,20 @@ export const applyVoucherDiscount = async (
     );
   }
 
-  if (voucher.discountType === 'FIXED_DISCOUNT') {
-    totalPrice -= voucher.fixedDiscount || 0;
-  } else if (voucher.discountType === 'DISCOUNT') {
-    totalPrice -= (totalPrice * (voucher.discount || 0)) / 100;
+  let discountProducts = 0;
+  let discountShippingCost = 0;
+  if (voucher.voucherType === 'PRODUCT') {
+    if (voucher.discountType === 'FIXED_DISCOUNT') {
+      discountProducts = voucher.fixedDiscount || 0;
+    } else if (voucher.discountType === 'DISCOUNT') {
+      discountProducts = (totalPrice * (voucher.discount || 0)) / 100;
+    }
+  } else if (voucher.voucherType === 'SHIPPING_COST') {
+    if (voucher.discountType === 'FIXED_DISCOUNT') {
+      discountShippingCost = voucher.fixedDiscount || 0;
+    } else if (voucher.discountType === 'DISCOUNT') {
+      discountShippingCost = (shippingCost * (voucher.discount || 0)) / 100;
+    }
   }
 
   await prisma.userVoucher.update({
@@ -64,7 +75,7 @@ export const applyVoucherDiscount = async (
     data: { isUsed: true },
   });
 
-  return totalPrice;
+  return { discountProducts, discountShippingCost };
 };
 
 export const calculateShipping = async (
@@ -98,31 +109,20 @@ export const createOrder = async (
   userId: any,
   nearestStore: any,
   updatedCartItem: any[],
-  totalPrice: number,
-  shippingCost: any,
-  cost: number,
+  finalTotalPrice: number,
+  finalShippingCost: number,
   estimation: string,
   // estimatedDeliveryDate: any,
   orderStatus: string,
+  discountProducts: number,
+  discountShippingCost: number,
+  totalPayment: number,
 ) => {
-  let finalTotalPrice = totalPrice;
-
-  // Check if a voucherId is provided and apply the discount
-  if (orderRequest.userVoucherId) {
-    try {
-      finalTotalPrice = await applyVoucherDiscount(
-        orderRequest.userVoucherId,
-        totalPrice,
-        updatedCartItem.length,
-      );
-      console.log(`Discount applied. Final total price: ${finalTotalPrice}`);
-    } catch (error) {
-      throw new Error(`Failed to apply voucher: ${error}`);
-    }
-  }
   const storeAdmin = await prisma.storeAdmin.findFirst({
     where: { storeId: nearestStore?.id },
   });
+
+  console.log('Store Admin:', storeAdmin);
   return await prisma.order.create({
     data: {
       userId,
@@ -133,11 +133,14 @@ export const createOrder = async (
       serviceDescription: 'Layanan Reguler',
       estimation,
       storeId: nearestStore?.id,
-      storeAdminId: storeAdmin?.id,
+      // storeAdminId: storeAdmin?.id,
+      // storeAdminId: 'grosirun admin',
       note: orderRequest.note,
       totalPrice: finalTotalPrice,
-      shippingCost: cost,
-      totalPayment: finalTotalPrice + cost,
+      shippingCost: finalShippingCost,
+      discountProducts,
+      discountShippingCost,
+      totalPayment,
       orderItems: { connect: updatedCartItem.map((item) => ({ id: item.id })) },
     } as any,
   });
