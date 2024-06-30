@@ -24,31 +24,29 @@ export class StockController {
     }
   };
 
-  // postStockId = async (req: Request, res: Response) => {
-  //   try {
-  //     const { productId, addressId } = req.body;
-  //     const userId = res.locals.user?.id;
-  //     const stockId = await StockService.postStockId(
-  //       productId,
-  //       addressId,
-  //       userId,
-  //     );
-  //     res.status(200).json({ stockId });
-  //   } catch (error) {
-  //     if (error instanceof ResponseError) {
-  //       res.status(error.status).json({ message: error.message });
-  //     } else {
-  //       res.status(500).json({ message: 'Internal Server Error' });
-  //     }
-  //   }
-  // };
+  postStockId: ICallback = async (req, res, next) => {
+    try {
+      const { productId, addressId } = req.body;
+      const userId = res.locals.user?.id;
+      const stockId = await StockService.postStockId(
+        productId,
+        addressId,
+        userId,
+      );
+      res.status(200).json({ stockId });
+    } catch (error) {
+      next(error);
+    }
+  };
 
   createStock: ICallback = async (req, res, next) => {
     try {
       const user = this.getUserOrFail(res.locals.user);
       const stockData = await this.getStockData(req, user);
       const stock = await StockService.createStock(stockData, user.id);
-      res.status(201).json({ status: "OK", message: "Stock item created!", stock });
+      res
+        .status(201)
+        .json({ status: 'OK', message: 'Stock item created!', stock });
     } catch (error) {
       next(error);
     }
@@ -63,8 +61,14 @@ export class StockController {
       const stock = await StockService.getStockById(id);
       await this.validateStoreAdmin(stock, user);
 
-      const updatedStock = await StockService.updateStockAmount(id, { amount, description, mutationType }, user.id);
-      res.status(200).json({ status: "OK", message: "Stock item updated!", updatedStock });
+      const updatedStock = await StockService.updateStockAmount(
+        id,
+        { amount, description, mutationType },
+        user.id,
+      );
+      res
+        .status(200)
+        .json({ status: 'OK', message: 'Stock item updated!', updatedStock });
     } catch (error) {
       next(error);
     }
@@ -79,7 +83,7 @@ export class StockController {
       await this.validateStoreAdmin(stock, user);
 
       await StockService.deleteStock(id);
-      res.status(200).json({ status: "OK", message: "Stock item deleted!" });
+      res.status(200).json({ status: 'OK', message: 'Stock item deleted!' });
     } catch (error) {
       next(error);
     }
@@ -94,49 +98,66 @@ export class StockController {
     return { page, limit, filters };
   }
 
-  private getUserOrFail(user: User | null): User & { storeAdmin?: { storeId: string } } {
-    if (!user) throw new ResponseError(403, "Unauthorized");
+  private getUserOrFail(
+    user: User | null,
+  ): User & { storeAdmin?: { storeId: string } } {
+    if (!user) throw new ResponseError(403, 'Unauthorized');
     return user as User & { storeAdmin?: { storeId: string } };
   }
 
-  private async getStockData(req: any, user: User & { storeAdmin?: { storeId: string } }) {
+  private async getStockData(
+    req: any,
+    user: User & { storeAdmin?: { storeId: string } },
+  ) {
     const stockData = { ...req.body };
     if (user.role === 'STORE_ADMIN') {
       const storeId = await this.getStoreAdminStoreId(user);
       if (stockData.storeId !== storeId) {
-        throw new ResponseError(403, "Forbidden: Cannot create stock for a different store");
+        throw new ResponseError(
+          403,
+          'Forbidden: Cannot create stock for a different store',
+        );
       }
       stockData.storeId = storeId;
     } else if (user.role !== 'SUPER_ADMIN') {
-      throw new ResponseError(403, "Forbidden");
+      throw new ResponseError(403, 'Forbidden');
     }
     return stockData;
   }
 
-  private async getStoreAdminStoreId(user: User & { storeAdmin?: { storeId: string } }) {
+  private async getStoreAdminStoreId(
+    user: User & { storeAdmin?: { storeId: string } },
+  ) {
     if (!user.storeAdmin?.storeId) {
       const storeAdmin = await prisma.storeAdmin.findUnique({
         where: { storeAdminId: user.id },
         select: { storeId: true },
       });
       if (!storeAdmin) {
-        throw new ResponseError(403, "Forbidden: Store admin without assigned store");
+        throw new ResponseError(
+          403,
+          'Forbidden: Store admin without assigned store',
+        );
       }
       user.storeAdmin = { storeId: storeAdmin.storeId };
     }
     return user.storeAdmin.storeId;
   }
 
-  private async validateStoreAdmin(stock: any, user: User & { storeAdmin?: { storeId: string } }) {
+  private async validateStoreAdmin(
+    stock: any,
+    user: User & { storeAdmin?: { storeId: string } },
+  ) {
     if (user.role === 'STORE_ADMIN') {
       const storeId = await this.getStoreAdminStoreId(user);
       if (stock.storeId !== storeId) {
-        throw new ResponseError(403, "Forbidden: Cannot perform action for a different store");
+        throw new ResponseError(
+          403,
+          'Forbidden: Cannot perform action for a different store',
+        );
       }
     } else if (user.role !== 'SUPER_ADMIN') {
-      throw new ResponseError(403, "Forbidden");
+      throw new ResponseError(403, 'Forbidden');
     }
   }
-
-
 }

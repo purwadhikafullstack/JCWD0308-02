@@ -15,37 +15,38 @@ export class OrderRouter {
 
   private initializeRoutes(): void {
     const authed = AuthMiddleware.authed;
-    const storeAdmin = AuthMiddleware.storeAdmin;
-    const superAdmin = AuthMiddleware.superAdmin;
     const upload = uploader('payment-proof', 'orders').single('proof');
-    this.router
-      .route('/')
-      .get(authed, this.orderController.getOrder)
-      .post(authed, this.orderController.addOrder);
+    // Endpoint for adding an order
+    this.router.post('/', authed, this.orderController.addOrder);
 
-    this.router
-      .route('/:orderId/payment-proof')
-      .post(authed, upload, this.orderController.uploadProof);
+    this.router.get('/:orderId', authed, this.orderController.getOrder);
 
-    this.router
-      .route('/:orderId/cancel')
-      .post(authed, this.orderController.cancelOrder);
+    this.router.patch(
+      '/:orderId/payment-proof',
+      authed,
+      upload,
+      this.orderController.uploadProof,
+    );
 
-    this.router
-      .route('/:orderId/send')
-      .post(storeAdmin, this.orderController.sendUserOrders);
+    // Endpoint for canceling an order
+    this.router.post(
+      '/:orderId/cancel',
+      authed,
+      this.orderController.cancelOrder,
+    );
 
-    this.router
-      .route('/:orderId/confirm')
-      .post(authed, this.orderController.confirmOrder);
+    // Endpoint for confirming an order
+    this.router.post(
+      '/:orderId/confirm',
+      authed,
+      this.orderController.confirmOrder,
+    );
 
-    this.router
-      .route('/admin/cancel')
-      .post(storeAdmin, this.orderController.cancelOrderByAdmin);
-
-    this.router
-      .route('/admin/orders')
-      .get(superAdmin, this.orderController.getAllOrders);
+    this.router.get(
+      '/status/:status',
+      authed,
+      this.orderController.getOrderByStatus,
+    );
   }
 
   getRouter(): Router {

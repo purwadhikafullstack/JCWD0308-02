@@ -84,7 +84,7 @@ enum PaymentMethod {
 // Define the models
 model User {
   id               String      @id @default(uuid())
-  providerId         String?     @unique @map("provider_id")
+  providerId       String?     @unique @map("provider_id")
   accountType      AccountType @default(EMAIL) @map("account_type")
   email            String?     @unique
   contactEmail     String?     @map("contact_email")
@@ -289,14 +289,13 @@ model Stock {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  @@unique([storeId, productId])
-
   //relation
   product   Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
   store     Store           @relation(fields: [storeId], references: [id], onDelete: Cascade)
   mutations StockMutation[]
   OrderItem OrderItem[]
 
+  @@unique([storeId, productId])
   @@map("stock")
 }
 
@@ -338,6 +337,7 @@ model Order {
   storeId              String?       @map("store_id")
   storeAdminId         String?       @map("store_admin_id")
   isDeleted            Boolean       @default(false) @map("is_deleted")
+  paymentLink          String?       @map("payment_link")
   deletedAt            DateTime?     @map("deleted_at")
   updatedAt            DateTime      @updatedAt @map("updated_at")
   createdAt            DateTime      @default(now()) @map("created_at")

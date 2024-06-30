@@ -8,7 +8,7 @@ import express, {
   NextFunction,
 } from 'express';
 import cors from 'cors';
-import cookieParser from "cookie-parser";
+import cookieParser from 'cookie-parser';
 import path from 'path';
 import { API_URL, PORT, WEB_URL } from './config.js';
 import { AuthMiddleware } from './middlewares/auth.middleware.js';
@@ -27,7 +27,9 @@ import { StoreRouter } from './api/store/store.router.js';
 import { ShippingRouter } from './api/shipping/shipping.router.js';
 import { ProvinceRouter } from './api/province/province.router.js';
 import { CityRouter } from './api/city/city.router.js';
-
+import { OrderSuperRouter } from './api/order-super/super.router.js';
+import { OrderStoreRouter } from './api/order-store/stores.router.js';
+import './helpers/order/orderScheduler.ts';
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
@@ -76,7 +78,8 @@ export default class App {
     const shippingRouter = new ShippingRouter();
     const proviceRouter = new ProvinceRouter();
     const cityRouter = new CityRouter();
-
+    const orderSuperRouter = new OrderSuperRouter();
+    const orderStoreRouter = new OrderStoreRouter();
 
     this.app.get('/', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
@@ -95,6 +98,8 @@ export default class App {
     this.app.use('/api/shipping', shippingRouter.getRouter());
     this.app.use('/api/province', proviceRouter.getRouter());
     this.app.use('/api/city', cityRouter.getRouter());
+    this.app.use('/api/order-super', orderSuperRouter.getRouter());
+    this.app.use('/api/order-store', orderStoreRouter.getRouter());
   }
 
   private handleError(): void {
