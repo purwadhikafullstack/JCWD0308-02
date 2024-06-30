@@ -7,7 +7,8 @@ export class StoreValidation {
     imageUrl: z.string(),
     address: z.string(),
     coordinate: z.string(),
-    cityId: z.string().transform(city =>  +city),
+    cityId: z.string().transform(city => +city),
+    status: z.enum(['DRAFT', 'INACTIVE', 'PUBLISHED', 'SUSPENDED']),
   })
   static readonly UPDATE = z.object({
     id: z.string().min(1),
@@ -16,7 +17,8 @@ export class StoreValidation {
     imageUrl: z.string().optional(),
     address: z.string(),
     coordinate: z.string(),
-    cityId: z.string().transform(city =>  +city),
+    cityId: z.string().transform(city => +city),
+    status: z.enum(['DRAFT', 'INACTIVE', 'PUBLISHED', 'SUSPENDED']),
   })
 }
 
