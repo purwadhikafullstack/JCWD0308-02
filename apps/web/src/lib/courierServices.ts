@@ -22,3 +22,13 @@ export const formattedCourierNames: Record<string, string> = {
   tiki: 'TIKI',
   pos: 'POS',
 };
+
+export const mapCourierToUpperCase = (courier: string): string => {
+  const formattedCourierNames: Record<string, string> = {
+    jne: 'JNE',
+    tiki: 'TIKI',
+    pos: 'POS',
+  };
+
+  return formattedCourierNames[courier.toLowerCase()] || courier.toUpperCase();
+};

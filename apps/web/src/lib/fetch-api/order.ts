@@ -1,17 +1,21 @@
 import axios from 'axios';
+import { API_URL } from './lib';
 
-const BASE_URL = 'http://localhost:8000/api/order';
-
+//super admin
 export const getAllOrders = async () => {
-  const response = await axios.get(`${BASE_URL}/super-admin/orders`, {
+  const response = await axios.get(`${API_URL}/order-super/all-orders`, {
     withCredentials: true,
   });
   return response.data;
 };
 
-export const getOrdersByStoreAdmin = async (storeAdminId: string) => {
-  const response = await axios.get(
-    `${BASE_URL}/store-admin/order/${storeAdminId}`,
+export const confirmPaymentByAdmin = async (
+  orderId: string,
+  isAccepted: boolean,
+) => {
+  const response = await axios.post(
+    `${API_URL}/${orderId}/order-super/confirm-payment`,
+    { orderId, isAccepted },
     {
       withCredentials: true,
     },
@@ -19,53 +23,72 @@ export const getOrdersByStoreAdmin = async (storeAdminId: string) => {
   return response.data;
 };
 
-export const getOrder = async (orderId?: string, orderStatus?: string) => {
-  const response = await axios.get(`${BASE_URL}`, {
-    withCredentials: true,
-    params: { orderId, orderStatus },
-  });
+//store admin
+export const getOrdersByStoreAdmin = async (storeAdminId: string) => {
+  const response = await axios.get(
+    `${API_URL}/order-store/store/${storeAdminId}`,
+    {
+      withCredentials: true,
+    },
+  );
   return response.data;
 };
 
-export const addOrder = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}`, data, {
-    withCredentials: true,
-  });
-  return response.data;
-};
-
-export const cancelOrder = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}/cancel-order`, data, {
+export const cancelOrderByAdmin = async (data: any, orderId: any) => {
+  const response = await axios.post(`${API_URL}/order-store/${orderId}`, data, {
     withCredentials: true,
   });
   return response.data;
 };
 
 export const sendOrder = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}/send-order`, data, {
+  const response = await axios.post(`${API_URL}/order-store/send`, data, {
     withCredentials: true,
   });
   return response.data;
 };
 
-export const confirmOrder = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}/confirm-order`, data, {
+//customer
+export const getOrder = async (orderId: string) => {
+  const response = await axios.get(`${API_URL}/order/${orderId}`, {
+    withCredentials: true,
+    // params: { orderId, orderStatus },
+  });
+  return response.data;
+};
+
+export const getOrdersByStatus = async (
+  status: string,
+  orderId?: string,
+  date?: string,
+) => {
+  const queryParams = new URLSearchParams();
+  if (orderId) queryParams.append('orderId', orderId);
+  if (date) queryParams.append('date', date);
+  const response = await axios.get(`${API_URL}/order/status/${status}`, {
     withCredentials: true,
   });
   return response.data;
 };
 
-export const cancelOrderByAdmin = async (data: any) => {
-  const response = await axios.post(`${BASE_URL}/cancel-by-admin`, data, {
+export const addOrder = async (data: any) => {
+  const response = await axios.post(`${API_URL}/order`, data, {
     withCredentials: true,
   });
   return response.data;
 };
 
-export const confirmPaymentByAdmin = async (orderId: string) => {
+export const cancelOrder = async (data: any) => {
+  const response = await axios.post(`${API_URL}/order/cancel`, data, {
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+export const confirmOrder = async (orderId: any) => {
   const response = await axios.post(
-    `${BASE_URL}/${orderId}/confirm`,
-    {},
+    `${API_URL}/order/${orderId}/confirm`,
+    orderId,
     {
       withCredentials: true,
     },
@@ -78,7 +101,7 @@ export const uploadPaymentProof = async (orderId: string, file: File) => {
   formData.append('proof', file);
 
   const response = await axios.patch(
-    `${BASE_URL}/${orderId}/payment-proof`,
+    `${API_URL}/order/${orderId}/payment-proof`,
     formData,
     {
       withCredentials: true,
