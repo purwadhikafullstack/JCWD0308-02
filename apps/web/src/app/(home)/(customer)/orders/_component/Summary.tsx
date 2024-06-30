@@ -12,11 +12,13 @@ import { formatCurrency } from '@/lib/currency';
 
 interface SummaryProps {
   selectedItems: any[];
+  discount: number;
   selectedAddress: any;
   shippingCost: number | null;
 }
 const Summary: React.FC<SummaryProps> = ({
   selectedItems,
+  discount,
   selectedAddress,
   shippingCost,
 }) => {
@@ -38,7 +40,8 @@ const Summary: React.FC<SummaryProps> = ({
   };
 
   const subtotal = calculateSubtotal();
-  const total = (shippingCost || 0) + subtotal;
+  const discountedSubtotal = subtotal - (discount || 0);
+  const total = (shippingCost || 0) + discountedSubtotal;
 
   console.log(subtotal);
   return (
@@ -58,6 +61,12 @@ const Summary: React.FC<SummaryProps> = ({
             {shippingCost !== null ? formatCurrency(shippingCost) : 0}
           </span>
         </div>
+        {discount > 0 && (
+          <div className="flex justify-between mb-2">
+            <span>Discount</span>
+            <span>-{formatCurrency(discount)}</span>
+          </div>
+        )}
         <div className="flex justify-between font-bold text-lg">
           <span>Total</span>
           <span>{formatCurrency(total)}</span>
@@ -85,11 +94,6 @@ const Summary: React.FC<SummaryProps> = ({
           <span className="ml-3">0811111111</span>
         </div>
       </CardContent>
-      <CardFooter className="mt-auto p-4">
-        <Button className="w-full bg-primary text-primary-foreground hover:bg-primary-dark">
-          Choose Payment
-        </Button>
-      </CardFooter>
     </Card>
   );
 };

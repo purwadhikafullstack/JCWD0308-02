@@ -17,6 +17,9 @@ import {
   selectAddresses,
   selectSelectedAddressId,
 } from '@/lib/features/address/addressSlice';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import AdditionalInfo from './_component/AdditionalInfo';
+import { mapCourierToUpperCase } from '@/lib/courierServices';
 
 export default function OrderCustomer() {
   const dispatch = useAppDispatch();
@@ -26,10 +29,11 @@ export default function OrderCustomer() {
   const [selectedItems, setSelectedItems] = useState<CartItemType[]>([]);
   const [shippingCourier, setShippingCourier] = useState<string>('');
   const [shippingMethod, setShippingMethod] = useState<string>('');
-  const [discount, setDiscount] = useState<string>('');
+  const [discount, setDiscount] = useState<any>('');
   const [note, setNote] = useState<string>('');
-  const [paymentMethod, setPaymentMethod] = useState<string>('MANUAL');
+  const [paymentMethod, setPaymentMethod] = useState<string>('');
   const [shippingCost, setShippingCost] = useState<number | null>(null);
+  const [serviceDescription, setServiceDescription] = useState<string>('');
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -60,20 +64,33 @@ export default function OrderCustomer() {
   const handleOrderSubmit = async () => {
     try {
       const orderData = {
-        courier: shippingCourier,
+        courier: mapCourierToUpperCase(shippingCourier),
         service: shippingMethod,
-        serviceDescription: 'Layanan Reguler',
+        serviceDescription,
         paymentMethod,
         addressId: selectedAddressId,
         note: note,
       };
-      const newOrder = await addOrder(orderData);
-      console.log('New Order:', newOrder);
+      const response = await addOrder(orderData);
+      console.log('Response:', response);
 
-      if (paymentMethod === 'MANUAL') {
-        router.push('/order/payment-proof');
+      if (response && response.data) {
+        const newOrder = response.data;
+        const paymentLink = newOrder.paymentLink;
+
+        console.log('New Order:', newOrder);
+        console.log('New Order id:', newOrder.id);
+        console.log('Payment Link:', paymentLink);
+
+        if (paymentMethod === 'GATEWAY' && newOrder) {
+          router.push(`/orders/order-details/${newOrder.id}`);
+        } else if (paymentMethod === 'MANUAL' && newOrder) {
+          router.push(`/orders/payment-proof/${newOrder.id}`);
+        } else {
+          console.error('Unexpected response structure:', response);
+        }
       } else {
-        router.push('/orders');
+        console.error('Unexpected response structure:', response);
       }
     } catch (error) {
       console.error('Failed to create order: ', error);
@@ -126,15 +143,29 @@ export default function OrderCustomer() {
               totalWeight={totalWeight}
               shippingCost={shippingCost}
               setShippingCost={setShippingCost}
+              setServiceDescription={setServiceDescription}
             />
           </div>
+          {/* Additional Info */}
+          <AdditionalInfo
+            note={note}
+            setNote={setNote}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+          />
         </div>
         {/* Summary Section */}
         <Summary
           selectedItems={selectedItems}
+          discount={discount}
           selectedAddress={selectedAddress}
           shippingCost={shippingCost}
         />
+      </div>
+      <div className="mt-6 text-center">
+        <Button onClick={handleOrderSubmit} className="px-4 py-2">
+          Place Order
+        </Button>
       </div>
     </div>
   );

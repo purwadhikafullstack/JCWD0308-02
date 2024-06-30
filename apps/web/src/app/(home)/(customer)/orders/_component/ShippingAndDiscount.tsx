@@ -12,6 +12,7 @@ import { Percent, Truck } from 'lucide-react';
 import { calculateShippingCost } from '@/lib/fetch-api/shipping';
 import { courierServices, formattedCourierNames } from '@/lib/courierServices';
 import { formatCurrency } from '@/lib/currency';
+import { getVouchers } from '@/lib/fetch-api/voucher';
 
 interface ShippingAndDiscountProps {
   shippingCourier: string;
@@ -24,6 +25,7 @@ interface ShippingAndDiscountProps {
   totalWeight: number;
   shippingCost: number | null;
   setShippingCost: (cost: number | null) => void;
+  setServiceDescription: (description: string) => void;
 }
 
 const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
@@ -37,37 +39,11 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   totalWeight,
   shippingCost,
   setShippingCost,
+  setServiceDescription,
 }) => {
-  // const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [shippingEstimation, setShippingEstimation] = useState<string | null>(
     null,
   );
-  //   if (courier && method && cityId) {
-  //     try {
-  //       const data = {
-  //         origin: 23,
-  //         destination: cityId,
-  //         weight: totalWeight,
-  //         courier,
-  //       };
-  //       const result = await calculateShippingCost(data);
-  //       console.log('result:', result);
-  //       // setShippingCost(result.rajaongkir.results[0].costs[0].cost[0].value);
-  //       // setShippingEstimation(
-  //       //   result.rajaongkir.results[0].costs[0].cost[0].etd,
-  //       // );
-  //       setShippingCost(result.cost);
-  //       setShippingEstimation(result.estimation);
-  //     } catch (error) {
-  //       console.error('failed to fetch shipping cost:', error);
-  //     }
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   fetchShippingCost(shippingCourier, shippingMethod);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [shippingCourier, shippingMethod]);
 
   useEffect(() => {
     const fetchShippingCost = async () => {
@@ -80,10 +56,11 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
             courier: shippingCourier,
           };
           const result = await calculateShippingCost(data);
-          setShippingCost(result.cost); // Update shippingCost state
+          setShippingCost(result.cost);
           setShippingEstimation(result.estimation);
         } catch (error) {
           console.error('Failed to fetch shipping cost:', error);
+          alert('There is no this shipping service to your destination');
         }
       }
     };
@@ -96,6 +73,41 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
     setShippingCourier(selectedCourier);
     setShippingMethod('');
   };
+
+  const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedMethod = e.target.value;
+    const selectedService = courierServices[shippingCourier].find(
+      (service) => service.service === selectedMethod,
+    );
+    setShippingMethod(selectedMethod);
+    setServiceDescription(selectedService?.description || '');
+  };
+
+  const [productVouchers, setProductVouchers] = useState([]);
+  const [shippingVouchers, setShippingVouchers] = useState([]);
+  const [selectedProductVoucher, setSelectedProductVoucher] = useState('');
+  const [selectedShippingVoucher, setSelectedShippingVoucher] = useState('');
+
+  useEffect(() => {
+    fetchVouchers();
+  }, []);
+
+  const fetchVouchers = async () => {
+    try {
+      const vouchers = await getVouchers();
+      const productVouchersList = vouchers.filter(
+        (voucher: any) => voucher.voucherType === 'PRODUCT',
+      );
+      const shippingVouchersList = vouchers.filter(
+        (voucher: any) => voucher.voucherType === 'SHIPPING COST',
+      );
+      setProductVouchers(productVouchersList);
+      setShippingVouchers(shippingVouchersList);
+    } catch (error) {
+      console.error('Error fetching vouchers:', error);
+    }
+  };
+
   return (
     <div className="flex gap-3">
       <Card className="bg-card text-card-foreground shadow-lg rounded-lg flex-1">
@@ -136,7 +148,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
               <select
                 id="shippingMethod"
                 value={shippingMethod}
-                onChange={(e) => setShippingMethod(e.target.value)}
+                onChange={handleMethodChange}
                 className="mt-1 block w-full p-2 border rounded-md"
               >
                 <option value="">Select Shipping Method</option>
@@ -164,11 +176,28 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
         <CardContent className="p-4">
           <p>Use discount codes to save more.</p>
           <select
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
+            value={selectedProductVoucher}
+            onChange={(e) => setSelectedProductVoucher(e.target.value)}
             className="w-full p-2 border rounded-md"
           >
-            <option value="">Select Discount</option>
+            <option value="">Select Discount Product</option>
+            {productVouchers.map((voucher: any) => (
+              <option key={voucher.id} value={voucher.id}>
+                {voucher.name}
+              </option>
+            ))}
+          </select>
+          <select
+            value={selectedShippingVoucher}
+            onChange={(e) => setSelectedShippingVoucher(e.target.value)}
+            className="w-full p-2 border rounded-md"
+          >
+            <option value="">Select Discount Shipping Cost</option>
+            {shippingVouchers.map((voucher: any) => (
+              <option key={voucher.id} value={voucher.id}>
+                {voucher.name}
+              </option>
+            ))}
           </select>
         </CardContent>
       </Card>
