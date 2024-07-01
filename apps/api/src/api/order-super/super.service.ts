@@ -4,7 +4,7 @@ import { ResponseError } from '@/utils/error.response.js';
 import { Validation } from '@/utils/validation.js';
 import { Request, Response } from 'express';
 import { ConfirmPaymentValidation } from './super.validation.js';
-import { OrderStatus } from '@prisma/client';
+import { OrderStatus, PaymentMethod } from '@prisma/client';
 import { transporter } from '@/helpers/nodemailers.js';
 import handlebars from 'handlebars';
 import path from 'path';
@@ -17,15 +17,18 @@ import {
 } from '@/helpers/order/confirmPaymentByAdmin.js';
 export class OrderSuperService {
   //for super admin
-  static getAllOrders = async (storeId: any) => {
+  static getAllOrders = async (storeId: any, page: number, perPage: number) => {
     const orders = await prisma.order.findMany({
       where: { storeId },
       include: {
         orderItems: { include: { stock: { include: { product: true } } } },
       },
       orderBy: { createdAt: 'desc' },
+      skip: perPage * (page - 1),
+      take: perPage,
     });
-    return orders;
+    const totalCount = await prisma.order.count({ where: { storeId } });
+    return { orders, totalCount };
   };
 
   static confirmPayment = async (req: ConfirmPaymentRequest, res: Response) => {
@@ -38,7 +41,8 @@ export class OrderSuperService {
     if (!order) throw new ResponseError(404, 'Order not found');
     if (order.orderStatus !== 'AWAITING_CONFIRMATION')
       throw new ResponseError(400, 'Order is not awaiting confirmation');
-
+    if (PaymentMethod.MANUAL && !order.paymentPicture)
+      throw new ResponseError(400, 'Order can not be processed');
     const user = order.user;
     const newStatus: OrderStatus = isAccepted ? 'PROCESS' : 'AWAITING_PAYMENT';
     const templateName = isAccepted

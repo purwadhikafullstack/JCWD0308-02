@@ -7,9 +7,15 @@ export class OrderSuperController {
   getAllOrders: ICallback = async (req, res, next) => {
     try {
       const storeId = res.locals.store?.id;
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.perPage as string) || 10;
       console.log('storeId from backend:', storeId);
-      const order = await OrderSuperService.getAllOrders(storeId);
-      return res.status(201).json({ status: 'OK', data: order });
+      const { orders, totalCount } = await OrderSuperService.getAllOrders(
+        storeId,
+        page,
+        perPage,
+      );
+      return res.status(201).json({ status: 'OK', data: orders, totalCount });
     } catch (error) {
       next(error);
     }

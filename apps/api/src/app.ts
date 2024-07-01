@@ -28,8 +28,10 @@ import { ShippingRouter } from './api/shipping/shipping.router.js';
 import { ProvinceRouter } from './api/province/province.router.js';
 import { CityRouter } from './api/city/city.router.js';
 import { OrderSuperRouter } from './api/order-super/super.router.js';
-import { OrderStoreRouter } from './api/order-store/stores.router.js';
-import './helpers/order/orderScheduler.ts';
+import { OrderStoreRouter } from './api/order-store/admin-store.router.js';
+import { initializeSchedulers } from './helpers/order/scheduler.js';
+
+initializeSchedulers();
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
