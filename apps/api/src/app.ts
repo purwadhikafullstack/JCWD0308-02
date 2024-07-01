@@ -29,7 +29,7 @@ import { ProvinceRouter } from './api/province/province.router.js';
 import { CityRouter } from './api/city/city.router.js';
 import { OrderSuperRouter } from './api/order-super/super.router.js';
 import { OrderStoreRouter } from './api/order-store/stores.router.js';
-import './helpers/order/orderScheduler.ts';
+
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
@@ -81,7 +81,7 @@ export default class App {
     const orderSuperRouter = new OrderSuperRouter();
     const orderStoreRouter = new OrderStoreRouter();
 
-    this.app.get('/', (req: Request, res: Response) => {
+    this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
     });
 
