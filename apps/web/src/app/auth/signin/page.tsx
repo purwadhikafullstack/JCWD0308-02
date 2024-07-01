@@ -66,7 +66,7 @@ const Login = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 m-auto shadow-xl shadow-gray-400 bg-white sm:max-w-5xl rounded-xl">
         {/* Photo */}
         <div className="hidden md:block">
-          <figure className="w-full h-full object-cover rounded-l-xl">
+          <figure className="w-full h-full object-cover rounded-l-xl m-auto">
             <Image
               src="/photo-login.jpg"
               width={500}
