@@ -101,20 +101,20 @@ model User {
   createdAt        DateTime    @default(now()) @map("created_at")
 
   //relation
-  orders           Order[]         @relation("UserOrders")
-  orderItems       OrderItem[]
-  addresses        UserAddress[]
-  loginAttempts    LoginAttempt[]
-  userVouchers     UserVoucher[]
-  StoreAdmin       StoreAdmin?
-  stores           Store[]         @relation("SuperAdminStores")
-  mutations        StockMutation[] @relation("AdminStockMutations")
-  products         Product[]       @relation("SuperAdminProducts")
-  categories       Category[]      @relation("SuperAdminCategories")
-  StoreAdminOrders Order[]         @relation("StoreAdminOrders")
-  adminVouchers    Voucher[]       @relation("AdminVouchers")
-  storeAdminVouchers Voucher[]     @relation("StoreAdminVouchers")
-  sessions         Session[]
+  orders             Order[]         @relation("UserOrders")
+  orderItems         OrderItem[]
+  addresses          UserAddress[]
+  loginAttempts      LoginAttempt[]
+  userVouchers       UserVoucher[]
+  StoreAdmin         StoreAdmin?
+  stores             Store[]         @relation("SuperAdminStores")
+  mutations          StockMutation[] @relation("AdminStockMutations")
+  products           Product[]       @relation("SuperAdminProducts")
+  categories         Category[]      @relation("SuperAdminCategories")
+  StoreAdminOrders   Order[]         @relation("StoreAdminOrders")
+  adminVouchers      Voucher[]       @relation("AdminVouchers")
+  storeAdminVouchers Voucher[]       @relation("StoreAdminVouchers")
+  sessions           Session[]
 
   @@map("users")
 }
@@ -146,12 +146,17 @@ model LoginAttempt {
 
 model UserAddress {
   id            String   @id @default(uuid())
+  labelAddress  String   @map("label_address")
+  recipientName String   @map("recipient_name")
+  phone         String?  @map("phone")
   userId        String   @map("user_id")
   isMainAddress Boolean  @default(false) @map("is_main_address")
   address       String   @db.LongText
   cityId        Int      @map("city_id")
   note          String?
   coordinate    String   @db.LongText
+  latitude      String?  @db.LongText
+  longitude     String?  @db.LongText
   updatedAt     DateTime @updatedAt @map("updated_at")
   createdAt     DateTime @default(now()) @map("created_at")
 
@@ -196,6 +201,8 @@ model Store {
   imageUrl     String?  @map("image_url")
   address      String   @db.LongText
   coordinate   String   @db.LongText
+  latitude     String?  @db.LongText
+  longitude    String?  @db.LongText
   cityId       Int      @map("city_id")
   updatedAt    DateTime @updatedAt @map("updated_at")
   createdAt    DateTime @default(now()) @map("created_at")
@@ -401,10 +408,10 @@ model Voucher {
   imageUrl      String?      @map("image_url")
 
   //relation
-  superAdmin    User?          @relation("AdminVouchers", fields: [superAdminId], references: [id], onDelete: Cascade)
-  storeAdmin    User?          @relation("StoreAdminVouchers", fields: [storeAdminId], references: [id], onDelete: Cascade)
-  store         Store?         @relation("StoreVouchers", fields: [storeId], references: [id], onDelete: Cascade)
-  userVouchers  UserVoucher[]
+  superAdmin   User?         @relation("AdminVouchers", fields: [superAdminId], references: [id], onDelete: Cascade)
+  storeAdmin   User?         @relation("StoreAdminVouchers", fields: [storeAdminId], references: [id], onDelete: Cascade)
+  store        Store?        @relation("StoreVouchers", fields: [storeId], references: [id], onDelete: Cascade)
+  userVouchers UserVoucher[]
 
   @@map("vouchers")
 }
