@@ -1,9 +1,11 @@
+import { UserFields } from '@/types/user.type.js';
 import { GITHUB_OAUTH_URL, GOOGLE_OAUTH_URL, NODE_ENV } from '@/config.js';
 import { prisma } from '@/db.js';
 import { AccountType, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 import { generateId } from 'lucia';
 import { CookieAttributes, parseCookies, serializeCookie } from 'oslo/cookie';
+import { user } from './auth.validation.js';
 
 export interface ICreateUserByEmail extends Prisma.UserCreateInput {
   email: string;
@@ -63,8 +65,36 @@ export class AuthHelper {
     });
   };
 
+  static setCookies = async (user: user, res: Response) => {
+    
+    if (user?.role === "STORE_ADMIN") {
+      const store = await prisma.storeAdmin.findUnique({ where: { storeAdminId: user!.id } })
+      AuthHelper.setStoreIdCookie(res, store?.storeId!)
+    }
+
+    if (user?.role === "SUPER_ADMIN") {
+      const store = await prisma.store.findFirst({ orderBy: { createdAt: 'asc' } })
+      AuthHelper.setStoreIdCookie(res, store?.id!)
+    }
+
+    if (user?.role === "USER") {
+      const address = await prisma.userAddress.findFirst({ where: {userId: user.id, isMainAddress: true } })
+      AuthHelper.setAddressIdCookie(res, address?.id!)
+    }
+  }
+
   static setStoreIdCookie = (res: Response, storeId: string) => {
     res.appendHeader("Set-Cookie", serializeCookie('storeId', storeId!, {
+      path: '/',
+      secure: NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 60 * 60 * 24 * 30,
+      sameSite: 'lax',
+    }))
+  };
+
+  static setAddressIdCookie = (res: Response, addressId: string) => {
+    res.appendHeader("Set-Cookie", serializeCookie('addressId', addressId!, {
       path: '/',
       secure: NODE_ENV === 'production',
       httpOnly: true,

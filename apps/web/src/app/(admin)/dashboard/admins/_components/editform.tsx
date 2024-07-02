@@ -129,7 +129,7 @@ const EditForm: React.FC<EditFormProps> = ({ user, onUpdate, onCancel }) => {
                 <label className="block text-sm font-medium text-gray-700">
                   Store
                 </label>
-                <StoreSelector disable={formData.role === "SUPER_ADMIN"} className='mt-1' />
+                <StoreSelector storeId={user?.StoreAdmin?.storeId} disable={formData.role === "SUPER_ADMIN"} className='mt-1' />
               </div>
             </div>
             <CardFooter className="mt-4 flex justify-end space-x-4">

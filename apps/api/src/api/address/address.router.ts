@@ -13,8 +13,11 @@ export class AddressRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/', this.addressController.addAddress);
-    this.router.get('/', this.addressController.getAddressById);
+    this.router.post('/', AuthMiddleware.authed, this.addressController.createAddress);
+    this.router.get('/', AuthMiddleware.authed, this.addressController.getAllAddress);
+    this.router.get('/selected', AuthMiddleware.authed, this.addressController.getSelectedAddress);
+    this.router.patch('/:addressId', AuthMiddleware.authed, this.addressController.updateAddress);
+    this.router.delete('/:addressId', AuthMiddleware.authed, this.addressController.deleteAddress);
   }
 
   getRouter(): Router {

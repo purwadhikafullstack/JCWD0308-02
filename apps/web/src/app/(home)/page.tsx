@@ -13,7 +13,7 @@ import Image from 'next/image';
 export default function Home() {
   return (
     <main className="flex-1">
-      <section className="w-full py-6 sm:py-12 md:py-14 lg:py-16">
+      <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
         <div className="container px-4 md:px-6">
           <Carousel className="rounded-lg shadow-lg">
             <CarouselContent>
@@ -76,7 +76,7 @@ export default function Home() {
           </Carousel>
         </div>
       </section>
-      <section className="w-full py-6 sm:py-12 md:py-14 lg:py-16">
+      <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
         <div className="container px-4 md:px-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
@@ -199,7 +199,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="w-full py-6 sm:py-12 md:py-14 lg:py-16">
+      <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
         <div className="container px-4 md:px-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
@@ -322,7 +322,7 @@ export default function Home() {
           </div>
         </div>
       </section>
-      <section className="w-full py-6 sm:py-12 md:py-14 lg:py-16">
+      <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
         <div className="container px-4 md:px-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
