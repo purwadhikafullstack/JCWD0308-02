@@ -108,7 +108,7 @@ export class StoreController {
 
   deleteStore: ICallback = async (req, res, next) => {
     try {
-      const updated = await StoreService.deleteStore(req.params.storeId)
+      const updated = await StoreService.deleteStore(req.params.storeId, res)
 
       console.log({updated});
       
