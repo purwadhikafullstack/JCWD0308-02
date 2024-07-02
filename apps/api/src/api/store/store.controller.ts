@@ -105,4 +105,25 @@ export class StoreController {
       next(error)
     }
   }
+
+  deleteStore: ICallback = async (req, res, next) => {
+    try {
+      const updated = await StoreService.deleteStore(req.params.storeId)
+
+      console.log({updated});
+      
+
+      res.appendHeader("Set-Cookie", serializeCookie('storeId', updated.storeFallback?.id!, {
+        path: '/',
+        secure: NODE_ENV === 'production',
+        httpOnly: true,
+        maxAge: 60 * 60 * 24 * 30,
+        sameSite: 'lax',
+      }))
+      // res.end()
+      return res.status(200).json({ status: 'OK', message: `${updated.deletedStore.name} has been deleted!`, ...updated })
+    } catch (error) {
+      next(error)
+    }
+  }
 }
