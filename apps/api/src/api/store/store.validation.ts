@@ -7,6 +7,8 @@ export class StoreValidation {
     imageUrl: z.string(),
     address: z.string(),
     coordinate: z.string(),
+    latitude: z.string(),
+    longitude: z.string(),
     cityId: z.string().transform(city => +city),
     status: z.enum(['DRAFT', 'INACTIVE', 'PUBLISHED', 'SUSPENDED']),
   })
@@ -16,6 +18,8 @@ export class StoreValidation {
     slug: z.string().min(8).max(512),
     imageUrl: z.string().optional(),
     address: z.string(),
+    latitude: z.string(),
+    longitude: z.string(),
     coordinate: z.string(),
     cityId: z.string().transform(city => +city),
     status: z.enum(['DRAFT', 'INACTIVE', 'PUBLISHED', 'SUSPENDED']),

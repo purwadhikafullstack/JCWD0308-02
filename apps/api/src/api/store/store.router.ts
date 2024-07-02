@@ -20,6 +20,7 @@ export class StoreRouter {
     this.router.get('/:storeId', AuthMiddleware.storeAdmin, this.storeController.getStore);
     this.router.get('/:storeId/admin', AuthMiddleware.storeAdmin, this.storeController.getStoreAdmin);
     this.router.patch('/:storeId', AuthMiddleware.superAdmin, uploader('IMG', '/images').single('file'), this.storeController.updateStore);
+    this.router.delete('/:storeId', AuthMiddleware.superAdmin, this.storeController.deleteStore);
     this.router.post('/', AuthMiddleware.superAdmin, uploader('IMG', '/images').single('file'), this.storeController.createStore);
   }
 

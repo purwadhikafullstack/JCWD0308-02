@@ -28,7 +28,8 @@ import { ShippingRouter } from './api/shipping/shipping.router.js';
 import { ProvinceRouter } from './api/province/province.router.js';
 import { CityRouter } from './api/city/city.router.js';
 import { OrderSuperRouter } from './api/order-super/super.router.js';
-import { OrderStoreRouter } from './api/order-store/stores.router.js';
+import { OrderStoreRouter } from './api/order-store/admin-store.router.js';
+import { initializeSchedulers } from './helpers/order/scheduler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -56,6 +57,7 @@ export default class App {
     this.app.use(urlencoded({ extended: true, limit: '10mb' }));
     this.app.use(morganMiddleware);
     this.app.use(AuthMiddleware.identifyRequest);
+    this.app.use(AuthMiddleware.identifyUser);
     this.app.use(AuthMiddleware.identifyStoreAdmin);
     this.app.use(AuthMiddleware.identifySuperAdmin);
     this.app.use(

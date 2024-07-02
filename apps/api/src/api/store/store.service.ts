@@ -125,4 +125,25 @@ export class StoreService {
 
     return updatedStore
   }
+
+  static deleteStore = async (storeId: string, res: Response) => {
+    const existingStore = await prisma.store.findUnique({
+      where: {
+        id: storeId
+      }
+    })
+
+    if (!existingStore) throw new ResponseError(400, "Store is not found!")
+
+    const deletedStore = await prisma.store.delete({ where: { id: storeId } })
+
+    if (deletedStore.id === res.locals.store?.id) {
+
+      const storeFallback = await prisma.store.findFirst()
+
+      return { deletedStore, storeFallback }
+    }
+
+    return { deletedStore }
+  }
 }

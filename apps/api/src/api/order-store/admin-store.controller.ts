@@ -1,9 +1,5 @@
 import { ICallback } from '@/types/index.js';
-
-import { ResponseError } from '@/utils/error.response.js';
-import { OrderStoreService } from './stores.service.js';
-import { OrderStatus } from '@prisma/client';
-import { ConfirmPaymentRequest } from '@/types/order.type.js';
+import { OrderStoreService } from './admin-store.service.js';
 
 export class OrderStoreController {
   getOrdersByStoreAdmin: ICallback = async (req, res, next) => {

@@ -36,7 +36,10 @@ export default function StoreList() {
           <TableHeader>
             <TableRow>
               <TableHead>Store</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead className="hidden xl:table-cell">Status</TableHead>
+              <TableHead>
+                <span className="sr-only">Actions</span>
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

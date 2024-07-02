@@ -8,7 +8,9 @@ import { ResponseError } from '@/utils/error.response.js';
 export class UserController {
 
   getUsers: ICallback = async (req, res) => {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({include: {
+      StoreAdmin: true,
+    }});
 
     return res.status(200).json({ users });
   }

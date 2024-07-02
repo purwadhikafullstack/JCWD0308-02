@@ -12,19 +12,26 @@ import { toast } from 'sonner';
 export default function Map({
   latitude,
   longitude,
-  handleChange
+  handleChangeCoords,
+  handleChangeLatitude,
+  handleChangeLongitude,
 }: {
   latitude: number;
   longitude: number;
-  handleChange: (coords: string) => void;
+  handleChangeCoords: (coords: string) => void;
+  handleChangeLatitude: (latitude: string) => void;
+  handleChangeLongitude: (longitude: string) => void;
 }) {
-    const mapContainer = useRef(null);
-    const map = useRef<maptilersdk.Map | null>(null);
+  const mapContainer = useRef(null);
+  const map = useRef<maptilersdk.Map | null>(null);
   const [currentLng, setCurrentLng] = useState(0);
   const [currentLat, setCurrentLat] = useState(0);
   const [API_KEY] = useState('6ZnThUh4eqovc7VjsFBV');
   const [mapController, setMapController] = useState<MapController>();
   maptilersdk.config.apiKey = '6ZnThUh4eqovc7VjsFBV';
+
+  // const center = longitude && latitude ? [longitude && latitude] : undefined
+  
 
   useEffect(() => {
     if (map.current) return; // stops map from intializing more than once
@@ -35,13 +42,17 @@ export default function Map({
       geolocate: maptilersdk.GeolocationType.POINT,
       fullscreenControl: 'bottom-right',
       language: 'name:id',
+      center: latitude ? [longitude, latitude] : undefined,
+      zoom: 10,
     };
     map.current = new maptilersdk.Map(options);
     const marker = new maptilersdk.Marker({ draggable: true, color: '#ff0000' })
       .setLngLat([longitude, latitude])
       .addTo(map.current!);
 
-    setMapController(createMapLibreGlMapController(map.current as any, maplibregl));
+    setMapController(
+      createMapLibreGlMapController(map.current as any, maplibregl),
+    );
 
     map.current.on('load', () => {
       map.current!.addSource('search-results', {
@@ -70,15 +81,17 @@ export default function Map({
       const results = await maptilersdk.geocoding.reverse([lng, lat]);
       console.log(lng, lat);
       console.log(results);
-      handleChange(`${lat}, ${lng}`)
+      handleChangeCoords(`${lat}, ${lng}`);
+      handleChangeLatitude(`${lat}`);
+      handleChangeLongitude(`${lng}`);
     });
   }, []);
 
-//   useEffect(() => {
-//     const marker = new maptilersdk.Marker({ draggable: true, color: '#ff0000' })
-//       .setLngLat([longitude, latitude])
-//       .addTo(map.current!);
-//   }, [latitude, longitude])
+  //   useEffect(() => {
+  //     const marker = new maptilersdk.Marker({ draggable: true, color: '#ff0000' })
+  //       .setLngLat([longitude, latitude])
+  //       .addTo(map.current!);
+  //   }, [latitude, longitude])
 
   return (
     <>

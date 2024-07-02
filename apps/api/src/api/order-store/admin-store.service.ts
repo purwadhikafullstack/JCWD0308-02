@@ -3,7 +3,7 @@ import { OrderId } from '@/types/order.type.js';
 import { ResponseError } from '@/utils/error.response.js';
 import { Validation } from '@/utils/validation.js';
 import { Request, Response } from 'express';
-import { OrderIdValidation } from './stores.validation.js';
+import { OrderIdValidation } from './admin-store.validation.js';
 
 export class OrderStoreService {
   //for store admin
