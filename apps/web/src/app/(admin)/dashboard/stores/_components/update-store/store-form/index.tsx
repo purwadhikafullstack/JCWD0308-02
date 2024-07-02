@@ -27,11 +27,13 @@ export function UpdateStoreForm({
     address: store.address,
     cityId: String(store.cityId),
     coordinate: store.coordinate,
+    latitude: store.latitude || '',
+    longitude: store.longitude || '',
     name: store.name,
     provinceId: String(store.City.provinceId),
     slug: store.slug,
     status: store.status,
-    file: undefined
+    file: undefined,
   });
 
   const [provinceId, setProvinceId] = useState(store.City.provinceId);
@@ -44,8 +46,8 @@ export function UpdateStoreForm({
     await createNewStore.mutateAsync(formData);
   }
 
-  let latitude = +form.getValues('coordinate')?.split(', ')[0] || 0;
-  let longitude = +form.getValues('coordinate')?.split(', ')[1] || 0;
+  let latitude = +form.getValues('latitude') || 0;
+  let longitude = +form.getValues('longitude') || 0;
 
   return (
     <Form {...form}>

@@ -34,15 +34,7 @@ export class AuthController {
 
       const session = await lucia.createSession(user!.id, {});
 
-      if (user?.role === "STORE_ADMIN") {
-        const store = await prisma.storeAdmin.findUnique({ where: { storeAdminId: user!.id } })
-        AuthHelper.setStoreIdCookie(res, store?.storeId!)
-      }
-
-      if (user?.role === "SUPER_ADMIN") {
-        const store = await prisma.store.findFirst({ orderBy: { createdAt: 'asc' } })
-        AuthHelper.setStoreIdCookie(res, store?.id!)
-      }
+      await AuthHelper.setCookies(user!, res)
 
       return res
         .status(200)
@@ -69,6 +61,7 @@ export class AuthController {
           lucia.createBlankSessionCookie().serialize(),
         )
         .clearCookie('storeId')
+        .clearCookie('addressId')
         .json({ status: 'OK', message: 'Signout Success' });
     } catch (error) {
       next(error);
@@ -104,6 +97,9 @@ export class AuthController {
       const user = await AuthService.githubOAuth(code);
 
       const session = await lucia.createSession(user.id, {});
+      
+      await AuthHelper.setCookies(user!, res)
+
       return res
         .clearCookie('github_oauth_state')
         .appendHeader(
@@ -155,6 +151,9 @@ export class AuthController {
       const user = await AuthService.googleOAuth(code, codeVerifier);
 
       const session = await lucia.createSession(user.id, {});
+      
+      await AuthHelper.setCookies(user!, res)
+      
       return res
         .clearCookie('google_oauth_state')
         .clearCookie('google_code_verifier')

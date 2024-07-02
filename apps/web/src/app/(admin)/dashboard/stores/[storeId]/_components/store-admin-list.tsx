@@ -21,11 +21,11 @@ import fetchAPI from '@/lib/fetchAPI';
 import { env } from '@/app/env';
 
 export default function StoreAdminList({
-  header,
+  cookie,
   storeId,
 }: {
   storeId: string;
-  header: Headers;
+  cookie: string;
 }) {
   const storeAdmins = useSuspenseQuery({
     queryKey: ['store', storeId, 'admin'],
@@ -33,7 +33,7 @@ export default function StoreAdminList({
       (
         await fetchAPI(
           `${env.NEXT_PUBLIC_BASE_API_URL}/stores/${storeId}/admin?client=true`,
-          { headers: header },
+          { headers: { Cookie: cookie } },
         )
       ).json(),
   });

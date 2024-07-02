@@ -55,6 +55,9 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
   //   // router.refresh()
   //   router.push('/auth/signin')
   // }
+  
+  const [selectedStoreId, setSelectedStoreId] = React.useState(storeId || selectedStore?.data?.store?.id)
+  
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -69,9 +72,9 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
           <div className="flex items-center gap-2">
             <Store className="h-4 w-4" />
             <span className='max-w-28 truncate'>
-              {selectedStore?.data?.store?.id
+              {selectedStoreId
                 ? stores.data.stores.find(
-                    (store) => store.id === selectedStore?.data?.store?.id,
+                    (store) => store.id === selectedStoreId,
                   )?.name
                 : 'Select store...'}
             </span>
@@ -94,18 +97,19 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
 
                     // setValue(currentValue === value ? (selectedStore.data.store.id || '') : currentValue);
                     await handleChangeStore.mutateAsync(
-                      currentValue === selectedStore?.data?.store?.id
-                        ? selectedStore?.data?.store?.id || ''
+                      currentValue === selectedStoreId
+                        ? selectedStoreId || ''
                         : currentValue,
                     );
                     console.log('hi');
-                    setOpen(false);
+                    setOpen(() =>false);
+                    setSelectedStoreId(() => selectedStore?.data?.store?.id);
                   }}
                 >
                   <Check
                     className={cn(
                       'mr-2 h-4 w-4',
-                      selectedStore?.data?.store?.id === store.id
+                      selectedStoreId === store.id
                         ? 'opacity-100'
                         : 'opacity-0',
                     )}

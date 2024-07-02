@@ -14,12 +14,12 @@ export const STATUS = ['DRAFT', 'INACTIVE', 'PUBLISHED', 'SUSPENDED'] as const;
 export const FormSchema = z.object({
   name: z
     .string({
-      required_error: 'Please select an email to display.',
+      required_error: 'Please input your store name',
     })
     .min(1, 'This field is required'),
   slug: z
     .string({
-      required_error: 'Please select an email to display.',
+      required_error: 'Please input your store slug',
     })
     .min(1, 'This field is required'),
   file: z
@@ -45,22 +45,32 @@ export const FormSchema = z.object({
     ),
   provinceId: z
     .string({
-      required_error: 'Please select an email to display.',
+      required_error: 'Please input your store province',
     })
     .min(1, 'This field is required'),
   cityId: z
     .string({
-      required_error: 'Please select an email to display.',
+      required_error: 'Please input your store city',
     })
     .min(1, 'This field is required'),
   address: z
     .string({
-      required_error: 'Please select an email to display.',
+      required_error: 'Please input your store address',
     })
     .min(1, 'This field is required'),
   coordinate: z
     .string({
-      required_error: 'Please select an email to display.',
+      required_error: 'Please input your store coordinate',
+    })
+    .min(1, 'This field is required'),
+  latitude: z
+    .string({
+      required_error: 'Please input your store coordinate',
+    })
+    .min(1, 'This field is required'),
+  longitude: z
+    .string({
+      required_error: 'Please input your store coordinate',
     })
     .min(1, 'This field is required'),
   status: z.enum(STATUS),

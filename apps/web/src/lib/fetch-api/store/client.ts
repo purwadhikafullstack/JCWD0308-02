@@ -31,8 +31,28 @@ export const createStore = async (formData: FormData): Promise<{ store: Store | 
     return await newStore.json()
   } catch (error) {
     console.log('hit error');
-    
+
     return error as any
+  }
+}
+
+export const deleteStore = async (storeId: string): Promise<{
+  status: string,
+  message: string,
+  deletedStore: Store | null,
+  storeFallback: Store | null
+}> => {
+  try {
+    const res = await fetchAPI(`${env.NEXT_PUBLIC_BASE_API_URL}/stores/${storeId}`, {
+      method: "DELETE",
+    })
+
+    if (!res.ok) throw new Error(await res.json())
+    return await res.json()
+  } catch (error) {
+    console.log('hit error');
+
+    throw error
   }
 }
 

@@ -23,6 +23,17 @@ export default function FieldCoordinate({
   latitude: number;
   longitude: number;
 }) {
+  const handleChangeCoords = (coords: string) => {
+    form.setValue('coordinate', coords);
+  };
+
+  const handleChangeLatitude = (latitude: string) => {
+    form.setValue('latitude', latitude);
+  };
+
+  const handleChangeLongitude = (longitude: string) => {
+    form.setValue('longitude', longitude);
+  };
   return (
     <FormField
       control={form.control}
@@ -34,24 +45,37 @@ export default function FieldCoordinate({
           <Map
             latitude={latitude}
             longitude={longitude}
-            handleChange={field.onChange}
+            handleChangeCoords={handleChangeCoords}
+            handleChangeLatitude={handleChangeLatitude}
+            handleChangeLongitude={handleChangeLongitude}
           />
           {/* ) : null} */}
           <FormControl>
-            <Input
-              placeholder="latitude, longitude (-6.868536055986229, 107.62149511534268)"
-              id="coodinate"
-              value={field.value || ''}
-              {...form.register('coordinate')}
-            />
+            <>
+              <Input
+                placeholder="latitude, longitude (-6.868536055986229, 107.62149511534268)"
+                id="coodinate"
+                value={field.value || ''}
+                {...form.register('coordinate')}
+              />
+              <Input
+                type="hidden"
+                id="latitude"
+                value={form.getValues('latitude')}
+                {...form.register('latitude')}
+              />
+              <Input
+                type="hidden"
+                id="longitude"
+                value={form.getValues('longitude')}
+                {...form.register('longitude')}
+              />
+            </>
           </FormControl>
           <FormDescription>
             This is your store coordinate, please mark your coordinate.
           </FormDescription>
-          <FormMessage>
-            {typeof errorMessage &&
-              errorMessage}
-          </FormMessage>
+          <FormMessage>{typeof errorMessage && errorMessage}</FormMessage>
         </FormItem>
       )}
     />

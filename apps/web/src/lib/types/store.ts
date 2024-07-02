@@ -9,6 +9,8 @@ export interface Store {
   imageUrl: string;
   address: string;
   coordinate: string;
+  latitude: string;
+  longitude: string;
   cityId: number;
   updatedAt: string;
   createdAt: string;

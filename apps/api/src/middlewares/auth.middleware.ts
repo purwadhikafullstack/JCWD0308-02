@@ -58,6 +58,31 @@ export class AuthMiddleware {
     next()
   }
 
+  static identifyUser: ICallback = async (req, res, next) => {
+    if (res.locals.user?.role === "USER") {
+
+      if (!req.cookies.addressId) {
+        const mainAddress = await prisma.userAddress.findFirst({ where: { userId: res.locals.user.id, isMainAddress: true } })
+        res.appendHeader("Set-Cookie", serializeCookie('addressId', mainAddress?.id!, {
+          path: '/',
+          secure: NODE_ENV === 'production',
+          httpOnly: true,
+          maxAge: 60 * 60 * 24 * 30,
+          sameSite: 'lax',
+        }))
+
+
+        res.locals.address = { id: mainAddress?.id! }
+
+      }
+
+      res.locals.address = { id: req.cookies.addressId || res.locals.address?.id! }
+
+    }
+
+    next()
+  }
+
   static identifySuperAdmin: ICallback = async (req, res, next) => {
     if (res.locals.user?.role === "SUPER_ADMIN") {
       const store = await prisma.store.findFirst({ orderBy: { createdAt: 'asc' } })

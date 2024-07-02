@@ -12,6 +12,9 @@ import FieldCoordinate from './field/coordinate';
 import FieldProvince from './field/province';
 import FieldCity from './field/city';
 import FieldStatus from './field/status';
+import FieldLatitude from './field/latitude';
+import FieldLongitude from './field/longitude';
+import { Button } from '@/components/ui/button';
 
 export function CreateStoreForm({
   className,
@@ -29,11 +32,12 @@ export function CreateStoreForm({
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+
     await createNewStore.mutateAsync(formData);
   }
 
-  let latitude = +form.getValues('coordinate')?.split(', ')[0] || 0;
-  let longitude = +form.getValues('coordinate')?.split(', ')[1] || 0;
+  let latitude = +form.getValues('latitude') || 0;
+  let longitude = +form.getValues('longitude') || 0;
 
   return (
     <Form {...form}>
@@ -74,11 +78,14 @@ export function CreateStoreForm({
           latitude={latitude}
           longitude={longitude}
         />
+        <FieldLatitude form={form} errorMessage={createNewStore?.error?.errors?.fieldErrors?.latitude} />
+        <FieldLongitude form={form} errorMessage={createNewStore?.error?.errors?.fieldErrors?.longitude} />
         <FieldStatus
           form={form}
           errorMessage={createNewStore?.error?.errors?.fieldErrors?.status}
         />
-        <Submit type="submit">Submit</Submit>
+        <Button type="submit">Submit</Button>
+        {/* <Submit type="submit">Submit</Submit> */}
       </form>
     </Form>
   );

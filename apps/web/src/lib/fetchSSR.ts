@@ -1,11 +1,13 @@
-import { headers } from "next/headers";
+import { cookies } from "next/headers";
 
 const fetchSSR = (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
-  
+
   const modifiedInit: RequestInit = {
     ...init,
     credentials: init.credentials ?? 'include',
-    headers: new Headers(headers()),
+    headers: {
+      Cookie: cookies().toString()
+    }
   };
 
   return fetch(input, modifiedInit);

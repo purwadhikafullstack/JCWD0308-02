@@ -12,6 +12,7 @@ import { getStores } from '@/lib/fetch-api/store/server';
 import { Toaster } from '@/components/ui/sonner';
 import { getProvinces } from '@/lib/fetch-api/province/server';
 import { getCities } from '@/lib/fetch-api/city/server';
+import { getAddressList, getSelectedAddress } from '@/lib/fetch-api/address/server';
 
 export const runtime = 'nodejs'; // 'nodejs' (default) | 'edge'
 export const fetchCache = 'default-no-store';
@@ -43,12 +44,20 @@ export default async function RootLayout({
     queryFn: getUserProfile,
   });
 
+  queryClient.prefetchQuery({
+    queryKey: ['address-list'],
+    queryFn: getAddressList,
+  });
+
+  queryClient.prefetchQuery({
+    queryKey: ['selected-address'],
+    queryFn: getSelectedAddress,
+  });
   
   queryClient.prefetchQuery({
     queryKey: ["stores"],
     queryFn: getStores
   })
-
   
   queryClient.prefetchQuery({
     queryKey: ["provinces"],

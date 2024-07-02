@@ -21,7 +21,7 @@ import SecondNavbar from './second-navbar';
 
 export const NavbBar = ({ category }: { category: Category[] }) => {
   return (
-    <div className="flex flex-col z-[999rem]">
+    <div className="flex flex-col z-10 bg-background">
       <header className="container flex items-center justify-between gap-4 h-16 bg-background px-4 md:px-6">
         <div className="flex items-center gap-4">
           <Link

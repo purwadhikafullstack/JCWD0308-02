@@ -11,8 +11,8 @@ const DialogStore = dynamic(() => import('./dialog-store'));
 
 export default function CreateNewStore() {
   const [open, setOpen] = useState(false);
-  const isDesktop = useMediaQuery('(min-width: 768px)');
   const handleClose = () => setOpen(false);
+  const isDesktop = useMediaQuery('(min-width: 768px)');
 
   const [showOnMobile, setShowOnMobile] = useState(false);
   useEffect(() => {

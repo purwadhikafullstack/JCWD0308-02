@@ -1,3 +1,4 @@
+import { $Enums } from '@prisma/client';
 import { ZodType, z } from 'zod';
 
 export class AuthValidation {
@@ -16,4 +17,18 @@ export class AuthValidation {
     }).max(256),
     password: z.string().min(8).max(512),
   })
+}
+
+export type user = {
+  id: string;
+  updatedAt: Date;
+  createdAt: Date;
+  status: $Enums.UserStatus;
+  displayName: string;
+  avatarUrl: string;
+  contactEmail: string | null;
+  email: string | null;
+  role: $Enums.UserRole;
+  referralCode: string;
+  registerCode: string | null;
 }
