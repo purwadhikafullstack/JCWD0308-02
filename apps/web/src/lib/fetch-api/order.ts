@@ -2,8 +2,9 @@ import axios from 'axios';
 import { API_URL } from './lib';
 
 //super admin
-export const getAllOrders = async () => {
+export const getAllOrders = async (page: number, perPage: number) => {
   const response = await axios.get(`${API_URL}/order-super/all-orders`, {
+    params: { page, perPage },
     withCredentials: true,
   });
   return response.data;

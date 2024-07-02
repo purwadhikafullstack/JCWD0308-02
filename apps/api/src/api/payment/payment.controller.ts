@@ -1,17 +1,16 @@
 import { ICallback } from '@/types/index.js';
-
-import { ResponseError } from '@/utils/error.response.js';
 import { PaymentService } from './payment.service.js';
 import { OrderStatus } from '@prisma/client';
+import {
+  getEmailTemplate,
+  getOrderWithUser,
+  sendConfirmationEmail,
+} from '@/helpers/order/confirmPaymentByAdmin.js';
 
 export class PaymentController {
   updateOrderStatus: ICallback = async (req, res, next) => {
     try {
-      console.log('Midtrans Notification Received');
-      console.log('req.body:', req.body);
-
       const { order_id, transaction_status } = req.body;
-
       if (
         transaction_status === 'capture' ||
         transaction_status === 'settlement'
@@ -20,12 +19,18 @@ export class PaymentController {
           order_id,
           OrderStatus.AWAITING_CONFIRMATION,
         );
-      }
+        const order = await getOrderWithUser(order_id);
+        const user = order?.user;
+        const subject = 'Welcome to Grosirun - Payment Confirmation';
+        const html = getEmailTemplate('paymentConfirmed.html', {
+          name: user?.displayName,
+        });
 
-      res.status(200).send('Notification received');
+        await sendConfirmationEmail(user?.email, subject, html);
+      }
+      res.status(200).json({ status: 'OK' });
     } catch (error) {
-      console.error('Error handling Midtrans notification:', error);
-      res.status(500).send('Internal Server Error');
+      next(error);
     }
   };
 }
