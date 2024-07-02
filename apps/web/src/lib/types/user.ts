@@ -25,4 +25,11 @@ export interface User {
   password: string;
   createdAt: string;
   updatedAt: string;
+  StoreAdmin?: {
+    id: string,
+    storeId: string,
+    storeAdminId: string,
+    updatedAt: Date,
+    createdAt: Date,
+  } | null
 }
