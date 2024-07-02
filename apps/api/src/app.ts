@@ -56,6 +56,7 @@ export default class App {
     this.app.use(urlencoded({ extended: true, limit: '10mb' }));
     this.app.use(morganMiddleware);
     this.app.use(AuthMiddleware.identifyRequest);
+    this.app.use(AuthMiddleware.identifyUser);
     this.app.use(AuthMiddleware.identifyStoreAdmin);
     this.app.use(AuthMiddleware.identifySuperAdmin);
     this.app.use(
