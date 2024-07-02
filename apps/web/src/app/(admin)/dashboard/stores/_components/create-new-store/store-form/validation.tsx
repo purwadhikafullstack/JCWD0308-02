@@ -53,6 +53,16 @@ export const FormSchema = z.object({
       required_error: 'Please select an email to display.',
     })
     .min(1, 'This field is required'),
+    latitude: z
+      .string({
+        required_error: 'Please input your store coordinate',
+      })
+      .min(1, 'This field is required'),
+    longitude: z
+      .string({
+        required_error: 'Please input your store coordinate',
+      })
+      .min(1, 'This field is required'),
   status: z.enum(STATUS),
 });
 
