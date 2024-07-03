@@ -14,6 +14,16 @@ export class StockController {
       next(error);
     }
   };
+  
+  getNearestStocks: ICallback = async (req, res, next) => {
+    try {
+      const { page, limit, filters } = this.getPaginationAndFilters(req.query);
+      const stocks = await StockService.getNearestStocks(page, limit, filters, res);
+      res.status(200).json(stocks);
+    } catch (error) {
+      next(error);
+    }
+  };
 
   getStockById: ICallback = async (req, res, next) => {
     try {
