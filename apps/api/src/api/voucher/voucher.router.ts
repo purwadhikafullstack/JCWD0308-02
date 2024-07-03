@@ -17,7 +17,7 @@ export class VoucherRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get('/', AuthMiddleware.authed, this.voucherController.getVouchers);
+    this.router.get('/', this.voucherController.getVouchers);
     this.router.post('/', AuthMiddleware.storeAdmin, uploader('voucher').single('image'), this.voucherController.createVoucher);
     this.router.put('/:id', AuthMiddleware.storeAdmin, uploader('voucher').single('image'), this.voucherController.updateVoucher);
     this.router.delete('/:id', AuthMiddleware.storeAdmin, this.voucherController.deleteVoucher);
