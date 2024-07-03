@@ -9,7 +9,6 @@ export default function StoreLayout({
   children: React.ReactNode;
   params: { storeId: string };
 }) {
-  console.log('HERE!!!********', params.storeId);
 
   const queryClient = getQueryClient();
   queryClient.prefetchQuery({

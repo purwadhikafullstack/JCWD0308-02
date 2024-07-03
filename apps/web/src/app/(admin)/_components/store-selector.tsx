@@ -50,14 +50,8 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
       await changeStore(storeId);
     },
   });
-
-  // if(!selectedStore.data.store) {
-  //   // router.refresh()
-  //   router.push('/auth/signin')
-  // }
   
   const [selectedStoreId, setSelectedStoreId] = React.useState(storeId || selectedStore?.data?.store?.id)
-  
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -93,15 +87,12 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
                   key={store.id}
                   value={store.id}
                   onSelect={async (currentValue) => {
-                    console.log('hi');
-
                     // setValue(currentValue === value ? (selectedStore.data.store.id || '') : currentValue);
                     await handleChangeStore.mutateAsync(
                       currentValue === selectedStoreId
                         ? selectedStoreId || ''
                         : currentValue,
                     );
-                    console.log('hi');
                     setOpen(() =>false);
                     setSelectedStoreId(() => selectedStore?.data?.store?.id);
                   }}

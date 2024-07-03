@@ -40,7 +40,6 @@ const EditStockForm: React.FC<EditStockFormProps> = ({ stockId, initialData, pro
 
   const handleEdit = async (data: any) => {
     try {
-      console.log('Data to be submitted:', data);
       await updateStockAmount(stockId, data);
       showSuccess('Stock item updated successfully');
       const updatedStock = await fetchStockById(stockId);

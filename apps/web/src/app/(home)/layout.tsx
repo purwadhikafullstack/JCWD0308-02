@@ -12,8 +12,6 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const auth = await validateRequest();
-  console.log(auth);
-
   const categories = await getCategory();
 
   return (
