@@ -37,10 +37,7 @@ export class StoreController {
 
   getSelectedStore: ICallback = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      console.log('selected store');
-      console.log(res.locals.store?.id);
       const store = await StoreService.getStore(res.locals.store!?.id);
-      console.log('selected store', store);
       
       return res.status(200).json({ status: 'OK', store });
     } catch (error) {
@@ -59,15 +56,9 @@ export class StoreController {
   }
 
   createStore: ICallback = async (req, res, next) => {
-    console.log('hiiiii');
-    console.log('req body:', req.body);
-    
-    
     try {
       const store = await StoreService.createStore(req, res)
 
-      console.log('Created New Store:', store);
-      
       res.appendHeader("Set-Cookie", serializeCookie('storeId', store?.id!, {
         path: '/',
         secure: NODE_ENV === 'production',
@@ -83,15 +74,8 @@ export class StoreController {
   }
 
   updateStore: ICallback = async (req, res, next) => {
-    console.log('hiiiii');
-    console.log('req body:', req.body);
-    
-    
     try {
       const store = await StoreService.updateStore(req, res)
-
-      console.log('Created New Store:', store);
-      
       res.appendHeader("Set-Cookie", serializeCookie('storeId', store?.id!, {
         path: '/',
         secure: NODE_ENV === 'production',
@@ -109,10 +93,7 @@ export class StoreController {
   deleteStore: ICallback = async (req, res, next) => {
     try {
       const updated = await StoreService.deleteStore(req.params.storeId, res)
-
-      console.log({updated});
       
-
       res.appendHeader("Set-Cookie", serializeCookie('storeId', updated.storeFallback?.id!, {
         path: '/',
         secure: NODE_ENV === 'production',
