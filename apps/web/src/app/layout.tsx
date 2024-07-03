@@ -13,6 +13,8 @@ import { Toaster } from '@/components/ui/sonner';
 import { getProvinces } from '@/lib/fetch-api/province/server';
 import { getCities } from '@/lib/fetch-api/city/server';
 import { getAddressList, getSelectedAddress } from '@/lib/fetch-api/address/server';
+import { getNearestStocks } from '@/lib/fetch-api/stocks/server';
+import { getVouchers } from '@/lib/fetch-api/voucher/server';
 
 export const runtime = 'nodejs'; // 'nodejs' (default) | 'edge'
 export const fetchCache = 'default-no-store';
@@ -35,8 +37,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const auth = await validateRequest();
-  console.log(auth);
+  await validateRequest();
   const queryClient = getQueryClient();
 
   queryClient.prefetchQuery({
@@ -68,6 +69,16 @@ export default async function RootLayout({
     queryKey: ["cities", 0],
     queryFn: () => getCities(0)
   })
+
+  queryClient.prefetchQuery({
+    queryKey: ['nearest-stocks'],
+    queryFn: getNearestStocks,
+  });
+
+  queryClient.prefetchQuery({
+    queryKey: ['carousel-voucher'],
+    queryFn: () => getVouchers(),
+  });
 
   return (
     <html lang="en" suppressHydrationWarning>
