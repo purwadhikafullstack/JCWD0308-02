@@ -73,11 +73,9 @@ export class StoreService {
 
   static createStore = async (req: Request, res: Response) => {
     if (req.file) {
-      console.log(req.file, 'check file');
       req.body.imageUrl = `${API_URL}/public/images/${req.file.filename}`
     }
     const storeData = Validation.validate(StoreValidation.CREATE, req.body as CreateStoreRequest)
-    console.log(storeData);
 
     const existingStore = await prisma.store.findFirst({
       where: {
@@ -96,18 +94,13 @@ export class StoreService {
 
   static updateStore = async (req: Request, res: Response) => {
     if (req.file) {
-      console.log(req.file, 'check file');
       req.body.imageUrl = `${API_URL}/public/images/${req.file.filename}`
     }
 
     req.body.id = req.params.storeId
 
-    console.log('BODY: ', req.body);
-
-
     const storeData = Validation.validate(StoreValidation.UPDATE, req.body as UpdateStoreRequest)
-    console.log(storeData);
-
+    
     const existingStore = await prisma.store.findUnique({
       where: {
         id: storeData.id
