@@ -13,16 +13,14 @@ import Link from 'next/link';
 import { Signout } from './signout';
 import { ReceiptText, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
-const UserDropdown = dynamic(() => import('./user-dropdown'));
-const AdminDropdown = dynamic(() => import('./admin-dropdown'));
+import AdminDropdown from './admin-dropdown';
+import UserDropdown from './user-dropdown';
 
 export const AvatarDropdown = () => {
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,
   });
-
-  console.log(userProfile.data);
 
   if (!userProfile.data?.user) {
     return (
@@ -33,8 +31,6 @@ export const AvatarDropdown = () => {
       </>
     );
   }
-
-  console.log(userProfile.data.user.avatarUrl);
 
   return (
     <DropdownMenu>

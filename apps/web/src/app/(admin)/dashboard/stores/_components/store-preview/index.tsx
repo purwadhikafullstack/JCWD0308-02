@@ -11,10 +11,9 @@ import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { Store } from '@/lib/types/store';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Link2 } from 'lucide-react';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
-const UpdateStore = dynamic(() => import('../update-store'), { ssr: false });
+import UpdateStore from '../update-store';
 
 export default function StorePreview({ store }: { store: Store }) {
   const userProfile = useSuspenseQuery({

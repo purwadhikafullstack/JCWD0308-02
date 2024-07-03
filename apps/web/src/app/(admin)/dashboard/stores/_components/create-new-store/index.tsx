@@ -5,9 +5,8 @@ import { Dialog, DialogTrigger } from '@/components/ui/dialog';
 import { Drawer, DrawerTrigger } from '@/components/ui/drawer';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-
-const DrawerStore = dynamic(() => import('./drawer-store'));
-const DialogStore = dynamic(() => import('./dialog-store'));
+import DialogStore from './dialog-store';
+import DrawerStore from './drawer-store';
 
 export default function CreateNewStore() {
   const [open, setOpen] = useState(false);

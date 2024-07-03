@@ -30,7 +30,6 @@ export const createStore = async (formData: FormData): Promise<{ store: Store | 
     if (!newStore.ok) throw new Error(await newStore.json())
     return await newStore.json()
   } catch (error) {
-    console.log('hit error');
 
     return error as any
   }
