@@ -9,7 +9,9 @@ import {
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import CreateNewStore from '../create-new-store';
+const CreateNewStore = dynamic(() => import('../create-new-store'), {
+  ssr: false,
+});
 
 export default function StoreCard() {
   const userProfile = useSuspenseQuery({
