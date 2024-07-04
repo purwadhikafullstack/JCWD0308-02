@@ -6,4 +6,5 @@ node_modules
 logs
 
 public/images/IMG*
-public/images/product*
+public/images/PRODUCT*
+public/images/VOUCHER*
