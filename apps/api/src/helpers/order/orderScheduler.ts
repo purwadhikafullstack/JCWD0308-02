@@ -3,6 +3,26 @@ import { prisma } from '@/db.js';
 import { OrderStatus, PaymentMethod } from '@prisma/client';
 
 export const orderScheduler = () => {
+
+  //shipping to delivered
+  cron.schedule('0 0 * * *', async () => {
+    const today = new Date();
+    const formattedToday = today.toISOString().split('T')[0];
+    const ordersToUpdate = await prisma.order.findMany({
+      where: { orderStatus: 'SHIPPING', estimation: { lte: formattedToday } },
+    });
+
+    await prisma.$transaction(async (prisma) => {
+      for (const order of ordersToUpdate) {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { orderStatus: 'DELIVERED' },
+        });
+      }
+    });
+  });
+
+
   //set up confirmed by user
   cron.schedule('0 0 * * *', async () => {
     const today = new Date();
@@ -78,8 +98,4 @@ export const orderScheduler = () => {
       console.error('Error in cron job:', error);
     }
   });
-
-  cron.schedule('* * * * *', () => {
-    console.log('Cron job running every minute');
-  });
-};
+}

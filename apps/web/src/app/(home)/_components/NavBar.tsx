@@ -18,6 +18,7 @@ import { Category } from '@/lib/types/category';
 import { AvatarDropdown } from '@/components/shared/avatar-dropdown';
 import RightMenu from './right-menu';
 import SecondNavbar from './second-navbar';
+import Image from 'next/image';
 
 export const NavbBar = ({ category }: { category: Category[] }) => {
   return (
@@ -28,7 +29,14 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
             href="/"
             className="flex items-center gap-2 text-lg font-semibold md:text-sm"
           >
-            <ShoppingBag className="h-7 w-7" />
+            <figure>
+              <Image
+                src="/logogram-new.png"
+                width={200}
+                height={200}
+                alt="logo grosirun"
+              />
+            </figure>
           </Link>
           <nav className="flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
             <NavigationMenu>
@@ -120,13 +128,13 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
                     href="#"
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Dashboard
+                    Home
                   </Link>
                   <Link
                     href="#"
                     className="text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    Orders
+                    List Orders
                   </Link>
                   <Link
                     href="#"

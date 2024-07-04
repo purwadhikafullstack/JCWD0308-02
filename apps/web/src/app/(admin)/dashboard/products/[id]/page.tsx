@@ -1,7 +1,11 @@
-"use client";
+'use client';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
-import { fetchProductById, updateProduct, deleteProduct } from '@/lib/fetch-api/product';
+import {
+  fetchProductById,
+  updateProduct,
+  deleteProduct,
+} from '@/lib/fetch-api/product';
 import EditForm from '../_components/editform';
 import { Button } from '@/components/ui/button';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
@@ -19,7 +23,7 @@ import { Product } from '@/lib/types/product';
 const ProductDetail = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const id = pathname.split('/').pop(); 
+  const id = pathname.split('/').pop();
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,7 +113,9 @@ const ProductDetail = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">{product.title}</h2>
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">
+        {product.title}
+      </h2>
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <Carousel className="relative w-full h-64" opts={{ loop: true }}>
           <CarouselContent className="flex">
@@ -132,34 +138,71 @@ const ProductDetail = () => {
           <CarouselNext className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-700 cursor-pointer transition-all" />
         </Carousel>
         <div className="p-6">
-          <p className="text-md text-gray-600 mb-2"><strong>Slug:</strong> {product.slug}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Description:</strong> {product.description}</p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Slug:</strong> {product.slug}
+          </p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Description:</strong> {product.description}
+          </p>
           <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.price?.toLocaleString() ?? 'N/A'}</p>
-            <p className="text-lg font-semibold text-green-500">Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}</p>
+            <p className="text-lg font-semibold text-red-500 line-through">
+              Rp {product.price?.toLocaleString() ?? 'N/A'}
+            </p>
+            <p className="text-lg font-semibold text-green-500">
+              Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}
+            </p>
           </div>
           <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.packPrice?.toLocaleString() ?? 'N/A'}</p>
-            <p className="text-lg font-semibold text-green-500">Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}</p>
+            <p className="text-lg font-semibold text-red-500 line-through">
+              Rp {product.packPrice?.toLocaleString() ?? 'N/A'}
+            </p>
+            <p className="text-lg font-semibold text-green-500">
+              Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}
+            </p>
           </div>
-          <p className="text-md text-gray-600 mb-2"><strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'} units</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Bonus:</strong> {product.bonus ?? 'No bonus'}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Min Order:</strong> {product.minOrderItem ?? 'No min order'}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Status:</strong> {product.status}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Updated At:</strong> {new Date(product.updatedAt).toLocaleDateString()}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Created At:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'}{' '}
+            units
+          </p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Bonus:</strong> {product.bonus ?? 'No bonus'}
+          </p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Min Order:</strong> {product.minOrderItem ?? 'No min order'}
+          </p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Status:</strong> {product.status}
+          </p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Updated At:</strong>{' '}
+            {new Date(product.updatedAt).toLocaleDateString()}
+          </p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Created At:</strong>{' '}
+            {new Date(product.createdAt).toLocaleDateString()}
+          </p>
           <div className="flex justify-end space-x-2 mt-4">
-            <Button onClick={() => handleEdit(product)} className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all">
+            <Button
+              onClick={() => handleEdit(product)}
+              className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
+            >
               <FaEdit />
             </Button>
-            <Button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all">
+            <Button
+              onClick={handleDelete}
+              className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all"
+            >
               <FaTrashAlt />
             </Button>
           </div>
         </div>
       </div>
       {editingProduct && (
-        <EditForm product={editingProduct} onUpdate={handleUpdate} onCancel={() => setEditingProduct(null)} />
+        <EditForm
+          product={editingProduct}
+          onUpdate={handleUpdate}
+          onCancel={() => setEditingProduct(null)}
+        />
       )}
     </div>
   );

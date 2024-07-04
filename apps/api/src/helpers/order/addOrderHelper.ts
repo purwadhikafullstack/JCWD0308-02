@@ -133,7 +133,7 @@ export const createOrder = async (
       serviceDescription: 'Layanan Reguler',
       estimation,
       storeId: nearestStore?.id,
-      // storeAdminId: storeAdmin?.id,
+      storeAdminId: storeAdmin?.id,
       // storeAdminId: 'grosirun admin',
       note: orderRequest.note,
       totalPrice: finalTotalPrice,

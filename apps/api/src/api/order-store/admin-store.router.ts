@@ -14,26 +14,28 @@ export class OrderStoreRouter {
 
   private initializeRoutes(): void {
     const storeAdmin = AuthMiddleware.storeAdmin;
+
+    this.router.get(
+      '/',
+      storeAdmin,
+      this.orderStoreController.getOrdersByStoreAdmin,
+    );
+
     this.router.post(
       '/:orderId/send',
       storeAdmin,
       this.orderStoreController.sendUserOrders,
     );
-    // Endpoint for canceling an order by an admin
+
     this.router.post(
       '/:orderId/cancel-by-admin',
       storeAdmin,
       this.orderStoreController.cancelOrderByAdmin,
     );
-    // Endpoint for fetching orders by store admin
-    this.router.get(
-      '/store/:storeAdminId',
-      storeAdmin,
-      this.orderStoreController.getOrdersByStoreAdmin,
-    );
-  }
 
-  getRouter(): Router {
+
+  }
+  public getRouter(): Router {
     return this.router;
   }
 }

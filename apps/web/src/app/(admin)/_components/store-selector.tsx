@@ -24,7 +24,15 @@ import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useRouter } from 'next/navigation';
 import { changeStore } from './action';
 
-export const StoreSelector = ({ storeId, className, disable }: { storeId?: string, className?: string, disable?: boolean }) => {
+export const StoreSelector = ({
+  storeId,
+  className,
+  disable,
+}: {
+  storeId?: string;
+  className?: string;
+  disable?: boolean;
+}) => {
   const router = useRouter();
   const stores = useSuspenseQuery({
     queryKey: ['stores'],
@@ -50,8 +58,10 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
       await changeStore(storeId);
     },
   });
+
   
   const [selectedStoreId, setSelectedStoreId] = React.useState(storeId || selectedStore?.data?.store?.id)
+
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -61,11 +71,11 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          className={cn('w-full justify-between', className)}
         >
           <div className="flex items-center gap-2">
             <Store className="h-4 w-4" />
-            <span className='max-w-28 truncate'>
+            <span className="max-w-28 truncate">
               {selectedStoreId
                 ? stores.data.stores.find(
                     (store) => store.id === selectedStoreId,
@@ -93,7 +103,9 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
                         ? selectedStoreId || ''
                         : currentValue,
                     );
+
                     setOpen(() =>false);
+
                     setSelectedStoreId(() => selectedStore?.data?.store?.id);
                   }}
                 >

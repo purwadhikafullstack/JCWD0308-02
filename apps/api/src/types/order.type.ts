@@ -43,7 +43,7 @@ export const getCourierType = (courier: string): CourierType => {
   }
 };
 
-export interface ConfirmPaymentRequest {
+export interface ChangeStatusRequest {
   orderId: string;
-  isAccepted: boolean;
+  newStatus: string;
 }

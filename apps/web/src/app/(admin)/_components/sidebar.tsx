@@ -1,6 +1,7 @@
 'use client';
 
 import {
+  Activity,
   Boxes,
   LayoutGrid,
   LineChart,
@@ -56,10 +57,15 @@ export const menu = [
     path: '/dashboard/categories',
     icon: <LayoutGrid className="h-4 w-4" />,
   },
-  { title: 'Vouchers', 
-    path: '/dashboard/vouchers', 
-    icon: <Ticket className="h-4 w-4" /> 
-    
+  {
+    title: 'Vouchers',
+    path: '/dashboard/vouchers',
+    icon: <Ticket className="h-4 w-4" />,
+  },
+  {
+    title: 'Reports',
+    path: '/dashboard/reports',
+    icon: <Activity className="h-4 w-4" />,
   },
 ];
 
