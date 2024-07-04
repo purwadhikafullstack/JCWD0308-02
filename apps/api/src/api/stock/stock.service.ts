@@ -230,4 +230,31 @@ export class StockService {
     return stock.id;
   };
 
+  static async getStockByIdWithMutationsGroupedByMonth(id: string) {
+    const stock = await prisma.stock.findUnique({
+      where: { id },
+      include: {
+        product: { select: { title: true } },
+        store: { select: { name: true } },
+        mutations: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    if (!stock) throw new ResponseError(404, "Stock item not found");
+
+    const mutationsByMonth: Record<string, any[]> = stock.mutations.reduce((acc: Record<string, any[]>, mutation) => {
+      const date = new Date(mutation.createdAt);
+      const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
+      if (!acc[monthYear]) {
+        acc[monthYear] = [];
+      }
+      acc[monthYear].push(mutation);
+      return acc;
+    }, {});
+
+    return { stock, mutationsByMonth };
+  }
+
 }

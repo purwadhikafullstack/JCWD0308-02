@@ -3,14 +3,13 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getVouchers, createVoucher, deleteVoucher } from '@/lib/fetch-api/voucher';
 import { Toaster } from '@/components/ui/sonner';
-
 import { Voucher } from './_components/types';
 import VoucherCard from './_components/vouchercard';
 import VoucherFilters from './_components/voucherfilters';
 import CreateForm from './_components/createform';
 import Pagination from '@/components/partial/pagination';
 import SearchBar from '@/components/partial/SearchBar';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { handleApiError } from '@/components/toast/errorapi';
 import { showSuccess } from '@/components/toast/toastutils';
@@ -59,7 +58,7 @@ const VoucherManagement = () => {
     }
   }, [searchParams]);
 
-  const handleCreate = async (newVoucher: any) => {
+  const handleCreate = async (newVoucher: FormData) => {
     try {
       await createVoucher(newVoucher);
       showSuccess('Voucher created successfully');
@@ -82,7 +81,7 @@ const VoucherManagement = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('page', newPage.toString());
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
@@ -91,7 +90,7 @@ const VoucherManagement = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setFilters({ ...filters, search: query });
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('search', query);
     params.set('page', '1');
     const url = `${pathname}?${params.toString()}`;
@@ -108,7 +107,7 @@ const VoucherManagement = () => {
     } else if (voucher.voucherType === 'SHIPPING_COST' && voucher.discountType === 'DISCOUNT') {
       return shippingDiscount;
     }
-    return fixedDiscountProduct; // Default icon, adjust as necessary
+    return fixedDiscountProduct; 
   };
 
   return (
@@ -127,24 +126,16 @@ const VoucherManagement = () => {
               <VoucherCard key={voucher.id} voucher={voucher} handleDelete={handleDelete} getVoucherIcon={getVoucherIcon} />
             ))}
           </div>
-          {creatingVoucher && (
-            <Dialog open={creatingVoucher} onOpenChange={setCreatingVoucher}>
-              <DialogTrigger asChild>
-                <Button className="hidden">Open Modal</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Voucher</DialogTitle>
-                  <DialogDescription>
-                    <CreateForm onCreate={handleCreate} onCancel={() => setCreatingVoucher(false)} />
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="secondary" onClick={() => setCreatingVoucher(false)}>Close</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          )}
+          <Dialog open={creatingVoucher} onOpenChange={setCreatingVoucher}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Voucher</DialogTitle>
+                <DialogDescription>
+                  <CreateForm onCreate={handleCreate} onCancel={() => setCreatingVoucher(false)} />
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
           <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
         </>
       )}

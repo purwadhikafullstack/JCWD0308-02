@@ -45,9 +45,9 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <Card className="w-[900px]">
+      <Card className="w-[900px] max-h-[90vh] overflow-y-auto">
         <CardHeader>
-          <CardTitle>Create Product</CardTitle>
+          <CardTitle className='text-primary'>Create Product</CardTitle>
           <CardDescription>Fill in the details to create a new product.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -55,8 +55,8 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
             <FormFields formData={formData} handleChange={handleChange} categories={categories} />
             <ImageUploader previewUrls={previewUrls} handleImageChange={handleImageChange} setImages={setImages} setPreviewUrls={setPreviewUrls} />
             <CardFooter className="mt-4 flex justify-end space-x-4">
-              <Button type="button" onClick={onCancel} className="px-4 py-2 border rounded bg-gray-300">Cancel</Button>
-              <Button type="submit" className="px-4 py-2 border rounded bg-blue-500 text-white">Create</Button>
+              <Button type="button" onClick={onCancel} variant="destructive" className="px-4 py-2">Cancel</Button>
+              <Button type="submit" variant="default" className="px-4 py-2">Create</Button>
             </CardFooter>
           </form>
         </CardContent>

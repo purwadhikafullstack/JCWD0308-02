@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { fetchCategories } from '@/lib/fetch-api/category/client';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import FormFields from './formfields';
 import ImageUploader from './imageuploader';
@@ -75,27 +76,31 @@ const EditForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-3xl">
-        <h2 className="text-2xl font-bold mb-4 text-center text-indigo-600">Edit Product</h2>
-        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <FormFields formData={formData} handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })} categories={categories} />
-          <ImageUploader previewUrls={previewUrls} handleImageChange={(e) => {
-            const files = Array.from(e.target.files || []);
-            setImages(files);
-            const urls = files.map(file => URL.createObjectURL(file));
-            setPreviewUrls(urls);
-          }} setImages={setImages} setPreviewUrls={setPreviewUrls} />
-          <div className="flex justify-end space-x-2 mt-4">
-            <Button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition-all" disabled={loading}>
-              {loading ? 'Updating...' : 'Update'}
-            </Button>
-            <Button onClick={onCancel} className="bg-gray-500 text-white px-4 py-2 rounded-lg shadow-md hover:bg-gray-600 transition-all">
-              Cancel
-            </Button>
-          </div>
-        </form>
-      </div>
+      <Card className="w-[900px] max-h-[90vh] overflow-y-auto">
+        <CardHeader>
+          <CardTitle className='text-primary'>Edit Product</CardTitle>
+          <CardDescription>Update the details of the product below.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit}>
+            <FormFields formData={formData} handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })} categories={categories} />
+            <ImageUploader previewUrls={previewUrls} handleImageChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              setImages(files);
+              const urls = files.map(file => URL.createObjectURL(file));
+              setPreviewUrls(urls);
+            }} setImages={setImages} setPreviewUrls={setPreviewUrls} />
+            <CardFooter className="mt-4 flex justify-end space-x-4">
+              <Button onClick={onCancel} className="px-4 py-2" variant="destructive">
+                Cancel
+              </Button>
+              <Button type="submit" className=" px-4 py-2" disabled={loading}>
+                {loading ? 'Updating...' : 'Update'}
+              </Button>
+            </CardFooter>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 };

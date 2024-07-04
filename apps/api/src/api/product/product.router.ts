@@ -20,8 +20,8 @@ export class ProductRouter {
   private initializeRoutes(): void {
     this.router.get('/', AuthMiddleware.authed, this.productController.getProducts);
     this.router.get('/:id', AuthMiddleware.authed, this.productController.getProductById);
-    this.router.post('/', AuthMiddleware.superAdmin, uploader('product').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.createProduct);
-    this.router.put('/:id', AuthMiddleware.superAdmin, uploader('product').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.updateProduct);
+    this.router.post('/', AuthMiddleware.superAdmin, uploader('PRODUCT').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.createProduct);
+    this.router.put('/:id', AuthMiddleware.superAdmin, uploader('PRODUCT').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.updateProduct);
     this.router.delete('/:id', AuthMiddleware.superAdmin, this.productController.deleteProduct);
   }
 

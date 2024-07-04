@@ -121,7 +121,7 @@ const ProductList = () => {
   };
 
   const handleTitleClick = (id: string) => {
-    router.push(`/products/${id}`);
+    router.push(`products/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -166,11 +166,11 @@ const ProductList = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">Products</h2>
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">Products</h2>
       <p className="text-lg mb-8 text-center text-gray-700">Manage your products here.</p>
       <SearchBar onSearch={handleSearch} />
       <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => setCreatingProduct(true)} className="bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:from-green-500 hover:to-blue-600 transition-all">
+        <Button onClick={() => setCreatingProduct(true)} className="px-6 py-2 ">
           Create Product
         </Button>
         <div className="w-1/4">

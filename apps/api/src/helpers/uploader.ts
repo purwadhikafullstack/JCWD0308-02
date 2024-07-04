@@ -10,7 +10,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export const uploader = (filePrefix: string, folderName?: string) => {
-  const defaultDir = path.join(__dirname, "../../public/");
+  const defaultDir = path.join(__dirname, "../../public/images/");
 
   const storage = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: DestinationCallback) => {

@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 
 interface ImageUploaderProps {
   previewUrls: string[];
@@ -11,7 +12,7 @@ interface ImageUploaderProps {
 const ImageUploader: React.FC<ImageUploaderProps> = ({ previewUrls, handleImageChange, setImages, setPreviewUrls }) => (
   <>
     <div className="col-span-4">
-      <label className="block text-sm font-medium text-gray-700">Images</label>
+      <label className="block text-sm font-medium text-primary mt-2">Images</label>
       <input
         type="file"
         multiple
@@ -23,16 +24,17 @@ const ImageUploader: React.FC<ImageUploaderProps> = ({ previewUrls, handleImageC
       {previewUrls.map((url, index) => (
         <div key={index} className="relative w-full h-32">
           <Image src={url} alt={`Preview ${index + 1}`} layout="fill" objectFit="cover" className="rounded-md" />
-          <button
+          <Button
             type="button"
-            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+            className="absolute top-0 right-0  rounded-ms size-2"
+            variant="destructive"
             onClick={() => {
               setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
               setImages((prev) => prev.filter((_, i) => i !== index));
             }}
           >
             X
-          </button>
+          </Button>
         </div>
       ))}
     </div>

@@ -7,9 +7,9 @@ import { User } from 'lucia';
 export class ProductController {
   getProducts: ICallback = async (req, res, next) => {
     try {
-      const { page = 1, limit = 10, search, ...filters } = req.query;
+      const { page = 1, limit, search, ...filters } = req.query;
       const pageNumber = parseInt(page as string, 10);
-      const limitNumber = parseInt(limit as string, 10);
+      const limitNumber = limit ? parseInt(limit as string, 10) : undefined;
 
       const products = await ProductService.getProducts(pageNumber, limitNumber, { ...filters, search });
       res.status(200).json(products);
@@ -42,7 +42,7 @@ export class ProductController {
       const productData = { ...req.body, superAdminId: user.id };
 
       const files = req.files as Express.Multer.File[] | undefined;
-      const imageUrls = files ? files.map((file) => `/public/${file.filename}`) : [];
+      const imageUrls = files ? files.map((file) => `/public/images/${file.filename}`) : [];
 
       const product = await ProductService.createProduct(productData, user.id, imageUrls);
 
@@ -60,7 +60,7 @@ export class ProductController {
       const productData: ProductUpdateRequest = { ...req.body, superAdminId: user.id };
 
       const files = req.files as Express.Multer.File[] | undefined;
-      const imageUrls = files ? files.map((file) => `/public/${file.filename}`) : [];
+      const imageUrls = files ? files.map((file) => `/public/images/${file.filename}`) : [];
       const imagesToDelete = req.body.imagesToDelete || [];
 
       const product = await ProductService.updateProduct(id, productData, user.id, imageUrls, imagesToDelete);

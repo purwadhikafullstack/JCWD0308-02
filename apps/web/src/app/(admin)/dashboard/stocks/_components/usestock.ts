@@ -1,28 +1,43 @@
-"use client";
+"use client"
 import { useState, useEffect } from 'react';
+import { Stock } from '@/lib/types/stock';
 import { fetchStockById } from '@/lib/fetch-api/stock';
-import { Stock } from '@/lib/types/stock'; // Correct type import
 
 export const useStock = (stockId: string) => {
   const [stock, setStock] = useState<Stock | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [mutationsByMonth, setMutationsByMonth] = useState<Record<string, any[]>>({});
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchStock = async () => {
+      setIsLoading(true);
+      setError(null);
+
       try {
-        const data = await fetchStockById(stockId);
-        setStock(data);
+        const { stock, mutationsByMonth } = await fetchStockById(stockId);
+        setStock(stock);
+        setMutationsByMonth(mutationsByMonth);
       } catch (err) {
+        console.error('Error fetching stock:', err);
         setError('Failed to fetch stock data');
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
-    fetchData();
+    fetchStock();
   }, [stockId]);
 
-  return { stock, isLoading, error, setIsEditing, isEditing, setStock };
+  return {
+    stock,
+    mutationsByMonth,
+    isLoading,
+    error,
+    isEditing,
+    setIsEditing,
+    setStock,
+    setMutationsByMonth,
+  };
 };
