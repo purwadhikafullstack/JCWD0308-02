@@ -17,11 +17,17 @@ import { getStores } from '@/lib/fetch-api/store/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import React from 'react';
 import StoreItem from './store-list-item';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 export default function StoreList() {
   const stores = useSuspenseQuery({
     queryKey: ['stores'],
     queryFn: getStores,
+  });
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
   });
   return (
     <Card x-chunk="dashboard-06-chunk-0">
@@ -37,9 +43,11 @@ export default function StoreList() {
             <TableRow>
               <TableHead>Store</TableHead>
               <TableHead className="hidden xl:table-cell">Status</TableHead>
-              <TableHead>
-                <span className="sr-only">Actions</span>
-              </TableHead>
+              {userProfile.data?.user?.role === 'SUPER_ADMIN' ? (
+                <TableHead>
+                  <span className="sr-only">Actions</span>
+                </TableHead>
+              ) : null}
             </TableRow>
           </TableHeader>
           <TableBody>
