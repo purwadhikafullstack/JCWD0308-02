@@ -1,4 +1,5 @@
 import { prisma } from '@/db.js';
+
 import { ChangeStatusRequest, OrderId } from '@/types/order.type.js';
 import { ResponseError } from '@/utils/error.response.js';
 import { Validation } from '@/utils/validation.js';
@@ -15,12 +16,14 @@ export class OrderStoreService {
     page: number,
     perPage: number,
   ) => {
+
     const orders = await prisma.order.findMany({
       where: { storeAdminId },
       include: {
         orderItems: { include: { stock: { include: { product: true } } } },
       },
       orderBy: { createdAt: 'desc' },
+
       skip: perPage * (page - 1),
       take: perPage,
     });
@@ -46,6 +49,7 @@ export class OrderStoreService {
       ChangeStatusValidation.CHANGE,
       req,
     );
+
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { user: true },
@@ -53,15 +57,18 @@ export class OrderStoreService {
     if (!order) throw new ResponseError(404, 'Order not found');
     if (order.orderStatus !== 'PROCESS')
       throw new ResponseError(400, 'Can not send the order!');
+
     const mappedStatus: OrderStatus = mapNewStatus(newStatus);
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { orderStatus: mappedStatus },
+
     });
     return updatedOrder;
   };
 
   static cancelOrderByAdmin = async (req: OrderId, res: Response) => {
+
     console.log('pingpongpong');
     const { orderId } = Validation.validate(OrderIdValidation.ORDER_ID, req);
     const order = await prisma.order.findUnique({
@@ -105,6 +112,7 @@ export class OrderStoreService {
             orderId: order.id,
           },
         }),
+
       ),
     ]);
     return updatedOrder;

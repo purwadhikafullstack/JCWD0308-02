@@ -13,7 +13,9 @@ import {
 
 interface OrderTableProps {
   orders: Order[];
+
   handleStatusChange: (orderId: string, newStatus: string) => void;
+
 }
 export const OrderTable: React.FC<OrderTableProps> = ({
   orders,

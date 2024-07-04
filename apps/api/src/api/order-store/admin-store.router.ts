@@ -14,11 +14,13 @@ export class OrderStoreRouter {
 
   private initializeRoutes(): void {
     const storeAdmin = AuthMiddleware.storeAdmin;
+
     this.router.get(
       '/',
       storeAdmin,
       this.orderStoreController.getOrdersByStoreAdmin,
     );
+
     this.router.post(
       '/:orderId/send',
       storeAdmin,
@@ -30,7 +32,7 @@ export class OrderStoreRouter {
       storeAdmin,
       this.orderStoreController.cancelOrderByAdmin,
     );
-  }
+
 
   getRouter(): Router {
     return this.router;

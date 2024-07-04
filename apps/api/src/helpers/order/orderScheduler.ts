@@ -3,6 +3,7 @@ import { prisma } from '@/db.js';
 import { OrderStatus, PaymentMethod } from '@prisma/client';
 
 export const orderScheduler = () => {
+
   //shipping to delivered
   cron.schedule('0 0 * * *', async () => {
     const today = new Date();
@@ -20,6 +21,7 @@ export const orderScheduler = () => {
       }
     });
   });
+
 
   //set up confirmed by user
   cron.schedule('0 0 * * *', async () => {
@@ -96,4 +98,4 @@ export const orderScheduler = () => {
       console.error('Error in cron job:', error);
     }
   });
-};
+

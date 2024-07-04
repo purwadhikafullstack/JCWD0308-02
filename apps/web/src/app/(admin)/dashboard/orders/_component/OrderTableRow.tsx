@@ -30,7 +30,9 @@ export const OrderTableRow: React.FC<OrderTableRowProps> = ({
         'PROCESS',
         'SHIPPING',
         'DELIVERED',
+
         'CANCELLED',
+
       ].includes(order.orderStatus) ? (
         <select
           className="bg-gray-300 p-2 rounded-xl"
@@ -42,7 +44,9 @@ export const OrderTableRow: React.FC<OrderTableRowProps> = ({
           <option value="PROCESS">Process</option>
           <option value="SHIPPING">Shipping</option>
           <option value="DELIVERED">Delivered</option>
+
           <option value="CANCELLED">Cancelled</option>
+
         </select>
       ) : (
         <span>{order.orderStatus}</span>

@@ -43,8 +43,6 @@ export const useCreateUserAddress = (handleClose: () => void) => {
       // router.push(`/dashboard/stores/${data.address.id}`);
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to create new address!', {
         description: data.error,
         duration: 4000,
@@ -95,8 +93,6 @@ export const useUpdateUserAddress = (
       // router.push(`/dashboard/stores/${data.address.id}`);
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to create new address!', {
         description: data.error,
         duration: 4000,
@@ -137,8 +133,6 @@ export const useDeleteUserAddress = () => {
       // router.push(`/dashboard/stores/${data.address.id}`);
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to delete address!', {
         description: data.error,
         duration: 4000,

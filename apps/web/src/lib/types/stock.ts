@@ -1,3 +1,5 @@
+import { Product } from "./product";
+
 export interface Stock {
   id: string;
   productId: string;
@@ -27,3 +29,12 @@ export interface Mutation {
   createdAt: string;
 }
 
+export interface NearestStock {
+  id: string;
+  productId: string;
+  storeId: string;
+  amount: number;
+  updatedAt: Date;
+  createdAt: Date;
+  product: Product
+}

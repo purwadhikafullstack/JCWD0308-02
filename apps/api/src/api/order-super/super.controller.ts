@@ -6,12 +6,14 @@ import { ChangeStatusRequest } from '@/types/order.type.js';
 export class OrderSuperController {
   getAllOrders: ICallback = async (req, res, next) => {
     try {
+
       const page = parseInt(req.query.page as string) || 1;
       const perPage = parseInt(req.query.perPage as string) || 10;
       const { orders, totalCount } = await OrderSuperService.getAllOrders(
         page,
         perPage,
         res,
+
       );
       return res.status(201).json({ status: 'OK', data: orders, totalCount });
     } catch (error) {

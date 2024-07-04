@@ -4,6 +4,7 @@ import { OrderStoreService } from './admin-store.service.js';
 export class OrderStoreController {
   getOrdersByStoreAdmin: ICallback = async (req, res, next) => {
     try {
+
       const storeId = res.locals.store?.id;
       const storeAdminId =
         await OrderStoreService.getStoreAdminIdByStoreId(storeId);

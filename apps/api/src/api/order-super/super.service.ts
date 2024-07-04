@@ -5,6 +5,7 @@ import { Validation } from '@/utils/validation.js';
 import { Response } from 'express';
 import { ConfirmPaymentValidation } from './super.validation.js';
 import { OrderStatus, PaymentMethod } from '@prisma/client';
+
 import {
   getEmailTemplate,
   getOrderWithUser,
@@ -14,6 +15,7 @@ import {
 import { mapNewStatus } from '@/helpers/order/mapNewStatus.js';
 export class OrderSuperService {
   //for super admin
+
   static getAllOrders = async (
     page: number,
     perPage: number,
@@ -47,7 +49,9 @@ export class OrderSuperService {
       skip: perPage * (page - 1),
       take: perPage,
     });
+
     const totalCount = await prisma.order.count({ where: whereClause });
+
     return { orders, totalCount };
   };
 

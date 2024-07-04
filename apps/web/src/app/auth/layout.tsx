@@ -5,9 +5,7 @@ import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
-  const session = await protectedRoute.noAuthOnly();
-
-  console.log(session);
+  await protectedRoute.noAuthOnly();
 
   return (
     <>

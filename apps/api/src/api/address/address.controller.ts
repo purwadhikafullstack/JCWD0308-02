@@ -6,7 +6,6 @@ import { AuthHelper } from '../auth/auth.helper.js';
 export class AddressController {
   createAddress: ICallback = async (req, res, next) => {
     try {
-      console.log("BODY", req.body);
 
       const address = await AddressService.createAddress(req.body, res);
       AuthHelper.setAddressIdCookie(res, address.id)
@@ -17,7 +16,6 @@ export class AddressController {
   };
   updateAddress: ICallback = async (req, res, next) => {
     try {
-      console.log("BODY", req.body);
 
       const address = await AddressService.updateAddress(req.body, req, res);
       AuthHelper.setAddressIdCookie(res, address.id)
@@ -29,8 +27,6 @@ export class AddressController {
   deleteAddress: ICallback = async (req, res, next) => {
     try {
       const deletedAddress = await AddressService.deleteAddress(req.params.addressId, res)
-
-      console.log({ deletedAddress });
 
       // res.end()
       return res.status(200).json({ status: 'OK', message: `${deletedAddress.labelAddress} address has been deleted!`, deletedAddress })

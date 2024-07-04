@@ -59,7 +59,6 @@ export class AuthHelper {
   };
 
   static getGitHubUserData = (token: string) => {
-    console.log(GITHUB_OAUTH_URL);
     return fetch(`${GITHUB_OAUTH_URL}/user`, {
       headers: { Authorization: `Bearer ${token}` },
     });

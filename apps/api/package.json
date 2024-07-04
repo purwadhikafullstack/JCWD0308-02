@@ -15,7 +15,8 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:reset": "prisma migrate reset",
     "migrate:deploy": "prisma migrate deploy && prisma generate",
-    "seed": "cross-env NODE_OPTIONS=--loader=ts-node/esm ts-node prisma/seed/seed.ts"
+    "seed": "cross-env NODE_OPTIONS=--loader=ts-node/esm ts-node prisma/seed/seed.ts",
+    "postinstall": "prisma generate"
   },
   "author": "",
   "license": "ISC",
