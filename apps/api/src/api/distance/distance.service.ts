@@ -16,6 +16,7 @@ export const findNearestStore = async (addressId: string) => {
   });
 
   let nearestStore = null;
+  let isServiceAvailable = false;
   let nearestDistance = Infinity; // ensure less than nearestDistance
 
   for (const store of stores) {
@@ -29,6 +30,7 @@ export const findNearestStore = async (addressId: string) => {
     if (distance < nearestDistance) {
       nearestDistance = distance;
       nearestStore = store;
+      isServiceAvailable = true;
     }
   }
 
@@ -36,8 +38,9 @@ export const findNearestStore = async (addressId: string) => {
     nearestStore = await prisma.store.findUnique({
       where: { slug: 'grosirun-pusat' },
     });
+    isServiceAvailable = false;
   }
-  return nearestStore;
+  return { nearestStore, isServiceAvailable };
 };
 
 export const findStoresInRange = async (

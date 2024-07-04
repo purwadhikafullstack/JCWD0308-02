@@ -45,6 +45,7 @@ export class StockService {
     }
 
     let store = null
+    let isServiceAvailable = false
     if (!res.locals.address?.id) {
       
       store = await prisma.store.findFirst({
@@ -54,10 +55,10 @@ export class StockService {
       })
       where.storeId = store?.id;
     } else {
-      const getNearestStore = await findNearestStore(res.locals.address.id)
-      where.storeId = getNearestStore?.id;
-      store = getNearestStore
-      
+      const data = await findNearestStore(res.locals.address.id)
+      where.storeId = data?.nearestStore?.id;
+      store = data?.nearestStore
+      isServiceAvailable = data?.isServiceAvailable
     }
     
     const total = await prisma.stock.count({ where });
@@ -76,7 +77,7 @@ export class StockService {
         },
       },
     });
-    return { total, page, limit, stocks, store };
+    return { total, page, limit, stocks, store, isServiceAvailable };
   }
 
   static async getStockById(id: string) {
