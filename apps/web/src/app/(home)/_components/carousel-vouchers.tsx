@@ -49,7 +49,7 @@ export function VoucherItem({ voucher }: { voucher: Voucher }) {
     <CarouselItem>
       <div className="relative h-[400px] w-full overflow-hidden rounded-lg">
         <Image
-          src={voucher?.image || '/placeholder.svg'}
+          src={voucher?.imageUrl || '/placeholder.svg'}
           alt="Promotion 1"
           fill
           className="object-cover"
