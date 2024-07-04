@@ -1,48 +1,56 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
-} from '@/components/ui/table';
-import { confirmPaymentByAdmin, getAllOrders } from '@/lib/fetch-api/order';
-import { Order } from '@/lib/types/order';
+  cancelOrderByAdmin,
+  confirmPaymentByAdmin,
+  getAllOrders,
+  getOrdersByStoreAdmin,
+  sendOrder,
+} from '@/lib/fetch-api/order';
 import { confirmAlert } from 'react-confirm-alert';
 import 'react-confirm-alert/src/react-confirm-alert.css';
-import { useRouter } from 'next/navigation';
+import { OrderTable } from './_component/OrderTable';
+import { PaginationDemo } from './_component/Pagination';
+import {
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
+import { getSelectedStore } from '@/lib/fetch-api/store/client';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 export default function ListOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const perPage = 10;
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchOrdersData = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await getAllOrders();
-        if (response.status === 'OK' && Array.isArray(response.data)) {
-          setOrders(response.data);
-        } else {
-          throw new Error('Data is not an array or status is not OK');
-        }
-      } catch (error) {
-        console.error('Error fetching orders:', error);
-        setError('Failed to fetch orders');
-      } finally {
-        setLoading(false);
-      }
-    };
+  const { data: selectedStoreData } = useSuspenseQuery({
+    queryKey: ['store'],
+    queryFn: getSelectedStore,
+  });
+  const storeId = selectedStoreData?.store?.id;
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
 
-    fetchOrdersData();
-  }, []);
+  const superAdminOnly = userProfile.data?.user?.role === 'SUPER_ADMIN';
+
+  const {
+    data: ordersData,
+    isLoading,
+    isError,
+  } = useSuspenseQuery({
+    queryKey: ['orders', currentPage],
+    queryFn: () => {
+      return getAllOrders(currentPage, perPage);
+    },
+  });
+
+  const orders = ordersData?.data || [];
+  const totalPages = Math.ceil((ordersData?.totalCount || 0) / perPage);
+
   const handleStatusChange = (orderId: string, newStatus: string) => {
     confirmAlert({
       title: 'Confirm to submit',
@@ -50,7 +58,17 @@ export default function ListOrdersPage() {
       buttons: [
         {
           label: 'Yes',
-          onClick: () => confirmPaymentStatus(orderId, newStatus),
+          onClick: () => {
+            if (superAdminOnly) {
+              confirmPaymentStatus(orderId, newStatus);
+            } else {
+              if (newStatus === 'CANCELLED') {
+                cancelOrderAdmin(orderId);
+              } else {
+                sendOrderAdmin(orderId, newStatus);
+              }
+            }
+          },
         },
         {
           label: 'No',
@@ -59,135 +77,72 @@ export default function ListOrdersPage() {
     });
   };
 
-  const confirmPaymentStatus = async (orderId: string, newStatus: any) => {
+  const confirmPaymentStatus = async (orderId: string, newStatus: string) => {
     try {
       const response = await confirmPaymentByAdmin(orderId, newStatus);
       if (response.status === 'OK') {
-        setOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order.id === orderId
-              ? {
-                  ...order,
-                  orderStatus: newStatus,
-                }
-              : order,
-          ),
-        );
+        queryClient.invalidateQueries([
+          'orders',
+          { currentPage, storeId },
+        ] as any);
       } else {
         throw new Error('Failed to update order status');
       }
     } catch (error) {
-      console.error('Error updating order status:', error);
-      setError('Failed to update order status');
-      setTimeout(() => {
-        setError(null);
-        router.push('/dashboard/orders');
-      }, 2000);
+      console.error(error);
+    }
+  };
+
+  const sendOrderAdmin = async (orderId: string, newStatus: string) => {
+    try {
+      const response = await sendOrder(orderId, newStatus);
+      if (response.status === 'OK') {
+        queryClient.invalidateQueries(['orders', currentPage, storeId] as any);
+      } else {
+        throw new Error('Failed to update order status');
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const cancelOrderAdmin = async (orderId: string) => {
+    try {
+      const response = await cancelOrderByAdmin(orderId);
+      console.log('response from frontend:', response);
+      if (response.status === 'OK') {
+        queryClient.invalidateQueries(['orders', currentPage, storeId] as any);
+      } else {
+        throw new Error('Failed to cancel order');
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
   return (
-    <div className="container mx-auto px-4">
-      <h2 className="text-2xl font-bold mb-4">Orders</h2>
-      <p>Manage your orders here.</p>
+    <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-screen-md">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4">Orders</h2>
       <div className="mt-4">
-        {loading ? (
+        {isLoading ? (
           <p>Loading...</p>
-        ) : error ? (
-          <p className="text-red-500">{error}</p>
+        ) : isError ? (
+          <p className="text-red-500">Error: Failed to fetch orders.</p>
         ) : (
-          <>
-            <div className="overflow-x-auto">
-              <Table className="min-w-full">
-                <TableCaption>A list of orders of all users</TableCaption>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Order Status</TableHead>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Courier</TableHead>
-                    <TableHead>Service</TableHead>
-                    <TableHead>Service Description</TableHead>
-                    <TableHead>Estimation of Arrival</TableHead>
-                    <TableHead>Note</TableHead>
-                    <TableHead>Payment Method</TableHead>
-                    <TableHead>Total Price</TableHead>
-                    <TableHead>Shipping Cost</TableHead>
-                    <TableHead>Discount Products</TableHead>
-                    <TableHead>Discount Shipping Cost</TableHead>
-                    <TableHead>Total Payment</TableHead>
-                    <TableHead>Payment Picture</TableHead>
-                    <TableHead>Store ID</TableHead>
-                    <TableHead>Store Admin ID</TableHead>
-                    <TableHead>Is Deleted</TableHead>
-                    <TableHead>Deleted At</TableHead>
-                    <TableHead>Updated At</TableHead>
-                    <TableHead>Created At</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {orders.map((order) => (
-                    <TableRow key={order.id}>
-                      <TableCell>{order.id}</TableCell>
-                      <TableCell>
-                        {[
-                          'AWAITING_CONFIRMATION',
-                          'PROCESS',
-                          'AWAITING_PAYMENT',
-                        ].includes(order.orderStatus) ? (
-                          <select
-                            className="bg-gray-300 p-3 rounded-full"
-                            value={order.orderStatus}
-                            onChange={(e) =>
-                              handleStatusChange(order.id, e.target.value)
-                            }
-                          >
-                            <option value="AWAITING_CONFIRMATION">
-                              Awaiting Confirmation
-                            </option>
-                            <option value="PROCESS">Process</option>
-                            <option value="AWAITING_PAYMENT">
-                              Awaiting Payment
-                            </option>
-                          </select>
-                        ) : (
-                          <span>{order.orderStatus}</span>
-                        )}
-                      </TableCell>
-                      <TableCell>{order.userId}</TableCell>
-                      <TableCell>{order.courier}</TableCell>
-                      <TableCell>{order.service}</TableCell>
-                      <TableCell>{order.serviceDescription}</TableCell>
-                      <TableCell>{order.estimation}</TableCell>
-                      <TableCell>{order.note}</TableCell>
-                      <TableCell>{order.paymentMethod}</TableCell>
-                      <TableCell>{order.totalPrice}</TableCell>
-                      <TableCell>{order.shippingCost}</TableCell>
-                      <TableCell>{order.discountProducts}</TableCell>
-                      <TableCell>{order.discountShippingCost}</TableCell>
-                      <TableCell>{order.totalPayment}</TableCell>
-                      <TableCell>{order.paymentPicture}</TableCell>
-                      <TableCell>{order.storeId}</TableCell>
-                      <TableCell>{order.storeAdminId}</TableCell>
-                      <TableCell>{order.isDeleted ? 'Yes' : 'No'}</TableCell>
-                      <TableCell>
-                        {order.deletedAt
-                          ? new Date(order.deletedAt).toLocaleDateString()
-                          : 'N/A'}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(order.updatedAt).toLocaleDateString()}
-                      </TableCell>
-                      <TableCell>
-                        {new Date(order.createdAt).toLocaleDateString()}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </>
+          <div className="overflow-x-auto">
+            <OrderTable
+              orders={orders}
+              handleStatusChange={handleStatusChange}
+            />
+          </div>
         )}
+      </div>
+      <div className="mt-4">
+        <PaginationDemo
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
       </div>
     </div>
   );

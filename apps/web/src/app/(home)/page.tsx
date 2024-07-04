@@ -90,8 +90,8 @@ export default function Home() {
               View All
             </Link>
           </div>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-6">
-            <div className="grid gap-2.5 relative group">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-6 ">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
@@ -102,96 +102,111 @@ export default function Home() {
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">Apples</h3>
                   <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Broccoli"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Broccoli</h3>
-                  <h4 className="font-semibold">$1.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Milk"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Milk</h3>
-                  <h4 className="font-semibold">$3.49/gal</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Chicken"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Chicken</h3>
-                  <h4 className="font-semibold">$4.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Pasta"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Pasta</h3>
-                  <h4 className="font-semibold">$1.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
@@ -214,7 +229,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-6">
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
@@ -225,96 +240,111 @@ export default function Home() {
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">Apples</h3>
                   <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Broccoli"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Broccoli</h3>
-                  <h4 className="font-semibold">$1.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Milk"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Milk</h3>
-                  <h4 className="font-semibold">$3.49/gal</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Chicken"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Chicken</h3>
-                  <h4 className="font-semibold">$4.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Pasta"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Pasta</h3>
-                  <h4 className="font-semibold">$1.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
@@ -337,7 +367,7 @@ export default function Home() {
             </Link>
           </div>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-6">
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
@@ -348,96 +378,111 @@ export default function Home() {
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold">Apples</h3>
                   <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Broccoli"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Broccoli</h3>
-                  <h4 className="font-semibold">$1.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Milk"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Milk</h3>
-                  <h4 className="font-semibold">$3.49/gal</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Chicken"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Chicken</h3>
-                  <h4 className="font-semibold">$4.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>
             </div>
-            <div className="grid gap-2.5 relative group">
+            <div className="grid gap-2.5 relative group shadow-lg rounded-lg overflow-hidden hover:shadow-xl transition-shadow">
               <Link href="#" className="absolute inset-0 z-10" prefetch={false}>
                 <span className="sr-only">View</span>
               </Link>
               <Image
                 src="/placeholder.svg"
-                alt="Pasta"
+                alt="Apples"
                 width={200}
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-50 transition-opacity"
               />
-              <div className="grid gap-1">
+              <div className="grid gap-1 p-3">
                 <div className="flex items-center justify-between">
-                  <h3 className="font-semibold">Pasta</h3>
-                  <h4 className="font-semibold">$1.99/lb</h4>
+                  <h3 className="font-semibold">Apples</h3>
+                  <h4 className="font-semibold">$2.99/lb</h4>
                 </div>
-                <Button variant="outline" className="w-full">
+                <Button
+                  variant="outline"
+                  className="bg-primary text-primary-foreground w-full"
+                >
                   Add to Cart
                 </Button>
               </div>

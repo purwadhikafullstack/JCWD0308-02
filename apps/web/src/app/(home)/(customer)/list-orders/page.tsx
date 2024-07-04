@@ -9,6 +9,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import DeliveredOrderItem from './_component/DeliveredOrderItem.';
 import AwaitingPayment from './_component/AwaitingPayment';
+import { Calendar, Search } from 'lucide-react';
 
 export default function ListOrdersPage() {
   const [orders, setOrders] = useState<OrderStatusMap>({
@@ -57,6 +58,7 @@ export default function ListOrdersPage() {
           searchTerm,
           selectedDate?.toISOString(),
         );
+        console.log('confirmedOrders:', confirmedOrders);
         const cancelledOrders = await getOrdersByStatus(
           'cancelled',
           searchTerm,
@@ -94,21 +96,28 @@ export default function ListOrdersPage() {
   };
 
   return (
-    <div className="mx-4 lg:mx-10 mt-4">
-      <div className="mb-4 flex flex-col md:flex-row gap-2">
-        <input
-          type="text"
-          placeholder="Search by Order ID"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="border p-2 rounded w-full md:w-1/2"
-        />
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => setSelectedDate(date)}
-          dateFormat="dd-MM-yyyy"
-          className="border p-2 rounded w-full md:w-1/2"
-        />
+    <div className="mx-4 lg:mx-10 mt-4 flex flex-col gap-2 justify-center">
+      <div className="mb-4 flex w-screen justify-center gap-3">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by Order ID"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="border p-2 rounded-xl pl-10"
+          />
+          <Search className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500" />
+        </div>
+        <div className="relative">
+          <DatePicker
+            selected={selectedDate}
+            placeholderText="       Select a Date"
+            onChange={(date) => setSelectedDate(date)}
+            dateFormat="dd-MM-yyyy"
+            className="border p-2 rounded-xl"
+          />
+          <Calendar className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500" />
+        </div>
       </div>
       <div className="flex justify-center items-center">
         <Tabs defaultValue="awaiting_payment" className="max-w-[70rem]">

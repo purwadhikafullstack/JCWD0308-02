@@ -9,6 +9,7 @@ import { AvatarDropdown } from '@/components/shared/avatar-dropdown';
 import { getQueryClient } from '../get-query-client';
 import { getSelectedStore } from '@/lib/fetch-api/store/server';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
+import { getAllOrders } from '@/lib/fetch-api/order/server';
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await protectedRoute.storeAdmin();
@@ -17,6 +18,15 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   queryClient.prefetchQuery({
     queryKey: ['store'],
     queryFn: getSelectedStore,
+  });
+  const perPage = 10;
+  const currentPage = 1;
+
+  queryClient.prefetchQuery({
+    queryKey: ['orders', currentPage],
+    queryFn: () => {
+      return getAllOrders(currentPage, perPage);
+    },
   });
 
   return (

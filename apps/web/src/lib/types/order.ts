@@ -34,3 +34,28 @@ export interface OrderStatusMap {
   confirmed: Order[];
   cancelled: Order[];
 }
+
+export interface OrderItemProps {
+  order: {
+    totalPayment: number;
+    id: string;
+    updatedAt: string;
+    paymentLink: any;
+    orderItems: {
+      createdAt: string;
+      isPack: string;
+      id: any;
+      stock: {
+        product: {
+          description: string;
+          price: number;
+          packQuantity: any;
+          packPrice: number;
+          images: string[];
+          title: string;
+        };
+      };
+      quantity: number;
+    }[];
+  };
+}
