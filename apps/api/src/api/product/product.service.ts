@@ -3,6 +3,7 @@ import { Validation } from "@/utils/validation.js";
 import { prisma } from "@/db.js";
 import { ProductFields, ProductRequest, ProductUpdateRequest } from "@/types/product.type.js";
 import { ProductValidation } from "./product.validation.js";
+import { API_URL } from "@/config.js";
 
 export class ProductService {
   static getProducts = async (page: number, limit?: number, filters: any = {}) => {
@@ -53,7 +54,7 @@ export class ProductService {
         await prisma.productImage.create({
           data: {
             productId: product.id,
-            imageUrl: `http://localhost:8000${imageUrl}`,
+            imageUrl: `${API_URL}${imageUrl}`,
           },
         });
       }
@@ -95,7 +96,7 @@ export class ProductService {
         await prisma.productImage.create({
           data: {
             productId: product.id,
-            imageUrl: `http://localhost:8000${imageUrl}`,
+            imageUrl: `${API_URL}${imageUrl}`,
           },
         });
       }
