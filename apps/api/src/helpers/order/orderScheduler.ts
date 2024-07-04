@@ -98,4 +98,4 @@ export const orderScheduler = () => {
       console.error('Error in cron job:', error);
     }
   });
-
+}

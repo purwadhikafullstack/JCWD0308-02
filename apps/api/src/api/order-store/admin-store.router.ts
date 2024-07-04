@@ -34,7 +34,8 @@ export class OrderStoreRouter {
     );
 
 
-  getRouter(): Router {
+  }
+  public getRouter(): Router {
     return this.router;
   }
 }
