@@ -51,7 +51,6 @@ export default function CreateAddressForm({
   const [provinceId, setProvinceId] = useState(address?.city?.provinceId || 0);
 
   const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-    console.log(data);
     if (type === 'create') {
       await createUserAddress.mutateAsync(data);
     } else {

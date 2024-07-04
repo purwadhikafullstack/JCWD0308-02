@@ -79,8 +79,6 @@ export default function Map({
       const { lng, lat } = e.lngLat;
       marker.setLngLat([lng, lat]);
       const results = await maptilersdk.geocoding.reverse([lng, lat]);
-      console.log(lng, lat);
-      console.log(results);
       handleChangeCoords(`${lat}, ${lng}`);
       handleChangeLatitude(`${lat}`);
       handleChangeLongitude(`${lng}`);

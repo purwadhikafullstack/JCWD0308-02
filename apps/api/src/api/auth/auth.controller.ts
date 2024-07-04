@@ -74,7 +74,6 @@ export class AuthController {
       const url = await github.createAuthorizationURL(state, {
         scopes: ['user:email'],
       });
-      console.log(url.toString());
 
       res
         .appendHeader(
@@ -88,7 +87,6 @@ export class AuthController {
   };
 
   githubCallback: ICallback = async (req, res, next) => {
-    console.log('hit');
     const { code, state, storedState } = AuthHelper.getGitHubCodesFromURL(req);
     try {
       if (!code || !state || !storedState || state !== storedState)

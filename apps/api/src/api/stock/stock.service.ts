@@ -2,7 +2,8 @@ import { prisma } from '@/db.js';
 import { Validation } from '@/utils/validation.js';
 import { StockValidation } from './stock.validation.js';
 import { ResponseError } from '@/utils/error.response.js';
-import { findStoresInRange } from '../distance/distance.service.js';
+import { findNearestStore, findStoresInRange } from '../distance/distance.service.js';
+import { Response } from 'express';
 
 export class StockService {
   static async getStocks(page: number, limit: number, filters: any) {
@@ -32,12 +33,59 @@ export class StockService {
     return { total, page, limit, stocks };
   }
 
+  static async getNearestStocks(page: number, limit: number, filters: any, res: Response) {
+    const { search, storeId, ...filterOptions } = filters;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { product: { title: { contains: search } } },
+        { store: { name: { contains: search } } },
+      ];
+    }
+
+    let store = null
+    let isServiceAvailable = false
+    if (!res.locals.address?.id) {
+      
+      store = await prisma.store.findFirst({
+        orderBy: {
+          createdAt: 'asc'
+        }
+      })
+      where.storeId = store?.id;
+    } else {
+      const data = await findNearestStore(res.locals.address.id)
+      where.storeId = data?.nearestStore?.id;
+      store = data?.nearestStore
+      isServiceAvailable = data?.isServiceAvailable
+    }
+    
+    const total = await prisma.stock.count({ where });
+    const stocks = await prisma.stock.findMany({
+      where: {
+        ...where,
+        amount: { gt: 0 }
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        product: {
+          include: {
+            images: true
+          }
+        },
+      },
+    });
+    return { total, page, limit, stocks, store, isServiceAvailable };
+  }
+
   static async getStockById(id: string) {
     const stock = await prisma.stock.findUnique({
       where: { id },
       include: {
         product: { select: { title: true } },
-        store: { select: { name: true } }, 
+        store: { select: { name: true } },
         mutations: {
           orderBy: { createdAt: 'desc' },
         },
