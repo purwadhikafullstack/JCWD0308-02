@@ -2,11 +2,21 @@
 import axios from 'axios';
 import { Product } from '../types/product';
 
-export const fetchProducts = async (page: number = 1, limit: number = 8, filters: any = {}): Promise<{ products: Product[], total: number, page: number, limit: number }> => {
-  const query = new URLSearchParams({ page: page.toString(), limit: limit.toString(), ...filters }).toString();
+export const fetchProducts = async (
+  page: number = 1,
+  limit?: number, // Optional limit parameter
+  filters: any = {}
+): Promise<{ products: Product[], total: number, page: number }> => {
+  const params: any = { page: page.toString(), ...filters };
+  if (limit !== undefined) {
+    params.limit = limit.toString();
+  }
+
+  const query = new URLSearchParams(params).toString();
   const res = await axios.get(`http://localhost:8000/api/product?${query}`, {
     withCredentials: true,
   });
+
   if (res.status !== 200) {
     throw new Error('Failed to fetch products');
   }

@@ -17,6 +17,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import CreateForm from './_components/createform';
 import StockTable from './_components/stocktable';
+import {  useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 const StockList = () => {
   const router = useRouter();
@@ -130,16 +132,22 @@ const StockList = () => {
     router.replace(url);
   };
 
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile
+  })
+
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">Stocks</h2>
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">Stocks</h2>
       <p className="text-lg mb-8 text-center text-gray-700">Manage your stocks here.</p>
       <SearchBar onSearch={handleSearch} />
       <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => setCreatingStock(true)} className="bg-gradient-to-r from-green-400 to-blue-500 text-white px-6 py-2 rounded-lg shadow-md hover:from-green-500 hover:to-blue-600 transition-all">
+        {userProfile.data?.user?.role === "SUPER_ADMIN" ? 
+        (<Button onClick={() => setCreatingStock(true)} className="px-6">
           Create Stock
-        </Button>
+        </Button>) : null}
         <div className="flex space-x-4">
           <div className="w-48">
             <Select onValueChange={handleStoreFilterChange}>

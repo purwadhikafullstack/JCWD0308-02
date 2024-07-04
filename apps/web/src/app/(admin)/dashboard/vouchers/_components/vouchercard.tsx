@@ -1,5 +1,6 @@
 import React from 'react';
 import Image, { StaticImageData } from 'next/image';
+import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Voucher } from './types';
@@ -11,6 +12,12 @@ interface VoucherCardProps {
 }
 
 const VoucherCard: React.FC<VoucherCardProps> = ({ voucher, handleDelete, getVoucherIcon }) => {
+  const router = useRouter();
+
+  const handleView = () => {
+    router.push(`/dashboard/vouchers/${voucher.id}`);
+  };
+
   return (
     <Card className="shadow-lg border border-gray-200 rounded-lg overflow-hidden">
       <CardHeader className="p-0 bg-indigo-100">
@@ -33,10 +40,9 @@ const VoucherCard: React.FC<VoucherCardProps> = ({ voucher, handleDelete, getVou
           <p className="text-gray-800"><strong>Expires At:</strong> {new Date(voucher.expiresAt).toLocaleDateString()}</p>
         </div>
       </CardContent>
-      <CardFooter className="p-4 bg-indigo-100 flex justify-end">
-        <Button variant="secondary" onClick={() => handleDelete(voucher.id)}>
-          Delete
-        </Button>
+      <CardFooter className="p-4 bg-indigo-100 flex justify-end space-x-2">
+        <Button variant="secondary" onClick={handleView}>View</Button>
+        <Button variant="secondary" onClick={() => handleDelete(voucher.id)}>Delete</Button>
       </CardFooter>
     </Card>
   );

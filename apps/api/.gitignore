@@ -6,3 +6,4 @@ node_modules
 logs
 
 public/images/IMG*
+public/images/product*

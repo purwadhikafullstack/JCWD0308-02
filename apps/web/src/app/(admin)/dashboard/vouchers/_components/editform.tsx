@@ -5,28 +5,29 @@ import { Button } from '@/components/ui/button';
 import FormFields from './formfields';
 import { DialogFooter } from '@/components/ui/dialog';
 
-interface CreateFormProps {
-  onCreate: (voucher: FormData) => void;
+interface EditFormProps {
+  voucher: any;
+  onUpdate: (data: FormData) => void;
   onCancel: () => void;
 }
 
-const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
+const EditForm: React.FC<EditFormProps> = ({ voucher, onUpdate, onCancel }) => {
   const methods = useForm({
     defaultValues: {
-      name: '',
-      code: '',
-      description: '',
-      isClaimable: false,
-      isPrivate: false,
-      voucherType: 'PRODUCT',
-      discountType: 'DISCOUNT',
-      fixedDiscount: 0,
-      discount: 0,
-      stock: 0,
-      minOrderPrice: 0,
-      minOrderItem: 0,
-      expiresAt: new Date(),
-      imageUrl: null,
+      name: voucher.name,
+      code: voucher.code,
+      description: voucher.description,
+      isClaimable: voucher.isClaimable,
+      isPrivate: voucher.isPrivate,
+      voucherType: voucher.voucherType,
+      discountType: voucher.discountType,
+      fixedDiscount: voucher.fixedDiscount || 0,
+      discount: voucher.discount || 0,
+      stock: voucher.stock || 0,
+      minOrderPrice: voucher.minOrderPrice || 0,
+      minOrderItem: voucher.minOrderItem || 0,
+      expiresAt: new Date(voucher.expiresAt),
+      image: null,
     },
   });
 
@@ -48,7 +49,7 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
     parsedFormData.set('minOrderPrice', data.minOrderPrice.toString());
     parsedFormData.set('minOrderItem', data.minOrderItem.toString());
 
-    onCreate(parsedFormData);
+    onUpdate(parsedFormData);
   };
 
   return (
@@ -56,14 +57,16 @@ const CreateForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) => {
       <form onSubmit={methods.handleSubmit(handleSubmit)}>
         <FormFields />
         <DialogFooter className="mt-4 flex justify-end space-x-4">
-          <Button type="button" onClick={onCancel} variant="secondary">
+          <Button type="button" onClick={onCancel} variant="outline">
             Cancel
           </Button>
-          <Button type="submit">Create</Button>
+          <Button type="submit" variant="secondary">
+            Update
+          </Button>
         </DialogFooter>
       </form>
     </FormProvider>
   );
 };
 
-export default CreateForm;
+export default EditForm;

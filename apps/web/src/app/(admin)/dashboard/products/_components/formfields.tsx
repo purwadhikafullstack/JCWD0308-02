@@ -11,7 +11,7 @@ interface FormFieldsProps {
 const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categories }) => (
   <div className="grid grid-cols-4 gap-4">
     <div className="col-span-4 md:col-span-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Title <span className="text-red-500">*</span>
       </label>
       <input
@@ -24,7 +24,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Slug <span className="text-red-500">*</span>
       </label>
       <input
@@ -37,7 +37,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Description <span className="text-red-500">*</span>
       </label>
       <textarea
@@ -49,7 +49,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Price <span className="text-red-500">*</span>
       </label>
       <input
@@ -62,7 +62,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Pack Price <span className="text-red-500">*</span>
       </label>
       <input
@@ -75,7 +75,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Discount Price
       </label>
       <input
@@ -87,7 +87,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Discount Pack Price
       </label>
       <input
@@ -99,7 +99,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Pack Quantity <span className="text-red-500">*</span>
       </label>
       <input
@@ -112,7 +112,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Bonus
       </label>
       <input
@@ -124,7 +124,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Min Order Item
       </label>
       <input
@@ -136,7 +136,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Weight <span className="text-red-500">*</span>
       </label>
       <input
@@ -149,7 +149,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-1">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Weight Pack <span className="text-red-500">*</span>
       </label>
       <input
@@ -162,7 +162,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       />
     </div>
     <div className="col-span-4 md:col-span-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Status <span className="text-red-500">*</span>
       </label>
       <select
@@ -179,7 +179,7 @@ const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange, categor
       </select>
     </div>
     <div className="col-span-4 md:col-span-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium text-primary">
         Category <span className="text-red-500">*</span>
       </label>
       <select

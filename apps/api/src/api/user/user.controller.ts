@@ -2,17 +2,35 @@ import { ICallback } from '@/types/index.js';
 import { prisma } from '@/db.js';
 import { UserFields } from '@/types/user.type.js';
 import { UserService } from './user.service.js';
-import { lucia } from '@/auth.lucia.js';
 import { ResponseError } from '@/utils/error.response.js';
 
 export class UserController {
-
   getUsers: ICallback = async (req, res) => {
-    const users = await prisma.user.findMany({include: {
-      StoreAdmin: true,
-    }});
+    const { page, limit, search } = req.query;
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = parseInt(limit as string, 10) || 10;
 
-    return res.status(200).json({ users });
+    const filters: any = {};
+
+    if (search) {
+      filters.OR = [
+        { email: { contains: search } },
+        { displayName: { contains: search } }
+      ];
+    }
+
+    const total = await prisma.user.count({
+      where: filters,
+    });
+
+    const users = await prisma.user.findMany({
+      where: filters,
+      skip: (pageNumber - 1) * pageSize,
+      take: pageSize,
+      select: { ...UserFields },
+    });
+
+    return res.status(200).json({ users, total });
   }
 
   getUserById: ICallback = async (req, res) => {

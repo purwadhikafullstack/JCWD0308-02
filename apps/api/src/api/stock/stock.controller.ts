@@ -27,8 +27,8 @@ export class StockController {
 
   getStockById: ICallback = async (req, res, next) => {
     try {
-      const stock = await StockService.getStockById(req.params.id);
-      res.status(200).json(stock);
+      const { stock, mutationsByMonth } = await StockService.getStockByIdWithMutationsGroupedByMonth(req.params.id);
+      res.status(200).json({ stock, mutationsByMonth });
     } catch (error) {
       next(error);
     }

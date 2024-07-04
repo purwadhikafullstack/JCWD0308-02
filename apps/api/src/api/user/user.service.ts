@@ -1,39 +1,58 @@
-import { CreateUserRequest, UserFields } from "@/types/user.type.js"
-import { prisma } from "@/db.js"
-import { Validation } from "@/utils/validation.js"
-import { UserValidation } from "./user.validation.js"
-import { ResponseError } from "@/utils/error.response.js"
-import { genSalt, hash } from "bcrypt"
-import { generateId } from "lucia"
-import { API_URL } from "@/config.js"
-import { Response } from "express"
+import { CreateUserRequest, UserFields } from "@/types/user.type.js";
+import { prisma } from "@/db.js";
+import { Validation } from "@/utils/validation.js";
+import { UserValidation } from "./user.validation.js";
+import { ResponseError } from "@/utils/error.response.js";
+import { genSalt, hash } from "bcrypt";
+import { generateId } from "lucia";
+import { API_URL } from "@/config.js";
+import { Response } from "express";
 
 export class UserService {
+  static getUsers = async ({ page, limit, search }: { page: number, limit?: number, search: string }) => {
+    const where = search ? {
+      OR: [
+        { email: { contains: search, mode: 'insensitive' } },
+        { displayName: { contains: search, mode: 'insensitive' } }
+      ]
+    } : {};
+
+    const total = await prisma.user.count({ where });
+    const users = await prisma.user.findMany({
+      where,
+      skip: (page - 1) * (limit || total), 
+      take: limit,
+      select: { ...UserFields, StoreAdmin: true },
+    });
+
+    return { total, page, limit: limit || total, users };
+  };
+
   static createUser = async (req: CreateUserRequest, res: Response) => {
-    let newUser = Validation.validate(UserValidation.createUser, req)
+    let newUser = Validation.validate(UserValidation.createUser, req);
     if (!newUser.avatarUrl) {
-      newUser.avatarUrl = `${API_URL}/public/images/avatar.png`
+      newUser.avatarUrl = `${API_URL}/public/images/avatar.png`;
     }
 
     const findUser = await prisma.user.findUnique({
       where: {
         email: newUser.email,
       }
-    })
+    });
 
     if (findUser) {
-      throw new ResponseError(400, "Email already used!")
+      throw new ResponseError(400, "Email already used!");
     }
 
-    const salt = await genSalt(10)
-    const hashed = await hash(newUser.password, salt)
+    const salt = await genSalt(10);
+    const hashed = await hash(newUser.password, salt);
 
     const user = await prisma.user.create({
       data: {
         ...newUser, referralCode: generateId(8), avatarUrl: newUser.avatarUrl, password: hashed
       },
       select: { ...UserFields }
-    })
+    });
 
     if (user.role === "STORE_ADMIN") {
       await prisma.storeAdmin.create({
@@ -41,11 +60,11 @@ export class UserService {
           storeAdminId: user.id,
           storeId: res.locals.store?.id!
         }
-      })
+      });
     }
 
-    return user
-  }
+    return user;
+  };
 
   static updateUser = async (id: string, req: Partial<CreateUserRequest>, res: Response) => {
     let updatedUser = Validation.validate(UserValidation.updateUser, req);
@@ -69,11 +88,11 @@ export class UserService {
         data: {
           storeId: res.locals.store?.id!
         }
-      })
+      });
     }
 
     return user;
-  }
+  };
 
   static deleteUser = async (id: string) => {
     const user = await prisma.user.delete({
@@ -82,5 +101,5 @@ export class UserService {
     });
 
     return user;
-  }
+  };
 }

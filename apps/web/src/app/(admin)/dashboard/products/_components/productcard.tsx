@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -20,9 +20,24 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, onTitleClick }) => {
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (carouselRef.current) {
+        const nextButton = carouselRef.current.querySelector('.carousel-next') as HTMLButtonElement;
+        if (nextButton) {
+          nextButton.click();
+        }
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105">
-      <Carousel className="relative w-full h-64">
+      <Carousel ref={carouselRef} className="relative w-full h-64" opts={{ loop: true }}>
         <CarouselContent className="flex">
           {(product.images || []).map((image, index) => (
             <CarouselItem key={index}>
@@ -40,12 +55,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, on
             </CarouselItem>
           ))}
         </CarouselContent>
-        <CarouselPrevious className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-700 cursor-pointer" />
-        <CarouselNext className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-indigo-500 text-white p-2 rounded-full hover:bg-indigo-700 cursor-pointer" />
+        <CarouselPrevious className="carousel-previous absolute left-0 top-1/2 transform -translate-y-1/2 bg-primary text-secondary p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
+        <CarouselNext className="carousel-next absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-secondary p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
       </Carousel>
       <div className="p-6">
         <p
-          className="text-2xl font-bold text-center mb-2 text-gray-800 hover:underline hover:text-blue-600 cursor-pointer"
+          className="text-2xl font-bold text-center mb-2 text-gray-800 hover:underline hover:text-primary cursor-pointer"
           onClick={() => onTitleClick(product.id)}
         >
           {product.title}
@@ -66,10 +81,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onEdit, onDelete, on
         <p className="text-md text-gray-600 mb-2"><strong>Updated At:</strong> {new Date(product.updatedAt).toLocaleDateString()}</p>
         <p className="text-md text-gray-600 mb-2"><strong>Created At:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
         <div className="flex justify-end space-x-2 mt-4">
-          <Button onClick={() => onEdit(product)} className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all">
+          <Button onClick={() => onEdit(product)} className="p-2">
             <FaEdit />
           </Button>
-          <Button onClick={() => onDelete(product.id)} className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all">
+          <Button onClick={() => onDelete(product.id)} className="p-2" variant="destructive">
             <FaTrashAlt />
           </Button>
         </div>

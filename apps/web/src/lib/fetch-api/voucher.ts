@@ -1,4 +1,3 @@
-
 import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/voucher';
@@ -14,13 +13,39 @@ export const getVouchers = async (page: number = 1, limit: number = 8, filters: 
   return response.data;
 };
 
+export const getVoucherById = async (id: string) => {
+  const response = await axios.get(`${API_URL}/${id}`, {
+    withCredentials: true,
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to fetch voucher');
+  }
+  return response.data;
+};
+
 export const createVoucher = async (voucherData: any) => {
   const response = await axios.post(API_URL, voucherData, {
     headers: {
-      'Content-Type': 'application/json',
+      'Content-Type': 'multipart/form-data',
     },
     withCredentials: true,
   });
+  if (response.status !== 201) {
+    throw new Error('Failed to create voucher');
+  }
+  return response.data;
+};
+
+export const updateVoucher = async (id: string, voucherData: any) => {
+  const response = await axios.put(`${API_URL}/${id}`, voucherData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    withCredentials: true,
+  });
+  if (response.status !== 200) {
+    throw new Error('Failed to update voucher');
+  }
   return response.data;
 };
 
@@ -28,5 +53,8 @@ export const deleteVoucher = async (id: string) => {
   const response = await axios.delete(`${API_URL}/${id}`, {
     withCredentials: true,
   });
+  if (response.status !== 200) {
+    throw new Error('Failed to delete voucher');
+  }
   return response.data;
 };

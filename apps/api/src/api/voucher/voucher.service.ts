@@ -31,6 +31,18 @@ export class VoucherService {
     return { total, page, limit, vouchers };
   }
 
+  static async getVoucherById(id: string) {
+    const voucher = await prisma.voucher.findUnique({
+      where: { id },
+      include: {
+        superAdmin: true,
+        storeAdmin: true,
+        store: true,
+      },
+    });
+    return voucher;
+  }
+
   static async createVoucher(data: any, userId: string, imageUrl?: string) {
     const validatedData = Validation.validate(VoucherValidation.createVoucher, data);
     const voucherData = {

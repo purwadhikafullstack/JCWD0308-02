@@ -5,7 +5,7 @@ import { ProductFields, ProductRequest, ProductUpdateRequest } from "@/types/pro
 import { ProductValidation } from "./product.validation.js";
 
 export class ProductService {
-  static getProducts = async (page: number, limit: number, filters: any) => {
+  static getProducts = async (page: number, limit?: number, filters: any = {}) => {
     const where: any = {};
     if (filters.search) {
       where.title = { contains: filters.search };
@@ -16,21 +16,25 @@ export class ProductService {
         where[key] = value;
       }
     }
+
     const total = await prisma.product.count({ where });
     const products = await prisma.product.findMany({
       where,
-      skip: (page - 1) * limit,
-      take: limit,
-      select: {
-        ...ProductFields,
-        images: true,
-      },
-    });
+    orderBy: {
+      createdAt: 'desc',
+    },
+    skip: page && limit ? (page - 1) * limit : undefined,
+    take: limit ?? undefined,
+    select: {
+      ...ProductFields,
+      images: true,
+    },
+  });
 
     return {
       total,
       page,
-      limit,
+      limit: limit || total, 
       products,
     };
   };

@@ -17,17 +17,41 @@ export class VoucherController {
     }
   };
 
+  getVoucherById: ICallback = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const voucher = await VoucherService.getVoucherById(id);
+      if (!voucher) {
+        return res.status(404).json({ message: 'Voucher not found' });
+      }
+      res.status(200).json(voucher);
+    } catch (error) {
+      next(error);
+    }
+  };
+
   createVoucher: ICallback = async (req, res, next) => {
     try {
       const user = res.locals.user as User;
       const { superAdminId, storeAdminId, storeId, ...voucherData } = req.body;
-
+  
+      const parsedVoucherData = {
+        ...voucherData,
+        isClaimable: JSON.parse(voucherData.isClaimable),
+        isPrivate: JSON.parse(voucherData.isPrivate),
+        fixedDiscount: Number(voucherData.fixedDiscount),
+        discount: Number(voucherData.discount),
+        stock: Number(voucherData.stock),
+        minOrderPrice: Number(voucherData.minOrderPrice),
+        minOrderItem: Number(voucherData.minOrderItem),
+      };
+  
       const file = req.file as Express.Multer.File | undefined;
       const imageUrl = file ? `/public/${file.filename}` : undefined;
-      
+  
       const voucher = await VoucherService.createVoucher(
         {
-          ...voucherData,
+          ...parsedVoucherData,
           superAdminId: user.role === 'SUPER_ADMIN' ? user.id : superAdminId,
           storeAdminId: user.role === 'STORE_ADMIN' ? user.id : storeAdminId,
           storeId,
@@ -35,18 +59,30 @@ export class VoucherController {
         user.id,
         imageUrl
       );
-
+  
       res.status(201).json({ status: 'OK', message: 'Voucher Created Successfully', voucher });
     } catch (error) {
       next(error);
     }
   };
+  
 
   updateVoucher: ICallback = async (req, res, next) => {
     try {
       const { id } = req.params;
       const user = res.locals.user as User;
       const { superAdminId, storeAdminId, storeId, ...voucherData } = req.body;
+  
+      const parsedVoucherData = {
+        ...voucherData,
+        isClaimable: JSON.parse(voucherData.isClaimable),
+        isPrivate: JSON.parse(voucherData.isPrivate),
+        fixedDiscount: Number(voucherData.fixedDiscount),
+        discount: Number(voucherData.discount),
+        stock: Number(voucherData.stock),
+        minOrderPrice: Number(voucherData.minOrderPrice),
+        minOrderItem: Number(voucherData.minOrderItem),
+      };
 
       const file = req.file as Express.Multer.File | undefined;
       const imageUrl = file ? `/public/${file.filename}` : undefined;
@@ -54,7 +90,7 @@ export class VoucherController {
       const voucher = await VoucherService.updateVoucher(
         id,
         {
-          ...voucherData,
+          ...parsedVoucherData,
           superAdminId: user.role === 'SUPER_ADMIN' ? user.id : superAdminId,
           storeAdminId: user.role === 'STORE_ADMIN' ? user.id : storeAdminId,
           storeId,
@@ -91,7 +127,6 @@ export class VoucherController {
       next(error);
     }
   };
-
 
   getUserVouchers: ICallback = async (req, res, next) => {
     try {

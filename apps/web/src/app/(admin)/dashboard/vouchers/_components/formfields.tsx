@@ -1,154 +1,147 @@
 import React from 'react';
+import { useFormContext, Controller } from 'react-hook-form';
+import { Input } from '@/components/ui/input';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 
-interface FormFieldsProps {
-  formData: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void;
-}
+const FormFields: React.FC = () => {
+  const { control, register } = useFormContext();
 
-const FormFields: React.FC<FormFieldsProps> = ({ formData, handleChange }) => {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Name</label>
-        <input
-          type="text"
+      <div>
+        <Label htmlFor="name">Name</Label>
+        <Controller
           name="name"
-          value={formData.name}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input {...field} className="text-black" />}
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Code</label>
-        <input
-          type="text"
+      <div>
+        <Label htmlFor="code">Code</Label>
+        <Controller
           name="code"
-          value={formData.code}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input {...field} className="text-black" />}
         />
       </div>
-      <div className="col-span-full mb-4">
-        <label className="block text-sm font-medium text-gray-700">Description</label>
-        <textarea
+      <div className="col-span-full">
+        <Label htmlFor="description">Description</Label>
+        <Controller
           name="description"
-          value={formData.description}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
-        ></textarea>
+          control={control}
+          render={({ field }) => <Textarea {...field} className="text-black" />}
+        />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Voucher Type</label>
-        <select
+      <div>
+        <Label htmlFor="voucherType">Voucher Type</Label>
+        <Controller
           name="voucherType"
-          value={formData.voucherType}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
-        >
-          <option value="PRODUCT">Product</option>
-          <option value="SHIPPING_COST">Shipping Cost</option>
-        </select>
+          control={control}
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger className="text-black">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="PRODUCT">Product</SelectItem>
+                <SelectItem value="SHIPPING_COST">Shipping Cost</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Discount Type</label>
-        <select
+      <div>
+        <Label htmlFor="discountType">Discount Type</Label>
+        <Controller
           name="discountType"
-          value={formData.discountType}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
-        >
-          <option value="FIXED_DISCOUNT">Fixed Discount</option>
-          <option value="DISCOUNT">Discount</option>
-        </select>
+          control={control}
+          render={({ field }) => (
+            <Select onValueChange={field.onChange} value={field.value}>
+              <SelectTrigger className="text-black">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="FIXED_DISCOUNT">Fixed Discount</SelectItem>
+                <SelectItem value="DISCOUNT">Discount</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Fixed Discount</label>
-        <input
-          type="number"
+      <div>
+        <Label htmlFor="fixedDiscount">Fixed Discount</Label>
+        <Controller
           name="fixedDiscount"
-          value={formData.fixedDiscount}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input type="number" {...field} className="text-black" />}
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Discount</label>
-        <input
-          type="number"
+      <div>
+        <Label htmlFor="discount">Discount</Label>
+        <Controller
           name="discount"
-          value={formData.discount}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input type="number" {...field} className="text-black" />}
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Stock</label>
-        <input
-          type="number"
+      <div>
+        <Label htmlFor="stock">Stock</Label>
+        <Controller
           name="stock"
-          value={formData.stock}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input type="number" {...field} className="text-black" />}
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Minimum Order Price</label>
-        <input
-          type="number"
+      <div>
+        <Label htmlFor="minOrderPrice">Minimum Order Price</Label>
+        <Controller
           name="minOrderPrice"
-          value={formData.minOrderPrice}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input type="number" {...field} className="text-black" />}
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Minimum Order Item</label>
-        <input
-          type="number"
+      <div>
+        <Label htmlFor="minOrderItem">Minimum Order Item</Label>
+        <Controller
           name="minOrderItem"
-          value={formData.minOrderItem}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input type="number" {...field} className="text-black" />}
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Expiration Date</label>
-        <input
-          type="date"
+      <div>
+        <Label htmlFor="expiresAt">Expiration Date</Label>
+        <Controller
           name="expiresAt"
-          value={(formData.expiresAt instanceof Date ? formData.expiresAt : new Date(formData.expiresAt)).toISOString().split('T')[0]}
-          onChange={handleChange}
-          className="mt-1 block w-full border border-black rounded-md"
+          control={control}
+          render={({ field }) => <Input type="date" {...field} className="text-black" />}
         />
       </div>
-      <div className="col-span-full mb-4">
-        <label className="block text-sm font-medium text-gray-700">Image</label>
+      <div className="col-span-full">
+        <Label htmlFor="image">Image</Label>
         <input
           type="file"
-          name="image"
-          onChange={(e) => handleChange(e as React.ChangeEvent<HTMLInputElement>)}
-          className="mt-1 block w-full border border-black rounded-md"
+          {...register('image')}
+          className="mt-1 block w-full"
         />
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Is Claimable</label>
-        <input
-          type="checkbox"
+      <div className="flex items-center">
+        <Controller
           name="isClaimable"
-          checked={formData.isClaimable}
-          onChange={handleChange}
-          className="mt-1"
+          control={control}
+          render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
         />
+        <Label htmlFor="isClaimable" className="ml-2">Is Claimable</Label>
       </div>
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">Is Private</label>
-        <input
-          type="checkbox"
+      <div className="flex items-center">
+        <Controller
           name="isPrivate"
-          checked={formData.isPrivate}
-          onChange={handleChange}
-          className="mt-1"
+          control={control}
+          render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
         />
+        <Label htmlFor="isPrivate" className="ml-2">Is Private</Label>
       </div>
     </div>
   );

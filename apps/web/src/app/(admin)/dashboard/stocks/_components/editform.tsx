@@ -20,7 +20,7 @@ interface EditStockFormProps {
   products: { id: string; title: string }[];
   stores: { id: string; name: string }[];
   onClose: () => void;
-  onUpdate: (stock: any) => void;
+  onUpdate: (stock: any, mutationsByMonth: Record<string, any[]>) => void;
 }
 
 const EditStockForm: React.FC<EditStockFormProps> = ({ stockId, initialData, products, stores, onClose, onUpdate }) => {
@@ -42,8 +42,8 @@ const EditStockForm: React.FC<EditStockFormProps> = ({ stockId, initialData, pro
     try {
       await updateStockAmount(stockId, data);
       showSuccess('Stock item updated successfully');
-      const updatedStock = await fetchStockById(stockId);
-      onUpdate(updatedStock);
+      const { stock, mutationsByMonth } = await fetchStockById(stockId);
+      onUpdate(stock, mutationsByMonth);
       onClose();
     } catch (error) {
       handleApiError(error, 'Failed to update stock item');

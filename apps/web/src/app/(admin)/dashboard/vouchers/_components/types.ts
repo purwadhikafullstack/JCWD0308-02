@@ -13,5 +13,5 @@ export interface Voucher {
   minOrderPrice: number;
   minOrderItem: number;
   expiresAt: Date;
-  image: string | null;
+  imageUrl: string | null;
 }
