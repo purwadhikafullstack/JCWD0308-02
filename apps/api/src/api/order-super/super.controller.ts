@@ -1,15 +1,19 @@
 import { ICallback } from '@/types/index.js';
 
 import { OrderSuperService } from './super.service.js';
-import { ConfirmPaymentRequest } from '@/types/order.type.js';
+import { ChangeStatusRequest } from '@/types/order.type.js';
 
 export class OrderSuperController {
   getAllOrders: ICallback = async (req, res, next) => {
     try {
-      const storeId = res.locals.store?.id;
-      console.log('storeId from backend:', storeId);
-      const order = await OrderSuperService.getAllOrders(storeId);
-      return res.status(201).json({ status: 'OK', data: order });
+      const page = parseInt(req.query.page as string) || 1;
+      const perPage = parseInt(req.query.perPage as string) || 10;
+      const { orders, totalCount } = await OrderSuperService.getAllOrders(
+        page,
+        perPage,
+        res,
+      );
+      return res.status(201).json({ status: 'OK', data: orders, totalCount });
     } catch (error) {
       next(error);
     }
@@ -17,7 +21,7 @@ export class OrderSuperController {
 
   confirmPayment: ICallback = async (req, res, next) => {
     try {
-      const confirmPaymentRequest: ConfirmPaymentRequest = req.body;
+      const confirmPaymentRequest: ChangeStatusRequest = req.body;
       const result = await OrderSuperService.confirmPayment(
         confirmPaymentRequest,
         res,
