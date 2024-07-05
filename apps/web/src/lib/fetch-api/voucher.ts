@@ -2,8 +2,16 @@ import axios from 'axios';
 
 const API_URL = 'http://localhost:8000/api/voucher';
 
-export const getVouchers = async (page: number = 1, limit: number = 8, filters: any = {}) => {
-  const query = new URLSearchParams({ page: page.toString(), limit: limit.toString(), ...filters }).toString();
+export const getVouchers = async (
+  page: number = 1,
+  limit: number = 8,
+  filters: any = {},
+) => {
+  const query = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...filters,
+  }).toString();
   const response = await axios.get(`${API_URL}?${query}`, {
     withCredentials: true,
   });
@@ -57,4 +65,15 @@ export const deleteVoucher = async (id: string) => {
     throw new Error('Failed to delete voucher');
   }
   return response.data;
+};
+
+export const getUserVouchers = async () => {
+  try {
+    const response = await axios.get(`${API_URL}/voucher-user`, {
+      withCredentials: true,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('getuserVouchers:', error);
+  }
 };

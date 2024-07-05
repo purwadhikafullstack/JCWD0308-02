@@ -15,9 +15,9 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({
   setPaymentMethod,
 }) => {
   return (
-    <div className="flex gap-3 mt-5">
-      <Card className="bg-card text-card-foreground shadow-lg rounded-lg">
-        <CardHeader className="p-4">
+    <div className="flex flex-col gap-6 mt-5 md:flex-row">
+      <Card className="bg-white text-gray-800 shadow-lg rounded-lg flex-1">
+        <CardHeader className="p-4 bg-primary text-primary-foreground rounded-t-lg">
           <CardTitle className="text-xl font-bold">Note</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
@@ -30,8 +30,8 @@ const AdditionalInfo: React.FC<AdditionalInfoProps> = ({
           />
         </CardContent>
       </Card>
-      <Card className="bg-card text-card-foreground shadow-lg rounded-lg flex-1">
-        <CardHeader className="flex items-center p-4 bg-accent text-accent-foreground rounded-t-lg">
+      <Card className="bg-white text-gray-800 shadow-lg rounded-lg flex-1">
+        <CardHeader className="p-4 bg-primary text-primary-foreground rounded-t-lg">
           <CardTitle className="text-xl font-bold">Choose Payment</CardTitle>
         </CardHeader>
         <CardContent className="p-4">
