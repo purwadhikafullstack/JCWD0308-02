@@ -1,9 +1,9 @@
 import { prisma } from '@/db.js';
 import { Validation } from '@/utils/validation.js';
 import { VoucherValidation } from './voucher.validation.js';
+import { Response } from 'express';
 
 export class VoucherService {
- 
   static async getVouchers(page: number, limit: number, filters: any) {
     const where: any = {};
     if (filters.search) {
@@ -44,7 +44,10 @@ export class VoucherService {
   }
 
   static async createVoucher(data: any, userId: string, imageUrl?: string) {
-    const validatedData = Validation.validate(VoucherValidation.createVoucher, data);
+    const validatedData = Validation.validate(
+      VoucherValidation.createVoucher,
+      data,
+    );
     const voucherData = {
       ...validatedData,
       imageUrl,
@@ -57,8 +60,16 @@ export class VoucherService {
     return voucher;
   }
 
-  static async updateVoucher(id: string, data: any, userId: string, imageUrl?: string) {
-    const validatedData = Validation.validate(VoucherValidation.updateVoucher, data);
+  static async updateVoucher(
+    id: string,
+    data: any,
+    userId: string,
+    imageUrl?: string,
+  ) {
+    const validatedData = Validation.validate(
+      VoucherValidation.updateVoucher,
+      data,
+    );
     const voucherData = {
       ...validatedData,
       imageUrl,
@@ -67,7 +78,10 @@ export class VoucherService {
       storeId: data.storeId || null,
     };
 
-    const voucher = await prisma.voucher.update({ where: { id }, data: voucherData });
+    const voucher = await prisma.voucher.update({
+      where: { id },
+      data: voucherData,
+    });
     return voucher;
   }
 
@@ -86,7 +100,8 @@ export class VoucherService {
     return userVoucher;
   };
 
-  static getUserVouchers = async (userId: string) => {
+  static getUserVouchers = async (res: Response) => {
+    const userId = res.locals.user?.id;
     const userVouchers = await prisma.userVoucher.findMany({
       where: { userId },
       include: { voucher: true },

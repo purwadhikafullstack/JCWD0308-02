@@ -16,15 +16,12 @@ export class CartService {
       req,
     );
     console.log('cartRequest:', cartRequest);
-    //hanya user yang active dan role user
     const user = await prisma.user.findUnique({
       where: { id: res.locals.user?.id },
       select: { id: true, status: true, role: true, addresses: true },
     });
 
-    if (!user) throw new ResponseError(401, 'Unauthorized');
-
-    const userAddress = user.addresses.find(
+    const userAddress = user?.addresses.find(
       (address: any) => address.id === cartRequest.addressId,
     );
 
@@ -63,7 +60,7 @@ export class CartService {
 
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
-        userId: user.id,
+        userId: user?.id,
         stockId: stock.id,
         orderItemType: 'CART_ITEM',
         isPack: cartRequest.isPack,
@@ -85,11 +82,11 @@ export class CartService {
     // If the item is not in the cart
     const orderItem = await prisma.orderItem.create({
       data: {
-        userId: user.id,
+        userId: user?.id,
         stockId: stock.id,
         quantity: cartRequest.quantity,
         isPack: cartRequest.isPack,
-      },
+      } as any,
     });
     console.log('orderItem:', orderItem);
     return orderItem;
