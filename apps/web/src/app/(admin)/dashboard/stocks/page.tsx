@@ -1,24 +1,21 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchStocks, createStock, deleteStock } from '@/lib/fetch-api/stock';
 import { fetchProducts } from '@/lib/fetch-api/product';
 import SearchBar from '@/components/partial/SearchBar';
 import Pagination from '@/components/partial/pagination';
-import { Toaster } from '@/components/ui/sonner';
-
 import { Stock } from '@/lib/types/stock';
 import { Product } from '@/lib/types/product';
 import { Store } from '@/lib/types/store';
-import { showSuccess } from '@/components/toast/toastutils';
-import { handleApiError } from '@/components/toast/errorapi';
+import { handleApiError, showSuccess } from '@/components/toast/toastutils';
 import { getAllStores } from '@/lib/fetch-api/store/client';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import CreateForm from './_components/createform';
-import StockTable from './_components/stocktable';
-import {  useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
+import StockTable from './_components/tables/StockTable';
+import CreateStockForm from './_components/forms/CreateStockForm';
+import DeleteStockDialog from './_components/dialogs/DeleteStockDialog';
+import StockFilters from './_components/filters/StockFilters';
 
 const StockList = () => {
   const router = useRouter();
@@ -30,6 +27,7 @@ const StockList = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [creatingStock, setCreatingStock] = useState<boolean>(false);
+  const [deletingStock, setDeletingStock] = useState<Stock | null>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(8);
@@ -80,10 +78,10 @@ const StockList = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string, productName: string, storeName: string) => {
     try {
       await deleteStock(id);
-      showSuccess('Stock deleted successfully');
+      showSuccess(`Stock for ${productName} in ${storeName} deleted successfully`);
       setUpdateFlag(!updateFlag);
     } catch (error) {
       handleApiError(error, 'Failed to delete stock');
@@ -139,36 +137,15 @@ const StockList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Toaster />
       <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">Stocks</h2>
       <p className="text-lg mb-8 text-center text-gray-700">Manage your stocks here.</p>
       <SearchBar onSearch={handleSearch} />
-      <div className="flex justify-between items-center mb-6">
-        {userProfile.data?.user?.role === "SUPER_ADMIN" ? 
-        (<Button onClick={() => setCreatingStock(true)} className="px-6">
-          Create Stock
-        </Button>) : null}
-        <div className="flex space-x-4">
-          <div className="w-48">
-            <Select onValueChange={handleStoreFilterChange}>
-              <SelectTrigger aria-label="Store Filter">
-                <SelectValue placeholder="Select a store" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>Stores</SelectLabel>
-                  <SelectItem value="all">All Stores</SelectItem>
-                  {stores.map(store => (
-                    <SelectItem key={store.id} value={store.id}>
-                      {store.name}
-                    </SelectItem>
-                  ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </div>
+      <StockFilters
+        stores={stores}
+        storeFilter={storeFilter}
+        handleStoreFilterChange={handleStoreFilterChange}
+        handleCreate={() => setCreatingStock(true)}
+      />
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
       ) : error ? (
@@ -178,10 +155,22 @@ const StockList = () => {
           <StockTable
             stocks={stocks}
             handleTitleClick={handleTitleClick}
-            handleDelete={handleDelete}
+            handleDelete={(id: string) => {
+              const stock = stocks.find(s => s.id === id);
+              if (stock) {
+                setDeletingStock(stock);
+              }
+            }}
           />
           {creatingStock && (
-            <CreateForm onCreate={handleCreate} onCancel={() => setCreatingStock(false)} products={products} stores={stores} />
+            <CreateStockForm onCreate={handleCreate} onCancel={() => setCreatingStock(false)} products={products} stores={stores} />
+          )}
+          {deletingStock && (
+            <DeleteStockDialog
+              stock={deletingStock}
+              onClose={() => setDeletingStock(null)}
+              onDeleteSuccess={() => setUpdateFlag(!updateFlag)}
+            />
           )}
           <Pagination
             total={total}

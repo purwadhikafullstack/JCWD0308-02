@@ -4,9 +4,9 @@ import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { getVoucherById, updateVoucher } from '@/lib/fetch-api/voucher';
 import { Toaster, toast } from '@/components/ui/sonner';
-import { Voucher } from '@/app/(admin)/dashboard/vouchers/_components/types';
+import { Voucher } from '@/lib/types/voucher';
 import { Button } from '@/components/ui/button';
-import EditForm from '../_components/editform';
+import EditForm from '../_components/forms/EditVoucherForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 
 const VoucherDetail: React.FC = () => {

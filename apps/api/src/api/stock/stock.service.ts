@@ -20,16 +20,18 @@ export class StockService {
       where.storeId = storeId;
     }
 
-    const total = await prisma.stock.count({ where });
+    const skip = (page - 1) * limit;
     const stocks = await prisma.stock.findMany({
-      where,
-      skip: (page - 1) * limit,
+      skip,
       take: limit,
+      where,
       include: {
-        product: { select: { title: true } },
-        store: { select: { name: true } },
+        product: true, 
+        store: true,  
       },
     });
+    const total = await prisma.stock.count({ where });
+
     return { total, page, limit, stocks };
   }
 

@@ -3,16 +3,17 @@ import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { getVouchers, createVoucher, deleteVoucher } from '@/lib/fetch-api/voucher';
 import { Toaster } from '@/components/ui/sonner';
-import { Voucher } from './_components/types';
-import VoucherCard from './_components/vouchercard';
-import VoucherFilters from './_components/voucherfilters';
-import CreateForm from './_components/createform';
+import { Voucher } from '../../../../lib/types/voucher';
+import VoucherCard from './_components/cards/VoucherCard';
+import VoucherFilters from './_components/filters/VoucherFilters';
+import CreateForm from './_components/forms/CreateVoucherForm';
 import Pagination from '@/components/partial/pagination';
 import SearchBar from '@/components/partial/SearchBar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { handleApiError } from '@/components/toast/errorapi';
+import { handleApiError } from '@/components/toast/toastutils';
 import { showSuccess } from '@/components/toast/toastutils';
+import DeleteVoucherDialog from './_components/dialogs/DeleteVoucherDialog';
 
 import fixedDiscountProduct from '../../../../../public/fixeddiscountproduct.png';
 import discountProduct from '../../../../../public/discountproduct.png';
@@ -27,6 +28,7 @@ const VoucherManagement = () => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [creatingVoucher, setCreatingVoucher] = useState<boolean>(false);
+  const [deletingVoucher, setDeletingVoucher] = useState<Voucher | null>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(8); // Adjust limit to fit 4 cards per row
@@ -123,7 +125,7 @@ const VoucherManagement = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {vouchers.map((voucher) => (
-              <VoucherCard key={voucher.id} voucher={voucher} handleDelete={handleDelete} getVoucherIcon={getVoucherIcon} />
+              <VoucherCard key={voucher.id} voucher={voucher} handleDelete={() => setDeletingVoucher(voucher)} getVoucherIcon={getVoucherIcon} />
             ))}
           </div>
           <Dialog open={creatingVoucher} onOpenChange={setCreatingVoucher}>
@@ -136,6 +138,13 @@ const VoucherManagement = () => {
               </DialogHeader>
             </DialogContent>
           </Dialog>
+          {deletingVoucher && (
+            <DeleteVoucherDialog
+              voucher={deletingVoucher}
+              onClose={() => setDeletingVoucher(null)}
+              onDeleteSuccess={() => setUpdateFlag(!updateFlag)}
+            />
+          )}
           <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
         </>
       )}

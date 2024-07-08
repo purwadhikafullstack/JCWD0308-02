@@ -1,6 +1,6 @@
 'use client';
 
-import { Voucher } from '@/app/(admin)/dashboard/vouchers/_components/types';
+import { Voucher } from '@/lib/types/voucher';
 import {
   Carousel,
   CarouselContent,

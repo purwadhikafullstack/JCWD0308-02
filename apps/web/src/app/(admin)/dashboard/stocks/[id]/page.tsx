@@ -1,14 +1,13 @@
 'use client';
 import React, { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-
 import { Stock } from '@/lib/types/stock';
-import { useStock } from '../_components/usestock';
-import EditStockForm from '../_components/editform';
+import EditStockForm from '../_components/forms/EditStockForm';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Toaster } from '@/components/ui/sonner';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { useStock } from '../_components/hooks/UseStock';
 
 const StockDetail = () => {
   const router = useRouter();

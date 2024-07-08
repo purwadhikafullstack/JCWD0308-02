@@ -21,21 +21,21 @@ export class ProductService {
     const total = await prisma.product.count({ where });
     const products = await prisma.product.findMany({
       where,
-    orderBy: {
-      createdAt: 'desc',
-    },
-    skip: page && limit ? (page - 1) * limit : undefined,
-    take: limit ?? undefined,
-    select: {
-      ...ProductFields,
-      images: true,
-    },
-  });
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: page && limit ? (page - 1) * limit : undefined,
+      take: limit ?? undefined,
+      select: {
+        ...ProductFields,
+        images: true,
+      },
+    });
 
     return {
       total,
       page,
-      limit: limit || total, 
+      limit: limit || total,
       products,
     };
   };
@@ -104,9 +104,14 @@ export class ProductService {
 
     if (imagesToDelete.length > 0) {
       for (const imageId of imagesToDelete) {
-        await prisma.productImage.delete({
+        const imageExists = await prisma.productImage.findUnique({
           where: { id: imageId },
         });
+        if (imageExists) {
+          await prisma.productImage.delete({
+            where: { id: imageId },
+          });
+        }
       }
     }
 
