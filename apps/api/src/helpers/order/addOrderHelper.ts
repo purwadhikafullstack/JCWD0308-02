@@ -8,18 +8,24 @@ import {
 import { ResponseError } from '@/utils/error.response.js';
 import { PaymentMethod } from '@prisma/client';
 import { calculateProductPriceAndWeight } from './calculateWeight.js';
+import { Response } from 'express';
 
-export const getUserAndAddress = async (userId: any, addressId: any) => {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, addresses: true },
+export const getUserAndAddress = async (res: Response) => {
+  const addressId = res.locals.address?.id;
+  if (!addressId) {
+    throw new ResponseError(404, 'Address not found!');
+  }
+  const address = await prisma.userAddress.findUnique({
+    where: { id: addressId },
+    include: {
+      city: true,
+    },
   });
-  if (!user) throw new ResponseError(401, 'Unauthorized');
-  const userAddress = user.addresses.find(
-    (address: any) => address.id === addressId,
-  );
-  if (!userAddress) throw new ResponseError(401, 'Address not found');
-  return userAddress;
+  console.log('address:', address);
+  if (!address) {
+    throw new ResponseError(404, 'Address not found!');
+  }
+  return address;
 };
 
 export const applyVoucherDiscount = async (
@@ -80,13 +86,13 @@ export const applyVoucherDiscount = async (
 
 export const calculateShipping = async (
   nearestStore: any,
-  userAddress: any,
+  cityId: any,
   weight: number,
   courier: any,
 ) => {
   return await calculateShippingCost(
     +nearestStore?.cityId!,
-    +userAddress.cityId,
+    +cityId,
     weight,
     mapCourierTypeToRajaOngkir(courier),
   );
@@ -133,7 +139,7 @@ export const createOrder = async (
       serviceDescription: 'Layanan Reguler',
       estimation,
       storeId: nearestStore?.id,
-      storeAdminId: storeAdmin?.id,
+      // storeAdminId: storeAdmin?.id,
       // storeAdminId: 'grosirun admin',
       note: orderRequest.note,
       totalPrice: finalTotalPrice,

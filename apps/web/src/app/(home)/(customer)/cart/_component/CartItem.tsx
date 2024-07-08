@@ -21,6 +21,9 @@ import {
 import { RootState } from '@/lib/features/store';
 import { formatCurrency } from '@/lib/currency';
 import { CartItemType } from '@/lib/types/cart';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getSelectedAddress } from '@/lib/fetch-api/address/client';
+import { useRouter } from 'next/navigation';
 
 interface CartItemProps {
   cart: CartItemType;
@@ -28,34 +31,36 @@ interface CartItemProps {
   onSelect: (itemId: string) => void;
 }
 const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
+  const selectedAddress = useSuspenseQuery({
+    queryKey: ['selected-address'],
+    queryFn: getSelectedAddress,
+  });
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
   const error = useAppSelector((state: RootState) => state.cart.error);
+  const router = useRouter();
 
   useEffect(() => {
     setQuantity(cart.quantity);
   }, [cart.quantity]);
 
-  if (!cart.stock || !cart.stock.product) {
-    console.log('no cart stock');
-    return null;
-  }
+  if (!cart.stock || !cart.stock.product) return null;
 
   const { product } = cart.stock;
-  const addressId = '11663abf-7a5b-4fa2-8503-53104311e924';
+  const addressId = selectedAddress.data?.address.id;
+  if (!addressId) router.push('/cart');
 
   const handleQuantityChange = async (newQuantity: number) => {
-    console.log('newQuantity:', newQuantity);
     if (newQuantity === 0) {
       dispatch(deleteCartItem(cart.id));
     } else {
       try {
         const resultAction = await dispatch(
           updateCartItem({
-            addressId: addressId,
+            addressId,
             quantity: newQuantity,
             productId: cart.stock.product.id,
-          }),
+          } as any),
         );
 
         if (updateCartItem.fulfilled.match(resultAction)) {
@@ -70,8 +75,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   };
 
   const handleRemove = async () => {
-    // dispatch(deleteCartItem(cart.id));
-    // dispatch(fetchCartItemCount());
     try {
       const resultAction = await dispatch(deleteCartItem(cart.id));
       if (deleteCartItem.fulfilled.match(resultAction)) {

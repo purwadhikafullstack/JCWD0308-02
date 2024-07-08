@@ -4,14 +4,17 @@ import { User } from 'lucia';
 import { API_URL } from '@/config.js';
 
 export class VoucherController {
-  
   getVouchers: ICallback = async (req, res, next) => {
     try {
       const { page = 1, limit = 10, search, ...filters } = req.query;
       const pageNumber = parseInt(page as string, 10);
       const limitNumber = parseInt(limit as string, 10);
 
-      const vouchers = await VoucherService.getVouchers(pageNumber, limitNumber, { ...filters, search });
+      const vouchers = await VoucherService.getVouchers(
+        pageNumber,
+        limitNumber,
+        { ...filters, search },
+      );
       res.status(200).json(vouchers);
     } catch (error) {
       next(error);
@@ -35,7 +38,7 @@ export class VoucherController {
     try {
       const user = res.locals.user as User;
       const { superAdminId, storeAdminId, storeId, ...voucherData } = req.body;
-  
+
       const parsedVoucherData = {
         ...voucherData,
         isClaimable: JSON.parse(voucherData.isClaimable),
@@ -46,10 +49,12 @@ export class VoucherController {
         minOrderPrice: Number(voucherData.minOrderPrice),
         minOrderItem: Number(voucherData.minOrderItem),
       };
-  
+
       const file = req.file as Express.Multer.File | undefined;
-      const imageUrl = file ? `${API_URL}/public/images/${file.filename}` : undefined;
-  
+      const imageUrl = file
+        ? `${API_URL}/public/images/${file.filename}`
+        : undefined;
+
       const voucher = await VoucherService.createVoucher(
         {
           ...parsedVoucherData,
@@ -58,22 +63,27 @@ export class VoucherController {
           storeId,
         },
         user.id,
-        imageUrl
+        imageUrl,
       );
-  
-      res.status(201).json({ status: 'OK', message: 'Voucher Created Successfully', voucher });
+
+      res
+        .status(201)
+        .json({
+          status: 'OK',
+          message: 'Voucher Created Successfully',
+          voucher,
+        });
     } catch (error) {
       next(error);
     }
   };
-  
 
   updateVoucher: ICallback = async (req, res, next) => {
     try {
       const { id } = req.params;
       const user = res.locals.user as User;
       const { superAdminId, storeAdminId, storeId, ...voucherData } = req.body;
-  
+
       const parsedVoucherData = {
         ...voucherData,
         isClaimable: JSON.parse(voucherData.isClaimable),
@@ -86,7 +96,9 @@ export class VoucherController {
       };
 
       const file = req.file as Express.Multer.File | undefined;
-      const imageUrl = file ? `${API_URL}/public/images/${file.filename}` : undefined;
+      const imageUrl = file
+        ? `${API_URL}/public/images/${file.filename}`
+        : undefined;
 
       const voucher = await VoucherService.updateVoucher(
         id,
@@ -97,10 +109,16 @@ export class VoucherController {
           storeId,
         },
         user.id,
-        imageUrl
+        imageUrl,
       );
 
-      res.status(200).json({ status: 'OK', message: 'Voucher Updated Successfully', voucher });
+      res
+        .status(200)
+        .json({
+          status: 'OK',
+          message: 'Voucher Updated Successfully',
+          voucher,
+        });
     } catch (error) {
       next(error);
     }
@@ -110,7 +128,9 @@ export class VoucherController {
     try {
       const { id } = req.params;
       await VoucherService.deleteVoucher(id);
-      res.status(200).json({ status: 'OK', message: 'Voucher Deleted Successfully' });
+      res
+        .status(200)
+        .json({ status: 'OK', message: 'Voucher Deleted Successfully' });
     } catch (error) {
       next(error);
     }
@@ -131,8 +151,8 @@ export class VoucherController {
 
   getUserVouchers: ICallback = async (req, res, next) => {
     try {
-      const { userId } = req.params;
-      const userVouchers = await VoucherService.getUserVouchers(userId);
+      const userId = res.locals.user?.id;
+      const userVouchers = await VoucherService.getUserVouchers(res);
       res.status(200).json(userVouchers);
     } catch (error) {
       next(error);

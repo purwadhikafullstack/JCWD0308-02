@@ -8,7 +8,6 @@ import {
 } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Trash2, Minus, Plus, Router } from 'lucide-react';
 import React, { FormEventHandler, useEffect, useState } from 'react';
 import Image from 'next/image';
 import { getCart } from '@/lib/fetch-api/cart';
@@ -17,7 +16,6 @@ import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
 import { setCart } from '@/lib/features/cart/cartSlice';
 import { RootState } from '@/lib/features/store';
 import { formatCurrency } from '@/lib/currency';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CartItemType } from '@/lib/types/cart';
 
@@ -95,11 +93,9 @@ export default function Cart() {
     const selectedCarts = Object.keys(selectedItem).filter(
       (key) => selectedItem[key],
     );
-    console.log('selectedCarts:', selectedCarts);
     const queryString = selectedCarts.length
       ? `?items=${selectedCarts.join(',')}`
       : '';
-    console.log('queryString:', queryString);
     router.push(`/orders${queryString}`);
   };
   return (
@@ -118,9 +114,9 @@ export default function Cart() {
               Select All
             </label>
           </Card>
-          {carts.map((cart: any) => (
+          {carts.map((cart: any, index) => (
             <CartItem
-              key={`${cart.id}-${cart.isPack}`}
+              key={`${cart.id}-${cart.isPack}-${index + 1}`}
               cart={cart}
               isSelected={selectedItem[`${cart.id}-${cart.isPack}`] || false}
               onSelect={() => handleSelectedItem(cart.id, cart.isPack)}

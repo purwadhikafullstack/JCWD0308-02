@@ -25,20 +25,20 @@ export class OrderService {
       req,
     );
     const userId = res.locals.user?.id;
-    const userAddress = await getUserAndAddress(userId, orderRequest.addressId);
+    const userAddress = await getUserAndAddress(res);
+    const { address } = userAddress;
+    const city = userAddress.cityId;
     const { updatedCartItem, nearestStore } = await handleCartItems(
       userId,
-      userAddress,
+      address,
     );
     let { totalPrice, weight } = calculateTotalPriceAndWeight(updatedCartItem);
-
     const { cost, estimation } = await calculateShipping(
       nearestStore,
-      userAddress,
+      city,
       weight,
       orderRequest.courier,
     );
-
     let discountProducts = 0;
     let discountShippingCost = 0;
 
@@ -75,24 +75,28 @@ export class OrderService {
       totalPayment,
     );
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
+    let paymentLink = null;
+    if (orderRequest.paymentMethod === 'GATEWAY') {
+      const data = {
+        transaction_details: {
+          order_id: newOrder.id,
+          gross_amount: totalPayment,
+        },
+        expiry: {
+          unit: 'minutes',
+          duration: 10,
+        },
+      };
+      const paymentResponse = await getPaymentLink(data);
+      paymentLink = paymentResponse.redirect_url;
+    }
 
-    let data = {
-      transaction_details: {
-        order_id: newOrder.id,
-        gross_amount: totalPayment,
-      },
-      expiry: {
-        unit: 'minutes',
-        duration: 10,
-      },
-    };
-    const paymentLink = await getPaymentLink(data);
     const updatedOrder = await prisma.order.update({
       where: { id: newOrder.id },
-      data: { paymentLink: paymentLink.redirect_url },
+      data: { paymentLink },
     });
 
-    return { ...updatedOrder, paymentLink: paymentLink.redirect_url };
+    return { ...updatedOrder, paymentLink };
   };
 
   //for customer
