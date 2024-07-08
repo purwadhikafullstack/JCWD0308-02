@@ -1,5 +1,4 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
 import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
 import { cn } from '@/lib/utils';
