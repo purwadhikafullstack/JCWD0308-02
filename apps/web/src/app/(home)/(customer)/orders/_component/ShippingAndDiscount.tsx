@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -8,7 +7,8 @@ import { calculateShippingCost } from "@/lib/fetch-api/shipping";
 import { courierServices, formattedCourierNames } from "@/lib/courierServices";
 import { formatCurrency } from "@/lib/currency";
 import { getVouchers } from "@/lib/fetch-api/voucher";
-
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
 
 interface ShippingAndDiscountProps {
   shippingCourier: string;
@@ -38,12 +38,10 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   setServiceDescription,
 }) => {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks'],
+    queryKey: ["nearest-stocks"],
     queryFn: getNearestStocks,
   });
-  const [shippingEstimation, setShippingEstimation] = useState<string | null>(
-    null,
-  );
+  const [shippingEstimation, setShippingEstimation] = useState<string | null>(null);
   const origin = nearestStocks?.data?.store?.cityId;
 
   useEffect(() => {
@@ -67,14 +65,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
     };
 
     fetchShippingCost();
-  }, [
-    shippingCourier,
-    shippingMethod,
-    cityId,
-    totalWeight,
-    setShippingCost,
-    origin,
-  ]);
+  }, [shippingCourier, shippingMethod, cityId, totalWeight, setShippingCost, origin]);
 
   const handleCourierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCourier = e.target.value;
@@ -99,7 +90,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   }, []);
 
   const fetchUserVouchers = async () => {
-    console.log('voucher pong');
+    console.log("voucher pong");
     try {
       const vouchers = await getVouchers();
       const productVouchersList = vouchers.filter((voucher: any) => voucher.voucherType === "PRODUCT");
@@ -108,7 +99,6 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
       setShippingVouchers(shippingVouchersList);
     } catch (error) {
       console.error("Error fetching vouchers:", error);
-
     }
   };
 
@@ -172,7 +162,6 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
             ))}
           </select>
           <select value={selectedShippingVoucher} onChange={(e) => setSelectedShippingVoucher(e.target.value)} className="w-full p-2 border rounded-md">
-
             <option value="">Select Discount Shipping Cost</option>
             {shippingVouchers.map((voucher: any) => (
               <option key={voucher.id} value={voucher.id}>

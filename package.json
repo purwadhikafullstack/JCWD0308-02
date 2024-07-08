@@ -31,5 +31,10 @@
     "hooks": {
       "pre-commit": "npx lint-staged"
     }
+  },
+  "prettier": {
+    "printWidth": 200,
+    "proseWrap": "never",
+    "htmlWhitespaceSensitivity": "ignore"
   }
 }
