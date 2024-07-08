@@ -59,6 +59,7 @@ export interface User {
 }
 
 export interface CartItemType {
+  productId: string;
   id: string;
   orderItemType: string;
   isChecked: boolean;

@@ -1,32 +1,22 @@
-'use client';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Trash2, Minus, Plus, Router } from 'lucide-react';
-import React, { FormEventHandler, useEffect, useState } from 'react';
-import Image from 'next/image';
-import { getCart } from '@/lib/fetch-api/cart';
-import CartItem from './_component/CartItem';
-import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
-import { setCart } from '@/lib/features/cart/cartSlice';
-import { RootState } from '@/lib/features/store';
-import { formatCurrency } from '@/lib/currency';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { CartItemType } from '@/lib/types/cart';
+"use client";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import React, { FormEventHandler, useEffect, useState } from "react";
+import Image from "next/image";
+import { checkCart, getCart } from "@/lib/fetch-api/cart";
+import CartItem from "./_component/CartItem";
+import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { setCart } from "@/lib/features/cart/cartSlice";
+import { RootState } from "@/lib/features/store";
+import { formatCurrency } from "@/lib/currency";
+import { useRouter } from "next/navigation";
+import { CartItemType } from "@/lib/types/cart";
 
 export default function Cart() {
   const dispatch = useAppDispatch();
   const carts = useAppSelector((state: RootState) => state.cart.items);
-  const [selectedItem, setSelectedItems] = useState<{ [key: string]: boolean }>(
-    {},
-  );
+  const [selectedItem, setSelectedItems] = useState<{ [key: string]: boolean }>({});
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const router = useRouter();
 
@@ -34,9 +24,14 @@ export default function Cart() {
     const fetchCartData = async () => {
       try {
         const cartData = await getCart();
-        dispatch(setCart(cartData.data));
+        const updatedCartData = cartData.data.map((item: CartItemType) => ({
+          ...item,
+          isChecked: false,
+        }));
+        dispatch(setCart(updatedCartData));
+        console.log("cartData:", updatedCartData);
       } catch (error) {
-        console.error('Error fetching cart data:', error);
+        console.error("Error fetching cart data:", error);
       }
     };
     fetchCartData();
@@ -45,14 +40,12 @@ export default function Cart() {
   function calculateSubtotal(items: CartItemType[]) {
     return items.reduce((acc, item) => {
       if (!item.stock) {
-        console.log('no stock for item:', item.id);
+        console.log("no stock for item:", item.id);
         return acc;
       }
       const key = `${item.id}-${item.isPack}`;
       if (selectedItem[key]) {
-        const price = item.isPack
-          ? item.stock.product.packPrice ?? 0
-          : item.stock.product.price ?? 0;
+        const price = item.isPack ? item.stock.product.packPrice ?? 0 : item.stock.product.price ?? 0;
 
         return acc + item.quantity * price;
       }
@@ -61,9 +54,7 @@ export default function Cart() {
     }, 0);
   }
 
-  const subtotal = useAppSelector((state: RootState) =>
-    calculateSubtotal(state.cart.items),
-  );
+  const subtotal = useAppSelector((state: RootState) => calculateSubtotal(state.cart.items));
 
   const handleSelectAll = () => {
     const newSelectedItems: { [key: string]: boolean } = {};
@@ -77,30 +68,40 @@ export default function Cart() {
     setSelectAll(!selectAll);
   };
 
-  const handleSelectedItem = (itemId: string, isPack: boolean) => {
+  useEffect(() => {
+    const initialSelectedItems: { [key: string]: boolean } = {};
+    carts.forEach((cart: CartItemType) => {
+      initialSelectedItems[`${cart.id}-${cart.isPack}`] = cart.isChecked || false;
+    });
+    setSelectedItems(initialSelectedItems);
+  }, [carts]);
+
+  const handleSelectedItem = async (itemId: string, isPack: boolean) => {
     const key = `${itemId}-${isPack}`;
     const newSelectedItems = {
       ...selectedItem,
       [key]: !selectedItem[key],
     };
     setSelectedItems(newSelectedItems);
+    try {
+      await checkCart(itemId, newSelectedItems[key]);
+      console.log(`Item ${itemId} isChecked updated to ${newSelectedItems[key]}`);
+    } catch (error) {
+      console.error("Error updating isChecked:", error);
+    }
 
-    const allSelectedManually = carts.every(
-      (cart: CartItemType) => newSelectedItems[`${cart.id}-${cart.isPack}`],
-    );
+    const allSelectedManually = carts.every((cart: CartItemType) => newSelectedItems[`${cart.id}-${cart.isPack}`]);
     setSelectAll(allSelectedManually);
   };
 
   const handleCheckout = () => {
-    const selectedCarts = Object.keys(selectedItem).filter(
-      (key) => selectedItem[key],
-    );
-    console.log('selectedCarts:', selectedCarts);
-    const queryString = selectedCarts.length
-      ? `?items=${selectedCarts.join(',')}`
-      : '';
-    console.log('queryString:', queryString);
-    router.push(`/orders${queryString}`);
+    const selectedCarts = Object.keys(selectedItem).filter((key) => selectedItem[key]);
+    const selectedItems = carts.filter((cart: any) => selectedCarts.includes(`${cart.id}-${cart.isPack}`));
+
+    if (selectedItems.length > 0) {
+      const queryString = selectedItems.map((item) => `items=${item.id}-${item.isPack}`).join("&");
+      router.push(`/orders?${queryString}`);
+    }
   };
   return (
     <div className="container mx-auto mt-10 p-4 min-h-[40rem]">
@@ -108,23 +109,13 @@ export default function Cart() {
         {/* Shopping List */}
         <div className="md:col-span-2">
           <Card className="p-4 flex items-center mb-4">
-            <Checkbox
-              id="select-all"
-              onChange={handleSelectAll}
-              onCheckedChange={handleSelectAll}
-              checked={selectAll}
-            />
+            <Checkbox id="select-all" onChange={handleSelectAll} onCheckedChange={handleSelectAll} checked={selectAll} />
             <label htmlFor="select-all" className="text-xl font-bold ml-3">
               Select All
             </label>
           </Card>
           {carts.map((cart: any) => (
-            <CartItem
-              key={`${cart.id}-${cart.isPack}`}
-              cart={cart}
-              isSelected={selectedItem[`${cart.id}-${cart.isPack}`] || false}
-              onSelect={() => handleSelectedItem(cart.id, cart.isPack)}
-            />
+            <CartItem key={`${cart.id}-${cart.isPack}`} cart={cart} isSelected={selectedItem[`${cart.id}-${cart.isPack}`] || false} onSelect={() => handleSelectedItem(cart.id, cart.isPack)} />
           ))}
         </div>
         {/* Summary Section */}
@@ -139,10 +130,7 @@ export default function Cart() {
             </div>
           </CardContent>
           <CardFooter className="mt-auto p-4">
-            <Button
-              className="w-full bg-primary text-primary-foreground hover:bg-primary-dark p-3 text-center rounded-lg"
-              onClick={handleCheckout}
-            >
+            <Button className="w-full bg-primary text-primary-foreground hover:bg-primary-dark p-3 text-center rounded-lg" onClick={handleCheckout}>
               Checkout
             </Button>
           </CardFooter>

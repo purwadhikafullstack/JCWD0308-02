@@ -1,18 +1,12 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Percent, Truck } from 'lucide-react';
-import { calculateShippingCost } from '@/lib/fetch-api/shipping';
-import { courierServices, formattedCourierNames } from '@/lib/courierServices';
-import { formatCurrency } from '@/lib/currency';
-import { getVouchers } from '@/lib/fetch-api/voucher';
+"use client";
+import React, { useEffect, useState } from "react";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Percent, Truck } from "lucide-react";
+import { calculateShippingCost } from "@/lib/fetch-api/shipping";
+import { courierServices, formattedCourierNames } from "@/lib/courierServices";
+import { formatCurrency } from "@/lib/currency";
+import { getVouchers } from "@/lib/fetch-api/voucher";
 
 interface ShippingAndDiscountProps {
   shippingCourier: string;
@@ -21,7 +15,7 @@ interface ShippingAndDiscountProps {
   setShippingMethod: (method: string) => void;
   discount: string;
   setDiscount: (method: string) => void;
-  cityId: number;
+  cityId: any;
   totalWeight: number;
   shippingCost: number | null;
   setShippingCost: (cost: number | null) => void;
@@ -41,9 +35,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   setShippingCost,
   setServiceDescription,
 }) => {
-  const [shippingEstimation, setShippingEstimation] = useState<string | null>(
-    null,
-  );
+  const [shippingEstimation, setShippingEstimation] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchShippingCost = async () => {
@@ -59,8 +51,8 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
           setShippingCost(result.cost);
           setShippingEstimation(result.estimation);
         } catch (error) {
-          console.error('Failed to fetch shipping cost:', error);
-          alert('There is no this shipping service to your destination');
+          console.error("Failed to fetch shipping cost:", error);
+          alert("There is no this shipping service to your destination");
         }
       }
     };
@@ -71,22 +63,20 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   const handleCourierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCourier = e.target.value;
     setShippingCourier(selectedCourier);
-    setShippingMethod('');
+    setShippingMethod("");
   };
 
   const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedMethod = e.target.value;
-    const selectedService = courierServices[shippingCourier].find(
-      (service) => service.service === selectedMethod,
-    );
+    const selectedService = courierServices[shippingCourier].find((service) => service.service === selectedMethod);
     setShippingMethod(selectedMethod);
-    setServiceDescription(selectedService?.description || '');
+    setServiceDescription(selectedService?.description || "");
   };
 
   const [productVouchers, setProductVouchers] = useState([]);
   const [shippingVouchers, setShippingVouchers] = useState([]);
-  const [selectedProductVoucher, setSelectedProductVoucher] = useState('');
-  const [selectedShippingVoucher, setSelectedShippingVoucher] = useState('');
+  const [selectedProductVoucher, setSelectedProductVoucher] = useState("");
+  const [selectedShippingVoucher, setSelectedShippingVoucher] = useState("");
 
   useEffect(() => {
     fetchVouchers();
@@ -95,16 +85,12 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   const fetchVouchers = async () => {
     try {
       const vouchers = await getVouchers();
-      const productVouchersList = vouchers.filter(
-        (voucher: any) => voucher.voucherType === 'PRODUCT',
-      );
-      const shippingVouchersList = vouchers.filter(
-        (voucher: any) => voucher.voucherType === 'SHIPPING COST',
-      );
+      const productVouchersList = vouchers.filter((voucher: any) => voucher.voucherType === "PRODUCT");
+      const shippingVouchersList = vouchers.filter((voucher: any) => voucher.voucherType === "SHIPPING COST");
       setProductVouchers(productVouchersList);
       setShippingVouchers(shippingVouchersList);
     } catch (error) {
-      console.error('Error fetching vouchers:', error);
+      console.error("Error fetching vouchers:", error);
     }
   };
 
@@ -117,18 +103,10 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
         </CardHeader>
         <CardContent className="p-4">
           <div className="mb-4">
-            <label
-              htmlFor="shippingCourier"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="shippingCourier" className="block text-sm font-medium text-gray-700">
               Shipping Courier
             </label>
-            <select
-              id="shippingCourier"
-              value={shippingCourier}
-              onChange={handleCourierChange}
-              className="mt-1 block w-full p-2 border rounded-md"
-            >
+            <select id="shippingCourier" value={shippingCourier} onChange={handleCourierChange} className="mt-1 block w-full p-2 border rounded-md">
               <option value="">Select Shipping Courier</option>
               {Object.keys(courierServices).map((courier) => (
                 <option key={courier} value={courier}>
@@ -139,18 +117,10 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
           </div>
           {shippingCourier && (
             <div>
-              <label
-                htmlFor="shippingMethod"
-                className="block text-sm font-medium text-gray-700"
-              >
+              <label htmlFor="shippingMethod" className="block text-sm font-medium text-gray-700">
                 Shipping Method
               </label>
-              <select
-                id="shippingMethod"
-                value={shippingMethod}
-                onChange={handleMethodChange}
-                className="mt-1 block w-full p-2 border rounded-md"
-              >
+              <select id="shippingMethod" value={shippingMethod} onChange={handleMethodChange} className="mt-1 block w-full p-2 border rounded-md">
                 <option value="">Select Shipping Method</option>
                 {courierServices[shippingCourier].map((service) => (
                   <option key={service.service} value={service.service}>
@@ -175,11 +145,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
         </CardHeader>
         <CardContent className="p-4">
           <p>Use discount codes to save more.</p>
-          <select
-            value={selectedProductVoucher}
-            onChange={(e) => setSelectedProductVoucher(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
+          <select value={selectedProductVoucher} onChange={(e) => setSelectedProductVoucher(e.target.value)} className="w-full p-2 border rounded-md">
             <option value="">Select Discount Product</option>
             {productVouchers.map((voucher: any) => (
               <option key={voucher.id} value={voucher.id}>
@@ -187,11 +153,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
               </option>
             ))}
           </select>
-          <select
-            value={selectedShippingVoucher}
-            onChange={(e) => setSelectedShippingVoucher(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
+          <select value={selectedShippingVoucher} onChange={(e) => setSelectedShippingVoucher(e.target.value)} className="w-full p-2 border rounded-md">
             <option value="">Select Discount Shipping Cost</option>
             {shippingVouchers.map((voucher: any) => (
               <option key={voucher.id} value={voucher.id}>

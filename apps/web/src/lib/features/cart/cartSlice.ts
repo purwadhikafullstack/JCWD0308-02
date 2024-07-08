@@ -1,14 +1,7 @@
-
-import {
-  deleteCart,
-  getCart,
-  updateCart,
-  addCart,
-  getCartItemCount,
-} from '@/lib/fetch-api/cart';
-import { postStockId } from '@/lib/fetch-api/stock';
-import { CartItemType } from '@/lib/types/cart';
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { deleteCart, getCart, updateCart, addCart, getCartItemCount } from "@/lib/fetch-api/cart";
+import { postStockId } from "@/lib/fetch-api/stock";
+import { CartItemType } from "@/lib/types/cart";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface CartSlice {
   items: CartItemType[];
@@ -22,58 +15,40 @@ const initialState: CartSlice = {
   error: null,
 };
 
-export const deleteCartItem = createAsyncThunk(
-  'cart/deleteCartItem',
-  async (cartId: any, { rejectWithValue }) => {
-    try {
-      const res = await deleteCart(cartId);
-      console.log('res from cartslice:', res);
-      return cartId;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  },
-);
+export const deleteCartItem = createAsyncThunk("cart/deleteCartItem", async (cartId: any, { rejectWithValue }) => {
+  try {
+    const res = await deleteCart(cartId);
+    console.log("res from cartslice:", res);
+    return cartId;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
 
-export const updateCartItem = createAsyncThunk(
-  'cart/updateCartItem',
-  async (
-    {
-      addressId,
-      productId,
-      quantity,
-    }: { addressId: string; productId: string; quantity: number },
-    { rejectWithValue },
-  ) => {
-    try {
-      const res = await updateCart({ addressId, productId, quantity });
-      console.log('res from updatedCartItem: ', res);
-      return res;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  },
-);
+export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ addressId, productId, quantity }: { addressId: any; productId: string; quantity: number }, { rejectWithValue }) => {
+  try {
+    const res = await updateCart({ addressId, productId, quantity });
+    console.log("res from updatedCartItem: ", res);
+    return res;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
 
 export const addCartItem = createAsyncThunk(
-  'cart/addToCart',
+  "cart/addToCart",
   async (
     cartData: {
       productId: string;
       quantity: number;
       isPack: boolean;
-      addressId: string;
+      addressId: any;
+      stockId: string;
     },
     { rejectWithValue, dispatch },
   ) => {
     try {
-      const { productId, addressId, isPack } = cartData;
-      const { stockId } = await postStockId(productId, addressId); // Fetch stock ID
-
-      const response = await addCart({
-        ...cartData,
-        stockId,
-      });
+      const response = await addCart(cartData);
       dispatch(fetchCartItemCount());
       return response.data;
     } catch (error) {
@@ -82,31 +57,32 @@ export const addCartItem = createAsyncThunk(
   },
 );
 
-export const fetchCartItemCount = createAsyncThunk(
-  'cart/fetchCartItemCount',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await getCartItemCount();
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  },
-);
+export const fetchCartItemCount = createAsyncThunk("cart/fetchCartItemCount", async (_, { rejectWithValue }) => {
+  try {
+    const response = await getCartItemCount();
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
 
-export const fetchCart = createAsyncThunk(
-  'cart/fetchCart',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await getCart();
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  },
-);
+export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { rejectWithValue }) => {
+  try {
+    const response = await getCart();
+    return response.data;
+  } catch (error) {
+    return rejectWithValue(error);
+  }
+});
+
+export const removeSelectedItems = createAsyncThunk("cart/removeSelectedItems", async (selectedItemIds: string[], { getState }) => {
+  const state = getState() as { cart: CartSlice };
+  const remainingItems = state.cart.items.filter((item) => !selectedItemIds.includes(`${item.id}-${item.isPack}`));
+  return remainingItems;
+});
+
 export const cartSlice = createSlice({
-  name: 'cart',
+  name: "cart",
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<CartItemType>) => {
@@ -143,9 +119,7 @@ export const cartSlice = createSlice({
       //update
       .addCase(updateCartItem.fulfilled, (state, action) => {
         const updatedItem = action.payload;
-        const index = state.items.findIndex(
-          (item) => item.id === updatedItem.id,
-        );
+        const index = state.items.findIndex((item) => item.id === updatedItem.id);
         if (index !== -1) {
           state.items[index] = updatedItem;
         }
@@ -176,14 +150,13 @@ export const cartSlice = createSlice({
       })
       .addCase(fetchCart.rejected, (state, action) => {
         state.error = action.payload as string;
+      })
+      //remove selected items
+      .addCase(removeSelectedItems.fulfilled, (state, action: PayloadAction<CartItemType[]>) => {
+        state.items = action.payload;
+        state.itemCount = action.payload.length;
       });
   },
 });
-export const {
-  setCart,
-  addToCart,
-  updateQuantity,
-  setItemCount,
-  removeFromCart,
-} = cartSlice.actions;
+export const { setCart, addToCart, updateQuantity, setItemCount, removeFromCart } = cartSlice.actions;
 export default cartSlice.reducer;

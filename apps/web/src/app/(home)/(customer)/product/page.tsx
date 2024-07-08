@@ -1,20 +1,20 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import { CardItem } from './_component/CardItem';
-import { Button } from '@/components/ui/button';
-import { getStore } from '@/lib/fetch-api/store/client';
-import { Product } from '@/lib/types/product';
-import { addCart } from '@/lib/fetch-api/cart';
-import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
-import { addCartItem, addToCart } from '@/lib/features/cart/cartSlice';
-import { CartRequestType } from '../../../../lib/types/cart';
-import { selectSelectedAddressId } from '@/lib/features/address/addressSlice';
+"use client";
+import React, { useEffect, useState } from "react";
+import { CardItem } from "./_component/CardItem";
+import { Button } from "@/components/ui/button";
+import { getStore } from "@/lib/fetch-api/store/client";
+import { Product } from "@/lib/types/product";
+import { addCart } from "@/lib/fetch-api/cart";
+import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { addCartItem, addToCart } from "@/lib/features/cart/cartSlice";
+import { CartRequestType } from "../../../../lib/types/cart";
+import { selectSelectedAddressId } from "@/lib/features/address/addressSlice";
 
 export default function ProductPage() {
-  const [selectedLocation, setSelectedLocation] = useState('');
-  const [selectedPrice, setSelectedPrice] = useState('');
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedPrice, setSelectedPrice] = useState("");
   const [products, setProducts] = useState<Product[]>([]);
-  const storeId = '55cf37a0-85f5-4963-b18c-6c50204e82ae';
+  const storeId = "55cf37a0-85f5-4963-b18c-6c50204e82ae";
   const dispatch = useAppDispatch();
   const selectAddressId = useAppSelector(selectSelectedAddressId);
 
@@ -26,16 +26,14 @@ export default function ProductPage() {
         const fetchedProducts = stocks.map((stock: any) => stock.product);
         setProducts(fetchedProducts);
       } catch (error) {
-        console.error('Error fetching store data:', error);
+        console.error("Error fetching store data:", error);
       }
     };
 
     fetchStoreData();
   }, []);
 
-  const handleLocationChange = (
-    event: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
+  const handleLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setSelectedLocation(event.target.value);
   };
 
@@ -43,29 +41,29 @@ export default function ProductPage() {
     setSelectedPrice(event.target.value);
   };
 
-  const handleAddToCart = (productId: string, isPack: boolean) => {
-    try {
-      const cartRequest: CartRequestType = {
-        productId,
-        quantity: 1,
-        isPack,
-        addressId: selectAddressId ?? ``,
-        // addressId,
-      };
-      // Dispatching addCartItem directly with cartRequest
-      dispatch(addCartItem(cartRequest))
-        .unwrap()
-        .then((response) => {
-          dispatch(addToCart(response));
-          alert('Product added to cart!');
-        })
-        .catch((error) => {
-          console.error('Error adding product to cart:', error);
-        });
-    } catch (error) {
-      console.error('Error adding product to cart:', error);
-    }
-  };
+  // const handleAddToCart = (productId: string, isPack: boolean) => {
+  //   try {
+  //     const cartRequest: CartRequestType = {
+  //       productId,
+  //       quantity: 1,
+  //       isPack,
+  //       addressId: selectAddressId ?? ``,
+  //       // addressId,
+  //     };
+  //     // Dispatching addCartItem directly with cartRequest
+  //     dispatch(addCartItem(cartRequest))
+  //       .unwrap()
+  //       .then((response) => {
+  //         dispatch(addToCart(response));
+  //         alert('Product added to cart!');
+  //       })
+  //       .catch((error) => {
+  //         console.error('Error adding product to cart:', error);
+  //       });
+  //   } catch (error) {
+  //     console.error('Error adding product to cart:', error);
+  //   }
+  // };
   return (
     <div className="flex">
       <div className="bg-muted w-96 min-h-screen p-5 flex flex-col">
@@ -73,10 +71,7 @@ export default function ProductPage() {
 
         {/* Location Filter Dropdown */}
         <div className="mt-4">
-          <label
-            htmlFor="locationSelect"
-            className="block font-medium text-gray-700"
-          >
+          <label htmlFor="locationSelect" className="block font-medium text-gray-700">
             Location:
           </label>
           <select
@@ -95,10 +90,7 @@ export default function ProductPage() {
 
         {/* Price Filter Dropdown */}
         <div className="mt-4">
-          <label
-            htmlFor="priceSelect"
-            className="block font-medium text-gray-700"
-          >
+          <label htmlFor="priceSelect" className="block font-medium text-gray-700">
             Price:
           </label>
           <select
@@ -116,13 +108,13 @@ export default function ProductPage() {
         </div>
       </div>
       <div>
-        {products.map((product) => (
+        {/* {products.map((product) => (
           <CardItem
             key={product.id}
             product={product}
             addToCart={handleAddToCart}
           />
-        ))}
+        ))} */}
       </div>
     </div>
   );
