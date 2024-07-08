@@ -1,3 +1,4 @@
+
 "use client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,7 +7,6 @@ import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
 import { RootState } from "@/lib/features/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import { fetchCart, removeSelectedItems } from "@/lib/features/cart/cartSlice";
-
 import OrderItem from "./_component/OrderItem";
 import ShippingAndDiscount from "./_component/ShippingAndDiscount";
 import Summary from "./_component/Summary";
@@ -18,6 +18,7 @@ import { mapCourierToUpperCase } from "@/lib/courierServices";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSelectedAddress } from "@/lib/fetch-api/address/client";
 import { addOrder } from "@/lib/fetch-api/order";
+
 
 export default function OrderCustomer() {
   const dispatch = useAppDispatch();
@@ -69,6 +70,7 @@ export default function OrderCustomer() {
         const newOrder = response.data;
         const paymentLink = newOrder.paymentLink;
         if (paymentMethod === "GATEWAY" && newOrder) {
+
           router.push(`/orders/order-details/${newOrder.id}`);
         } else if (paymentMethod === "MANUAL" && newOrder) {
           router.push(`/orders/payment-proof/${newOrder.id}`);
@@ -104,6 +106,7 @@ export default function OrderCustomer() {
                 <p>{selectedAddress.data?.address.address}</p>
                 <p>
                   {selectedAddress.data?.address.city?.name}, {selectedAddress.data?.address.city?.postalCode}
+
                 </p>
                 <p>Note: {selectedAddress?.data?.address?.note}</p>
               </CardContent>
@@ -135,6 +138,7 @@ export default function OrderCustomer() {
       </div>
       <div className="mt-6 text-center">
         <Button onClick={handleOrderSubmit} className="px-4 py-2 w-full bg-primary text-white rounded-lg shadow-md">
+
           Place Order
         </Button>
       </div>

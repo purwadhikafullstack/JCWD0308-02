@@ -1,4 +1,5 @@
 export interface Product {
+  isPack: any;
   id: string;
   title: string;
   slug: string;

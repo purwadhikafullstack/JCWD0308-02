@@ -18,6 +18,7 @@ export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
     const orderRequest = Validation.validate(OrderValidation.ORDER, req);
     const userId = res.locals.user?.id;
+
     const userAddress = await getAddress(res);
     const { address, cityId } = userAddress;
     const { updatedCartItem, nearestStore } = await handleCartItems(userId, address);
@@ -36,6 +37,7 @@ export class OrderService {
       discounts,
     );
 
+
     const newOrder = await createOrder(
       orderRequest,
       userId,
@@ -50,10 +52,12 @@ export class OrderService {
       totalPayment,
     );
 
+
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
     const paymentLink = await handlePaymentLinkCreation(orderRequest, newOrder, totalPayment);
 
     return { ...newOrder, paymentLink };
+
   };
   static getOrder = async (orderId: string) => {
     const orders = await prisma.order.findUnique({ where: { id: orderId }, include: { user: true, orderItems: true } });

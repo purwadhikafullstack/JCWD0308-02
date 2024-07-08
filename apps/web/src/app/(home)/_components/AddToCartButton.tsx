@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from "react";
@@ -7,6 +8,7 @@ import { useAppDispatch } from "@/lib/features/hooks";
 import { CartRequestType } from "@/lib/types/cart";
 import { ShoppingCart } from "lucide-react";
 
+
 interface AddToCartButtonProps {
   productId: string;
   isPack: boolean;
@@ -14,7 +16,9 @@ interface AddToCartButtonProps {
   stockId: string | undefined;
 }
 
+
 const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, isPack, addressId, stockId }) => {
+
   const dispatch = useAppDispatch();
   const [addToCartIndex, setAddToCartIndex] = useState(0);
 
@@ -27,6 +31,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, isPack, ad
         addressId,
         stockId: stockId || "",
         isChecked: false,
+
       };
 
       dispatch(addCartItem(cartRequest))
@@ -40,11 +45,14 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({ productId, isPack, ad
         });
     } catch (error) {
       console.error("Error adding product to cart:", error);
+
     }
   };
 
   return (
+
     <Button className="rounded-full flex items-center justify-center text-white" onClick={handleAddToCart} variant="default">
+
       <ShoppingCart size={13} />
     </Button>
   );

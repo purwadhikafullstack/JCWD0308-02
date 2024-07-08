@@ -10,27 +10,6 @@ import { mapNewStatus } from '@/helpers/order/mapNewStatus.js';
 import { OrderIdValidation } from '../order/order.validation.js';
 
 export class OrderStoreService {
-  //for store admin
-  static getOrdersByStoreAdmin = async (
-    storeAdminId: string,
-    page: number,
-    perPage: number,
-  ) => {
-
-    const orders = await prisma.order.findMany({
-      where: { storeAdminId },
-      include: {
-        orderItems: { include: { stock: { include: { product: true } } } },
-      },
-      orderBy: { createdAt: 'desc' },
-
-      skip: perPage * (page - 1),
-      take: perPage,
-    });
-    const totalCount = await prisma.order.count({ where: { storeAdminId } });
-    return { orders, totalCount };
-  };
-
   static getStoreAdminIdByStoreId = async (storeId: any) => {
     const store = await prisma.store.findUnique({
       where: { id: storeId },
@@ -62,13 +41,11 @@ export class OrderStoreService {
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: { orderStatus: mappedStatus },
-
     });
     return updatedOrder;
   };
 
   static cancelOrderByAdmin = async (req: OrderId, res: Response) => {
-
     console.log('pingpongpong');
     const { orderId } = Validation.validate(OrderIdValidation.ORDER_ID, req);
     const order = await prisma.order.findUnique({
@@ -112,7 +89,6 @@ export class OrderStoreService {
             orderId: order.id,
           },
         }),
-
       ),
     ]);
     return updatedOrder;

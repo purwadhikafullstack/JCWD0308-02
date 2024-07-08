@@ -9,12 +9,15 @@ import { OrderItemType } from "@prisma/client";
 
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
+
     const cartRequest: CartRequest = Validation.validate(CartValidation.CART, req);
     console.log("cartRequest:", cartRequest);
+
     const user = await prisma.user.findUnique({
       where: { id: res.locals.user?.id },
       select: { id: true, status: true, role: true, addresses: true },
     });
+
 
     const userAddress = user?.addresses.find((address: any) => address.id === cartRequest.addressId);
 
@@ -78,7 +81,9 @@ export class CartService {
         stockId: stock.id,
         quantity: cartRequest.quantity,
         isPack: cartRequest.isPack,
+
         isChecked: false,
+
       } as any,
     });
     console.log("orderItem:", orderItem);

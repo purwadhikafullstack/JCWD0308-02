@@ -1,3 +1,4 @@
+
 import { calculateShippingCost } from "@/api/shipping/shipping.service.js";
 import { prisma } from "@/db.js";
 import { OrderRequest, getCourierType, mapCourierTypeToRajaOngkir } from "@/types/order.type.js";
@@ -12,6 +13,7 @@ export const getAddress = async (res: Response) => {
   if (!addressId) throw new ResponseError(404, "Address not found!");
   const address = await prisma.userAddress.findUnique({ where: { id: addressId } });
   if (!address) throw new ResponseError(404, "Address not found!");
+
 
   return address;
 };
@@ -57,6 +59,7 @@ export const applyVoucherDiscount = async (userVoucherId: string, totalPrice: nu
   return { discountProducts, discountShippingCost };
 };
 
+
 export const applyDiscounts = async (orderRequest: any, totalPrice: number, cost: number, cartItemsLength: number) => {
   if (!orderRequest.userVoucherId) return { discountProducts: 0, discountShippingCost: 0 };
   return await applyVoucherDiscount(orderRequest.userVoucherId, totalPrice, cost, cartItemsLength);
@@ -64,6 +67,7 @@ export const applyDiscounts = async (orderRequest: any, totalPrice: number, cost
 
 export const calculateShipping = async (nearestStore: any, cityId: any, weight: number, courier: any) => {
   return await calculateShippingCost(+nearestStore?.cityId!, +cityId, weight, mapCourierTypeToRajaOngkir(courier));
+
 };
 
 export const calculateTotalPriceAndWeight = (updatedCartItem: any[]) => {
@@ -77,10 +81,12 @@ export const calculateTotalPriceAndWeight = (updatedCartItem: any[]) => {
   return { totalPrice, weight };
 };
 
+
 export const getEstimatedDeliveryDate = (estimation: number) => {
   const estimatedDeliveryDate = new Date();
   estimatedDeliveryDate.setDate(estimatedDeliveryDate.getDate() + estimation);
   return estimatedDeliveryDate.toISOString().split("T")[0];
+
 };
 
 export const updateOrderItemsAndStock = async (updatedCartItem: any[], orderId: any) => {

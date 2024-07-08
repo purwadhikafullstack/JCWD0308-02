@@ -1,3 +1,4 @@
+
 "use client";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -12,6 +13,7 @@ import { RootState } from "@/lib/features/store";
 import { formatCurrency } from "@/lib/currency";
 import { useRouter } from "next/navigation";
 import { CartItemType } from "@/lib/types/cart";
+
 
 export default function Cart() {
   const dispatch = useAppDispatch();
@@ -95,6 +97,7 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
+
     const selectedCarts = Object.keys(selectedItem).filter((key) => selectedItem[key]);
     const selectedItems = carts.filter((cart: any) => selectedCarts.includes(`${cart.id}-${cart.isPack}`));
 
@@ -102,6 +105,7 @@ export default function Cart() {
       const queryString = selectedItems.map((item) => `items=${item.id}-${item.isPack}`).join("&");
       router.push(`/orders?${queryString}`);
     }
+
   };
   return (
     <div className="container mx-auto mt-10 p-4 min-h-[40rem]">
@@ -114,8 +118,10 @@ export default function Cart() {
               Select All
             </label>
           </Card>
+
           {carts.map((cart: any) => (
             <CartItem key={`${cart.id}-${cart.isPack}`} cart={cart} isSelected={selectedItem[`${cart.id}-${cart.isPack}`] || false} onSelect={() => handleSelectedItem(cart.id, cart.isPack)} />
+
           ))}
         </div>
         {/* Summary Section */}
