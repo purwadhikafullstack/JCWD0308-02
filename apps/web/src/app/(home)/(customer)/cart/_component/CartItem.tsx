@@ -1,4 +1,3 @@
-
 "use client";
 import Image from "next/image";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,14 +14,12 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSelectedAddress } from "@/lib/fetch-api/address/client";
 import { useRouter } from "next/navigation";
 
-
 interface CartItemProps {
   cart: CartItemType;
   isSelected: boolean;
   onSelect: (itemId: string) => void;
 }
 const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
-
   const router = useRouter();
   const selectedAddress = useSuspenseQuery({
     queryKey: ["selected-address"],
@@ -32,12 +29,10 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
   const error = useAppSelector((state: RootState) => state.cart.error);
-  const router = useRouter();
 
   useEffect(() => {
     setQuantity(cart.quantity);
   }, [cart.quantity]);
-
 
   if (!cart.stock || !cart.stock.product) {
     console.log("no cart stock");
@@ -61,7 +56,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
             quantity: newQuantity,
             productId: cart.stock.product.id,
             isChecked: false,
-
           } as any),
         );
 
