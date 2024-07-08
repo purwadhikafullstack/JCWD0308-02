@@ -20,6 +20,7 @@ interface CartItemProps {
   onSelect: (itemId: string) => void;
 }
 const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
+  const router = useRouter();
   const selectedAddress = useSuspenseQuery({
     queryKey: ["selected-address"],
 
@@ -28,7 +29,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
   const error = useAppSelector((state: RootState) => state.cart.error);
-  const router = useRouter();
 
   useEffect(() => {
     setQuantity(cart.quantity);
