@@ -1,4 +1,4 @@
-import { Voucher } from "@/app/(admin)/dashboard/vouchers/_components/types";
+import { Voucher } from "@/lib/types/voucher";
 import { env } from "@/app/env";
 import fetchSSR from "@/lib/fetchSSR";
 

@@ -1,31 +1,27 @@
-import { prisma } from '@/db.js';
-import { CartRequest, UpdateCartRequest } from '@/types/cart.type.js';
-import { ResponseError } from '@/utils/error.response.js';
-import { Validation } from '@/utils/validation.js';
-import { CartValidation, patchCartValidation } from './cart.validation.js';
-import { Response } from 'express';
-import {
-  findNearestStore,
-  findStoresInRange,
-} from '../distance/distance.service.js';
+import { prisma } from "@/db.js";
+import { CartRequest, UpdateCartRequest } from "@/types/cart.type.js";
+import { ResponseError } from "@/utils/error.response.js";
+import { Validation } from "@/utils/validation.js";
+import { CartValidation, patchCartValidation } from "./cart.validation.js";
+import { Response } from "express";
+import { findNearestStore, findStoresInRange } from "../distance/distance.service.js";
+import { OrderItemType } from "@prisma/client";
 
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
-    const cartRequest: CartRequest = Validation.validate(
-      CartValidation.CART,
-      req,
-    );
-    console.log('cartRequest:', cartRequest);
+
+    const cartRequest: CartRequest = Validation.validate(CartValidation.CART, req);
+    console.log("cartRequest:", cartRequest);
+
     const user = await prisma.user.findUnique({
       where: { id: res.locals.user?.id },
       select: { id: true, status: true, role: true, addresses: true },
     });
 
-    const userAddress = user?.addresses.find(
-      (address: any) => address.id === cartRequest.addressId,
-    );
 
-    if (!userAddress) throw new ResponseError(401, 'Address not found!');
+    const userAddress = user?.addresses.find((address: any) => address.id === cartRequest.addressId);
+
+    if (!userAddress) throw new ResponseError(401, "Address not found!");
 
     //toko terdekat
     const nearbyStore = await findStoresInRange(userAddress.coordinate, 20);
@@ -40,7 +36,7 @@ export class CartService {
 
     if (!stock) {
       const centralStore = await prisma.store.findUnique({
-        where: { slug: 'grosirun-pusat' },
+        where: { slug: "grosirun-pusat" },
       });
       if (centralStore) {
         stock = await prisma.stock.findFirst({
@@ -52,33 +48,32 @@ export class CartService {
       }
     }
 
-    if (!stock)
-      throw new ResponseError(
-        400,
-        'Stock not found in the nearest or central store!',
-      );
-
+    if (!stock) throw new ResponseError(400, "Stock not found in the nearest or central store!");
+    console.log("pingpongpongprong");
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
         userId: user?.id,
         stockId: stock.id,
-        orderItemType: 'CART_ITEM',
+        orderItemType: OrderItemType.CART_ITEM,
         isPack: cartRequest.isPack,
+        // isChecked: false,
         isDeleted: false,
       },
     });
 
     if (existingCartItem) {
+      console.log("Updating existing cart item:", existingCartItem);
       const updatedCartItem = await prisma.orderItem.update({
         where: { id: existingCartItem.id },
         data: {
           quantity: existingCartItem.quantity + cartRequest.quantity,
-          isChecked: true,
+          isChecked: false,
         },
       });
+      console.log("Updated cart item:", updatedCartItem);
       return updatedCartItem;
     }
-
+    console.log("No existing cart item, creating a new one.");
     // If the item is not in the cart
     const orderItem = await prisma.orderItem.create({
       data: {
@@ -86,17 +81,17 @@ export class CartService {
         stockId: stock.id,
         quantity: cartRequest.quantity,
         isPack: cartRequest.isPack,
+
+        isChecked: false,
+
       } as any,
     });
-    console.log('orderItem:', orderItem);
+    console.log("orderItem:", orderItem);
     return orderItem;
   };
 
   static updateCart = async (req: UpdateCartRequest, res: Response) => {
-    const patchCart: UpdateCartRequest = Validation.validate(
-      patchCartValidation.CART,
-      req,
-    );
+    const patchCart: UpdateCartRequest = Validation.validate(patchCartValidation.CART, req);
 
     const userId = res.locals.user?.id;
     const user = await prisma.user.findUnique({
@@ -104,11 +99,9 @@ export class CartService {
       select: { addresses: true },
     });
 
-    const userAddress = user?.addresses.find(
-      (address: any) => address.id === patchCart?.addressId,
-    );
+    const userAddress = user?.addresses.find((address: any) => address.id === patchCart?.addressId);
 
-    if (!userAddress) throw new ResponseError(401, 'Address not found!');
+    if (!userAddress) throw new ResponseError(401, "Address not found!");
     const nearbyStore = await findStoresInRange(userAddress.coordinate, 20);
     let stock;
     for (const store of nearbyStore) {
@@ -119,7 +112,7 @@ export class CartService {
     }
     if (!stock) {
       const centralStore = await prisma.store.findUnique({
-        where: { slug: 'grosirun-pusat' },
+        where: { slug: "grosirun-pusat" },
       });
       if (centralStore) {
         stock = await prisma.stock.findFirst({
@@ -130,21 +123,17 @@ export class CartService {
         });
       }
     }
-    if (!stock)
-      throw new ResponseError(
-        400,
-        'Stock not found in any nearby or central store!',
-      );
+    if (!stock) throw new ResponseError(400, "Stock not found in any nearby or central store!");
     const cartItem = await prisma.orderItem.findFirst({
       where: {
         userId,
         stockId: stock.id,
-        orderItemType: 'CART_ITEM',
+        orderItemType: "CART_ITEM",
         isDeleted: false,
       },
     });
 
-    if (!cartItem) throw new ResponseError(401, 'Item not found in cart!');
+    if (!cartItem) throw new ResponseError(401, "Item not found in cart!");
 
     // Adjust the quantity based on the patchCart.quantity
     const newQuantity = patchCart.quantity || 0;
@@ -159,24 +148,32 @@ export class CartService {
 
     const updatedOrderItem = await prisma.orderItem.update({
       where: { id: cartItem.id },
-      data: { quantity: newQuantity, isChecked: true },
+      data: { quantity: newQuantity, isChecked: false },
     });
 
     return updatedOrderItem;
   };
+
+  static async updateCartItemCheckedStatus(cartId: string, isChecked: boolean) {
+    const updatedCartItem = await prisma.orderItem.update({
+      where: { id: cartId },
+      data: { isChecked },
+    });
+    return updatedCartItem;
+  }
 
   static deleteCart = async (cartId: string, userId: string) => {
     const cartItem = await prisma.orderItem.findFirst({
       where: {
         id: cartId,
         userId,
-        orderItemType: 'CART_ITEM',
+        orderItemType: "CART_ITEM",
         isDeleted: false,
       },
     });
 
     if (!cartItem) {
-      throw new ResponseError(404, 'Cart item not found');
+      throw new ResponseError(404, "Cart item not found");
     }
 
     const deleteCart = await prisma.orderItem.update({
@@ -192,18 +189,12 @@ export class CartService {
   };
 
   static getCart = async (userId: string) => {
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { status: true },
-    });
-
-    if (!user) throw new ResponseError(401, 'Unauthorized');
-
     const cartItems = await prisma.orderItem.findMany({
       where: {
         userId: userId,
-        orderItemType: 'CART_ITEM',
+        orderItemType: OrderItemType.CART_ITEM,
         isDeleted: false,
+        // isChecked: false,
       },
       include: {
         stock: {
@@ -214,7 +205,7 @@ export class CartService {
         user: true,
       },
     });
-
+    console.log("Cart Items:", cartItems);
     return cartItems;
   };
 

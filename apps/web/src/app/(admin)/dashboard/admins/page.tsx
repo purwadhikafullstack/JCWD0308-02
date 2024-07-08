@@ -1,23 +1,15 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { fetchUsers, updateUser, createUser, deleteUser } from '@/lib/fetch-api/user/client';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
-} from '@/components/ui/table';
-import EditForm from './_components/editform';
-import CreateForm from './_components/createform';
+import { fetchUsers, updateUser, createUser } from '@/lib/fetch-api/user/client';
+import EditForm from './_components/forms/EditFormUser';
+import CreateForm from './_components/forms/CreateFormUser';
+import UserTable from './_components/tables/usertable';
 import { Button } from '@/components/ui/button';
-import { toast } from '@/components/ui/sonner';
-import { User } from '@/lib/types/user';
 import SearchBar from '@/components/partial/SearchBar';
 import Pagination from '@/components/partial/pagination';
+import { handleApiError, showSuccess } from '@/components/toast/toastutils';
+import { User } from '@/lib/types/user';
 
 const Users = () => {
   const router = useRouter();
@@ -27,6 +19,7 @@ const Users = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [deletingUser, setDeletingUser] = useState<User | null>(null);
   const [creatingUser, setCreatingUser] = useState<boolean>(false);
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -44,7 +37,7 @@ const Users = () => {
         setUsers(data.users.sort((a: User, b: User) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
         setTotalUsers(data.total);
       } catch (error) {
-        console.error('Error fetching users:', error);
+        handleApiError(error, 'Failed to fetch users');
         setError('Failed to fetch users');
       } finally {
         setLoading(false);
@@ -64,14 +57,9 @@ const Users = () => {
       await updateUser(id, userToUpdate);
       setSelectedUser(null);
       setUpdateFlag(prev => !prev);
-      toast.success('User updated successfully', {
-        className: 'bg-green-500 text-white',
-      });
+      showSuccess('User updated successfully');
     } catch (error) {
-      console.error('Error updating user:', error);
-      toast.error('Failed to update user', {
-        className: 'bg-red-500 text-white',
-      });
+      handleApiError(error, 'Failed to update user');
     }
   };
 
@@ -80,35 +68,19 @@ const Users = () => {
       await createUser(newUser);
       setCreatingUser(false);
       setUpdateFlag(prev => !prev);
-      toast.success('User created successfully', {
-        className: 'bg-green-500 text-white',
-      });
+      showSuccess('User created successfully');
     } catch (error) {
-      console.error('Error creating user:', error);
-      toast.error('Failed to create user', {
-        className: 'bg-red-500 text-white',
-      });
+      handleApiError(error, 'Failed to create user');
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteUser(id);
-      setUpdateFlag(prev => !prev);
-      toast.success('User deleted successfully', {
-        className: 'bg-green-500 text-white',
-      });
-    } catch (error) {
-      console.error('Error deleting user:', error);
-      toast.error('Failed to delete user', {
-        className: 'bg-red-500 text-white',
-      });
-    }
+  const handleDelete = (user: User | null) => {
+    setDeletingUser(user);
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setPage(1); // Reset page to 1 when new search is made
+    setPage(1); 
     updateUrl({ search: query, page: 1 });
   };
 
@@ -140,70 +112,34 @@ const Users = () => {
     }
   }, [searchParams]);
 
+  const removeUserFromState = (userId: string) => {
+    setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+  };
+
   return (
-    <div className="container mx-auto px-4">
-      <h2 className="flex text-2xl font-bold mb-4 text-primary items-center">Users</h2>
+    <div className="py-8 px-4 sm:px-6 lg:px-8">
+      <h2 className="text-2xl font-bold mb-4 text-primary">Users</h2>
       <p>Manage your users here.</p>
-      <div className="mt-4 mb-4">
-        <Button onClick={() => setCreatingUser(true)} className="mb-4">Create User Admin</Button>
+      <div className="mt-4 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        <Button onClick={() => setCreatingUser(true)} className="mb-4 sm:mb-0">Create User Admin</Button>
         <SearchBar onSearch={handleSearch} />
       </div>
       {loading ? (
-        <p>Loading...</p>
+        <p className="text-center text-gray-500">Loading...</p>
       ) : error ? (
-        <p className="text-red-500">{error}</p>
+        <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <div className="overflow-x-auto">
-            <Table className="min-w-full">
-              <TableCaption>A list of users in the system.</TableCaption>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Account Type</TableHead>
-                  <TableHead>Contact Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Referral Code</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead>Updated At</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {users.map((user) => (
-                  <TableRow key={user.id}>
-                    <TableCell>{user.displayName}</TableCell>
-                    <TableCell>{user.email}</TableCell>
-                    <TableCell>{user.accountType}</TableCell>
-                    <TableCell>{user.contactEmail}</TableCell>
-                    <TableCell>{user.role}</TableCell>
-                    <TableCell>{user.status}</TableCell>
-                    <TableCell>{user.referralCode}</TableCell>
-                    <TableCell>{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-                    <TableCell>{new Date(user.updatedAt).toLocaleDateString()}</TableCell>
-                    <TableCell className="flex flex-col space-y-2">
-                      <Button onClick={() => handleEdit(user)}>Edit</Button>
-                      <Button onClick={() => handleDelete(user.id)} variant="destructive">Delete</Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
-          <Pagination
-            total={totalUsers}
-            page={page}
-            limit={limit}
-            onPageChange={handlePageChange}
+          <UserTable
+            users={users}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            deletingUser={deletingUser}
+            removeUserFromState={removeUserFromState}
           />
-          {selectedUser && (
-            <EditForm user={selectedUser} onUpdate={handleUpdate} onCancel={() => setSelectedUser(null)} />
-          )}
-          {creatingUser && (
-            <CreateForm onCreate={handleCreate} onCancel={() => setCreatingUser(false)} />
-          )}
+          <Pagination total={totalUsers} page={page} limit={limit} onPageChange={handlePageChange} />
+          {selectedUser && <EditForm user={selectedUser} onUpdate={handleUpdate} onCancel={() => setSelectedUser(null)} />}
+          {creatingUser && <CreateForm onCreate={handleCreate} onCancel={() => setCreatingUser(false)} />}
         </>
       )}
     </div>

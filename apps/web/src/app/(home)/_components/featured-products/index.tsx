@@ -1,5 +1,4 @@
 'use client';
-
 import { Button } from '@/components/ui/button';
 import { addCartItem, addToCart } from '@/lib/features/cart/cartSlice';
 import { useAppDispatch } from '@/lib/features/hooks';

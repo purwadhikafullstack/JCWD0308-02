@@ -1,5 +1,5 @@
-import { ResponseError } from '@/utils/error.response.js';
-import { CourierType } from '@prisma/client';
+import { ResponseError } from "@/utils/error.response.js";
+import { CourierType } from "@prisma/client";
 
 export interface OrderRequest {
   addressId?: any;
@@ -15,31 +15,29 @@ export interface OrderId {
   orderId: string;
 }
 
-export const mapCourierTypeToRajaOngkir = (
-  courierType: CourierType,
-): string => {
+export const mapCourierTypeToRajaOngkir = (courierType: CourierType): string => {
   switch (courierType) {
     case CourierType.JNE:
-      return 'jne';
+      return "jne";
     case CourierType.POS:
-      return 'pos';
+      return "pos";
     case CourierType.TIKI:
-      return 'tiki';
+      return "tiki";
     default:
-      throw new ResponseError(400, 'Invalid courier type');
+      throw new ResponseError(400, "Invalid courier type");
   }
 };
 
 export const getCourierType = (courier: string): CourierType => {
   switch (courier.toUpperCase()) {
-    case 'JNE':
+    case "JNE":
       return CourierType.JNE;
-    case 'POS':
+    case "POS":
       return CourierType.POS;
-    case 'TIKI':
+    case "TIKI":
       return CourierType.TIKI;
     default:
-      throw new ResponseError(400, 'Invalid courier type');
+      throw new ResponseError(400, "Invalid courier type");
   }
 };
 

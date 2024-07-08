@@ -5,10 +5,11 @@ import { fetchCategories, deleteCategory, updateCategory, createCategory } from 
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import CreateForm from './_components/createform';
-import EditForm from './_components/editform';
+import CreateForm from './_components/forms/CreateCategoryForm';
+import EditForm from './_components/forms/EditCategoryForm';
 import { Toaster, toast } from '@/components/ui/sonner';
 import { Category } from '@/lib/types/category';
+import DeleteCategoryDialog from './_components/dialogs/DeleteCategoriesDialog';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -16,6 +17,7 @@ const CategoryList = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [creatingCategory, setCreatingCategory] = useState<boolean>(false);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
 
   useEffect(() => {
     const fetchCategoryData = async () => {
@@ -74,19 +76,8 @@ const CategoryList = () => {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteCategory(id);
-      setCategories(categories.filter(category => category.id !== id));
-      toast.success('Category deleted successfully!', {
-        className: 'bg-green-500 text-white',
-      });
-    } catch (error) {
-      console.error('Error deleting category:', error);
-      toast.error('Failed to delete category', {
-        className: 'bg-red-500 text-white',
-      });
-    }
+  const handleDelete = (category: Category) => {
+    setDeletingCategory(category);
   };
 
   if (loading) {
@@ -118,7 +109,7 @@ const CategoryList = () => {
               <Button variant="secondary" onClick={() => handleEdit(category)}>
                 <FaEdit />
               </Button>
-              <Button variant="destructive" onClick={() => handleDelete(category.id)}>
+              <Button variant="destructive" onClick={() => handleDelete(category)}>
                 <FaTrashAlt />
               </Button>
             </CardFooter>
@@ -136,6 +127,13 @@ const CategoryList = () => {
           category={selectedCategory}
           onSave={handleUpdate}
           onCancel={() => setSelectedCategory(null)}
+        />
+      )}
+      {deletingCategory && (
+        <DeleteCategoryDialog
+          category={deletingCategory}
+          onClose={() => setDeletingCategory(null)}
+          onDeleteSuccess={() => setCategories(categories.filter(cat => cat.id !== deletingCategory.id))}
         />
       )}
     </div>

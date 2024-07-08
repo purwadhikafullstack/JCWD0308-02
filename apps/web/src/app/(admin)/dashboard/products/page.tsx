@@ -1,35 +1,35 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation'; 
-import { fetchProducts, createProduct, updateProduct, deleteProduct } from '@/lib/fetch-api/product';
-import { fetchCategories } from '@/lib/fetch-api/category/client';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+
 import { Button } from '@/components/ui/button';
-import SearchBar from '@/components/partial/SearchBar';
-import EditForm from './_components/editform';
-import CreateForm from './_components/createform';
-import Pagination from '@/components/partial/pagination';
-import ProductCard from './_components/productcard';
+
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Toaster, toast } from '@/components/ui/sonner';
+import { Toaster } from '@/components/ui/sonner';
 import { Category } from '@/lib/types/category';
 import { Product } from '@/lib/types/product';
+import { createProduct, fetchProducts } from '@/lib/fetch-api/product';
+import { fetchCategories } from '@/lib/fetch-api/category/client';
+import SearchBar from '@/components/partial/SearchBar';
+import Pagination from '@/components/partial/pagination';
+import ProductTable from './_components/table/ProductTable';
+import CreateProductForm from './_components/forms/CreateProductForm';
+import { handleApiError, showSuccess } from '@/components/toast/toastutils';
 
 const ProductList = () => {
   const router = useRouter();
-  const pathname = usePathname(); 
-  const searchParams = useSearchParams(); 
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [creatingProduct, setCreatingProduct] = useState<boolean>(false);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(8);
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [updateFlag, setUpdateFlag] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,16 +44,14 @@ const ProductList = () => {
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to fetch data');
-        toast.error('Failed to fetch data', {
-          className: 'bg-red-500 text-white',
-        });
+        handleApiError(error, 'Failed to fetch data');
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [page, limit, filters, updateFlag]);
+  }, [page, limit, filters]);
 
   useEffect(() => {
     const query = searchParams.get('search');
@@ -63,65 +61,16 @@ const ProductList = () => {
     }
   }, [searchParams]);
 
-  const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-  };
-
   const handleCreate = async (newProduct: FormData) => {
     try {
       const createdProduct = await createProduct(newProduct);
-      toast.success('Product created successfully', {
-        className: 'bg-green-500 text-white',
-      });
-      setUpdateFlag(!updateFlag);
+      showSuccess('Product created successfully');
       setCreatingProduct(false);
+      setFilters((prevFilters: any) => ({ ...prevFilters }));
     } catch (error) {
       console.error('Error creating product:', error);
-      toast.error('Failed to create product', {
-        className: 'bg-red-500 text-white',
-      });
+      handleApiError(error, 'Failed to create product');
     }
-  };
-
-  const handleUpdate = async (updatedProduct: FormData) => {
-    try {
-      const productId = selectedProduct?.id;
-      if (productId) {
-        updatedProduct.append('id', productId);
-        const product = await updateProduct(productId, updatedProduct);
-        toast.success('Product updated successfully', {
-          className: 'bg-green-500 text-white',
-        });
-        setUpdateFlag(!updateFlag);
-        setSelectedProduct(null);
-      } else {
-        throw new Error('Product ID is missing');
-      }
-    } catch (error) {
-      console.error('Error updating product:', error);
-      toast.error('Failed to update product', {
-        className: 'bg-red-500 text-white',
-      });
-    }
-  };
-
-  const handleDelete = async (id: string) => {
-    try {
-      await deleteProduct(id);
-      toast.success('Product deleted successfully', {
-        className: 'bg-green-500 text-white',
-      });
-      setUpdateFlag(!updateFlag);
-    } catch (error) {
-      console.error('Error deleting product:', error);
-      toast.error('Failed to delete product', {
-        className: 'bg-red-500 text-white',
-      });
-    }
-  };
-
-  const handleTitleClick = (id: string) => {
-    router.push(`products/${id}`);
   };
 
   const handlePageChange = (newPage: number) => {
@@ -137,7 +86,7 @@ const ProductList = () => {
     setFilters({ ...filters, search: query });
     const params = new URLSearchParams(searchParams);
     params.set('search', query);
-    params.set('page', '1'); // Reset to the first page when searching
+    params.set('page', '1');
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
@@ -158,7 +107,7 @@ const ProductList = () => {
     } else {
       params.set('categoryId', categoryId);
     }
-    params.set('page', '1'); 
+    params.set('page', '1');
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
@@ -170,9 +119,7 @@ const ProductList = () => {
       <p className="text-lg mb-8 text-center text-gray-700">Manage your products here.</p>
       <SearchBar onSearch={handleSearch} />
       <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => setCreatingProduct(true)} className="px-6 py-2 ">
-          Create Product
-        </Button>
+        <Button onClick={() => setCreatingProduct(true)} className="px-6 py-2">Create Product</Button>
         <div className="w-1/4">
           <Select onValueChange={handleCategoryFilterChange}>
             <SelectTrigger aria-label="Category Filter">
@@ -197,29 +144,9 @@ const ProductList = () => {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-            {products.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onTitleClick={() => handleTitleClick(product.id)}
-              />
-            ))}
-          </div>
-          {selectedProduct && (
-            <EditForm product={selectedProduct} onUpdate={handleUpdate} onCancel={() => setSelectedProduct(null)} />
-          )}
-          {creatingProduct && (
-            <CreateForm onCreate={handleCreate} onCancel={() => setCreatingProduct(false)} />
-          )}
-          <Pagination
-            total={total}
-            page={page}
-            limit={limit}
-            onPageChange={handlePageChange}
-          />
+          <ProductTable products={products} onTitleClick={(id: string) => router.push(`products/${id}`)} />
+          <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
+          {creatingProduct && <CreateProductForm onCreate={handleCreate} onCancel={() => setCreatingProduct(false)} />}
         </>
       )}
     </div>

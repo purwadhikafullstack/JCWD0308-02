@@ -45,7 +45,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
         <div className="relative flex flex-col">
-          <header className="z-10 flex h-14 items-center sticky top-0 gap-4 border-b bg-background  px-4 lg:h-[60px] lg:px-6">
+          <header className=" flex h-14 items-center sticky top-0 gap-4 border-b bg-background  px-4 lg:h-[60px] lg:px-6">
             <Sheet>
               <SheetTrigger asChild>
                 <Button

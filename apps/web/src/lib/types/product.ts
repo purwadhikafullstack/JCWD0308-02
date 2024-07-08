@@ -6,7 +6,7 @@ export interface Product {
   description: string;
   price: number;
   packPrice: number;
-  images: { imageUrl: string }[];
+  images: ProductImage[]; // Menggunakan ProductImage dengan id
   discountPrice?: number;
   discountPackPrice?: number;
   packQuantity?: number;

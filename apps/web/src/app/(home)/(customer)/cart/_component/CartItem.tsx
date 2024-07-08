@@ -1,29 +1,20 @@
-'use client';
-import Image from 'next/image';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Button } from '@/components/ui/button';
-import { Trash2, Minus, Plus } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
-import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
-import {
-  deleteCartItem,
-  fetchCartItemCount,
-  updateCartItem,
-  updateQuantity,
-} from '@/lib/features/cart/cartSlice';
-import { RootState } from '@/lib/features/store';
-import { formatCurrency } from '@/lib/currency';
-import { CartItemType } from '@/lib/types/cart';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { getSelectedAddress } from '@/lib/fetch-api/address/client';
-import { useRouter } from 'next/navigation';
+
+"use client";
+import Image from "next/image";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Trash2, Minus, Plus } from "lucide-react";
+import React, { useEffect, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { deleteCartItem, fetchCartItemCount, updateCartItem, updateQuantity } from "@/lib/features/cart/cartSlice";
+import { RootState } from "@/lib/features/store";
+import { formatCurrency } from "@/lib/currency";
+import { CartItemType } from "@/lib/types/cart";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getSelectedAddress } from "@/lib/fetch-api/address/client";
+import { useRouter } from "next/navigation";
+
 
 interface CartItemProps {
   cart: CartItemType;
@@ -31,8 +22,11 @@ interface CartItemProps {
   onSelect: (itemId: string) => void;
 }
 const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
+
+  const router = useRouter();
   const selectedAddress = useSuspenseQuery({
-    queryKey: ['selected-address'],
+    queryKey: ["selected-address"],
+
     queryFn: getSelectedAddress,
   });
   const [quantity, setQuantity] = useState(cart.quantity);
@@ -44,13 +38,19 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
     setQuantity(cart.quantity);
   }, [cart.quantity]);
 
-  if (!cart.stock || !cart.stock.product) return null;
+
+  if (!cart.stock || !cart.stock.product) {
+    console.log("no cart stock");
+    return null;
+  }
 
   const { product } = cart.stock;
   const addressId = selectedAddress.data?.address.id;
-  if (!addressId) router.push('/cart');
+  if (!addressId) router.push("/cart");
 
   const handleQuantityChange = async (newQuantity: number) => {
+    console.log("newQuantity:", newQuantity);
+
     if (newQuantity === 0) {
       dispatch(deleteCartItem(cart.id));
     } else {
@@ -60,6 +60,8 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
             addressId,
             quantity: newQuantity,
             productId: cart.stock.product.id,
+            isChecked: false,
+
           } as any),
         );
 
@@ -69,7 +71,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
         }
         setQuantity(newQuantity);
       } catch (error) {
-        console.error('Update Cart Error:', error);
+        console.error("Update Cart Error:", error);
       }
     }
   };
@@ -81,7 +83,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
         dispatch(fetchCartItemCount());
       }
     } catch (error) {
-      console.error('Remove Cart Item Error:', error);
+      console.error("Remove Cart Item Error:", error);
     }
   };
 
@@ -90,61 +92,29 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
       <Card className="flex flex-col bg-card text-card-foreground shadow-md mb-4">
         <CardHeader>
           <CardTitle className="flex items-center">
-            <Checkbox
-              id={cart.id}
-              checked={isSelected}
-              onCheckedChange={() => onSelect(cart.id)}
-              onChange={() => onSelect(cart.id)}
-            />
-            <label
-              htmlFor={cart.id}
-              className="text-xl font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-3"
-            >
+            <Checkbox id={cart.id} checked={isSelected} onCheckedChange={() => onSelect(cart.id)} onChange={() => onSelect(cart.id)} />
+            <label htmlFor={cart.id} className="text-xl font-bold leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 ml-3">
               {product.title}
             </label>
           </CardTitle>
         </CardHeader>
         <CardContent className="flex gap-3 items-center justify-between">
-          <Image
-            src={product.images[0]?.imageUrl || '/indomie.jpg'}
-            width={50}
-            height={50}
-            alt="product image"
-          />
+          <Image src={product.images[0]?.imageUrl || "/indomie.jpg"} width={50} height={50} alt="product image" />
           <p>{product.description}</p>
           <p>
-            <strong>
-              {cart.isPack
-                ? formatCurrency(product.packPrice)
-                : formatCurrency(product.price)}
-            </strong>
+            <strong>{cart.isPack ? formatCurrency(product.packPrice) : formatCurrency(product.price)}</strong>
           </p>
-          <p>{cart.isPack ? 'grosir' : 'eceran'}</p>
+          <p>{cart.isPack ? "grosir" : "eceran"}</p>
           <div className="flex items-center">
-            <Button
-              variant="outline"
-              size="icon"
-              className="text-primary"
-              onClick={() => handleQuantityChange(quantity - 1)}
-            >
+            <Button variant="outline" size="icon" className="text-primary" onClick={() => handleQuantityChange(quantity - 1)}>
               <Minus className="w-4 h-4" />
             </Button>
             <span className="mx-2 text-lg">{quantity}</span>
-            <Button
-              variant="outline"
-              size="icon"
-              className="text-primary"
-              onClick={() => handleQuantityChange(quantity + 1)}
-            >
+            <Button variant="outline" size="icon" className="text-primary" onClick={() => handleQuantityChange(quantity + 1)}>
               <Plus className="w-4 h-4" />
             </Button>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="text-danger"
-            onClick={handleRemove}
-          >
+          <Button variant="outline" size="icon" className="text-danger" onClick={handleRemove}>
             <Trash2 className="w-4 h-4" />
           </Button>
           {error && <p className="text-red-500">{error}</p>}

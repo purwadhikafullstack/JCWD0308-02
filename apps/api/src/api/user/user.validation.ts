@@ -10,7 +10,7 @@ export class UserValidation {
       message: 'Should be at least 11 character(s)'
     }).max(256),
     password: z.string().min(8).max(512),
-    displayName: z.string().min(1).max(64).optional(),
+    displayName: z.string().min(3, {message: "Name should be minimal 3 characters"}).max(64).optional(),
     avatarUrl: z.string().url().optional(),
     role: z.enum(["SUPER_ADMIN", "STORE_ADMIN", "USER"]), 
     status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]),
@@ -25,7 +25,7 @@ export class UserValidation {
       message: 'Should be at least 11 character(s)'
     }).max(256).optional(),
     password: z.string().min(8).max(512).optional(),
-    displayName: z.string().min(1).max(64).optional(),
+    displayName: z.string().min(3, {message: "Name should be minimal 3 characters"}).max(64).optional(),
     avatarUrl: z.string().url().optional(),
     role: z.enum(["SUPER_ADMIN", "STORE_ADMIN", "USER"]).optional(),
     status: z.enum(["ACTIVE", "INACTIVE", "SUSPENDED"]).optional(),

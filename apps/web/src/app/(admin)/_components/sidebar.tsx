@@ -23,6 +23,11 @@ export const menu = [
     icon: <PanelsTopLeft className="h-4 w-4" />,
   },
   {
+    title: 'Admins',
+    path: '/dashboard/admins',
+    icon: <Users className="h-4 w-4" />,
+  },
+  {
     title: 'Analytics',
     path: '/dashboard/analytics',
     icon: <LineChart className="h-4 w-4" />,
@@ -41,11 +46,6 @@ export const menu = [
     title: 'Stores',
     path: '/dashboard/stores',
     icon: <Store className="h-4 w-4" />,
-  },
-  {
-    title: 'Admins',
-    path: '/dashboard/admins',
-    icon: <Users className="h-4 w-4" />,
   },
   {
     title: 'Products',
