@@ -42,7 +42,7 @@ export class CartController {
   getCart: ICallback = async (req, res, next) => {
     try {
       const userId = res.locals?.user?.id!;
-      const cartItems = await CartService.getCart(userId);
+      const cartItems = await CartService.getCart(userId, res);
       return res.status(200).json({ status: "OK", data: cartItems });
     } catch (error) {
       next(error);
@@ -51,7 +51,7 @@ export class CartController {
   getCartItemCount: ICallback = async (req, res, next) => {
     try {
       const userId = res.locals?.user?.id!;
-      const itemCount = await CartService.getCartItemCount(userId);
+      const itemCount = await CartService.getCartItemCount(userId, res);
       return res.status(200).json({ status: "OK", data: itemCount });
     } catch (error) {
       next(error);

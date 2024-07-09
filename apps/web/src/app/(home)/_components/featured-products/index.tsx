@@ -110,7 +110,7 @@ export default function FeaturedProducts() {
     <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
       <div className="container px-4 md:px-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl text-primary">
+          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
             Featured Products
           </h2>
           <Link

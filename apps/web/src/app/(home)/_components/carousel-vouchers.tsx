@@ -47,17 +47,17 @@ export function VoucherItem({ voucher }: { voucher: Voucher }) {
     : `Rp.${voucher?.fixedDiscount}`;
   return (
     <CarouselItem>
-      <div className="relative h-[400px] w-full overflow-hidden rounded-lg">
+      <div className="group cursor-pointer relative h-52 sm:h-72 md:h-80 w-full overflow-hidden rounded-lg lg:h-[512px]">
         <Image
           src={voucher?.imageUrl || '/placeholder.svg'}
           alt="Promotion 1"
           fill
-          className="object-cover"
+          className="group-hover:scale-110 h-full w-full object-cover rounded-lg transition-transform duration-500 ease-in-out transform hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         <div className="absolute bottom-6 left-6 text-white">
-          <h2 className="text-2xl font-bold">{voucher?.name}</h2>
-          <p className="text-lg">Up to {discount} off on selected items</p>
+          <h2 className="lg:text-2xl font-bold">{voucher?.name}</h2>
+          <p className="lg:text-lg">Up to {discount} off on selected items</p>
         </div>
       </div>
     </CarouselItem>

@@ -43,5 +43,5 @@ export const getCourierType = (courier: string): CourierType => {
 
 export interface ChangeStatusRequest {
   orderId: string;
-  newStatus: string;
+  newStatus: any;
 }

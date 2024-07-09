@@ -1,13 +1,13 @@
-import { prisma } from '@/db.js';
+import { prisma } from "@/db.js";
 
-import { ChangeStatusRequest, OrderId } from '@/types/order.type.js';
-import { ResponseError } from '@/utils/error.response.js';
-import { Validation } from '@/utils/validation.js';
-import { Request, Response } from 'express';
-import { ChangeStatusValidation } from './admin-store.validation.js';
-import { OrderStatus } from '@prisma/client';
-import { mapNewStatus } from '@/helpers/order/mapNewStatus.js';
-import { OrderIdValidation } from '../order/order.validation.js';
+import { ChangeStatusRequest, OrderId } from "@/types/order.type.js";
+import { ResponseError } from "@/utils/error.response.js";
+import { Validation } from "@/utils/validation.js";
+import { Request, Response } from "express";
+import { ChangeStatusValidation } from "./admin-store.validation.js";
+import { OrderStatus } from "@prisma/client";
+import { mapNewStatus } from "@/helpers/order/mapNewStatus.js";
+import { OrderIdValidation } from "../order/order.validation.js";
 
 export class OrderStoreService {
   static getStoreAdminIdByStoreId = async (storeId: any) => {
@@ -24,49 +24,56 @@ export class OrderStoreService {
   };
 
   static sendUserOrders = async (req: ChangeStatusRequest, res: Response) => {
-    const { orderId, newStatus } = Validation.validate(
-      ChangeStatusValidation.CHANGE,
-      req,
-    );
-
+    const { orderId, newStatus } = Validation.validate(ChangeStatusValidation.CHANGE, req);
+    if (!Object.values(OrderStatus).includes(newStatus as OrderStatus)) {
+      throw new ResponseError(400, `Invalid status: ${newStatus}`);
+    }
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { user: true },
     });
-    if (!order) throw new ResponseError(404, 'Order not found');
-    if (order.orderStatus !== 'PROCESS')
-      throw new ResponseError(400, 'Can not send the order!');
+    if (!order) throw new ResponseError(404, "Order not found");
 
-    const mappedStatus: OrderStatus = mapNewStatus(newStatus);
+    const allowedTransitions: { [key in OrderStatus]: OrderStatus[] } = {
+      [OrderStatus.AWAITING_PAYMENT]: [],
+      [OrderStatus.AWAITING_CONFIRMATION]: [],
+      [OrderStatus.PROCESS]: [OrderStatus.SHIPPING],
+      [OrderStatus.SHIPPING]: [OrderStatus.DELIVERED],
+      [OrderStatus.DELIVERED]: [],
+      [OrderStatus.CONFIRMED]: [],
+      [OrderStatus.CANCELLED]: [],
+    };
+
+    const currentStatus = order.orderStatus;
+    const targetStatus = newStatus as OrderStatus;
+
+    if (!allowedTransitions[currentStatus].includes(targetStatus)) {
+      throw new ResponseError(400, `Unsupported new status: ${newStatus}`);
+    }
+
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { orderStatus: mappedStatus },
+      data: { orderStatus: targetStatus },
     });
+
     return updatedOrder;
   };
 
   static cancelOrderByAdmin = async (req: OrderId, res: Response) => {
-    console.log('pingpongpong');
+    console.log("pingpongpong");
     const { orderId } = Validation.validate(OrderIdValidation.ORDER_ID, req);
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { orderItems: true },
     });
     if (!order) {
-      console.error('Order not found:', orderId);
-      throw new ResponseError(404, 'Order not found');
+      console.error("Order not found:", orderId);
+      throw new ResponseError(404, "Order not found");
     }
-    console.log('current order status:', order.orderStatus);
-    if (
-      order.orderStatus === OrderStatus.SHIPPING ||
-      order.orderStatus === OrderStatus.DELIVERED ||
-      order.orderStatus === OrderStatus.CONFIRMED
-    ) {
-      console.error(
-        'Order cannot be canceled, current status:',
-        order.orderStatus,
-      );
-      throw new ResponseError(400, 'Order cannot be canceled');
+    console.log("current order status:", order.orderStatus);
+    if (order.orderStatus === OrderStatus.SHIPPING || order.orderStatus === OrderStatus.DELIVERED || order.orderStatus === OrderStatus.CONFIRMED) {
+      console.error("Order cannot be canceled, current status:", order.orderStatus);
+      throw new ResponseError(400, "Order cannot be canceled");
     }
 
     const updatedOrder = await prisma.$transaction([
@@ -84,7 +91,7 @@ export class OrderStoreService {
         prisma.stockMutation.create({
           data: {
             stockId: item.stockId,
-            mutationType: 'REFUND',
+            mutationType: "REFUND",
             amount: item.quantity,
             orderId: order.id,
           },

@@ -23,6 +23,8 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useDeleteUserAddress } from './address-form/mutation';
+import { useAppDispatch } from '@/lib/features/hooks';
+import { fetchCart, fetchCartItemCount } from '@/lib/features/cart/cartSlice';
 
 export default function AddressItem({
   address,
@@ -49,7 +51,7 @@ export default function AddressItem({
   const handleDelete = async () => {
     await deleteAddress.mutateAsync(address.id);
   };
-
+  const dispatch = useAppDispatch();
   return (
     <Card
       className={cn(
@@ -88,8 +90,7 @@ export default function AddressItem({
                 </AlertDialogTitle>
                 <AlertDialogDescription>
                   This action cannot be undone. This will permanently delete{' '}
-                  {address.labelAddress} from our
-                  servers.
+                  {address.labelAddress} from our servers.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -107,15 +108,42 @@ export default function AddressItem({
       </CardHeader>
       {address.id !== data?.address?.id ? (
         <CardHeader>
-          <Button
-            onClick={async () => {
-              await handleChangeAddress.mutateAsync(address.id);
-            }}
-            variant={'outline'}
-            className="text-primary/80 border-primary/80 hover:text-primary hover:border-primary"
-          >
-            Select
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                variant={'outline'}
+                className="text-primary/80 border-primary/80 hover:text-primary hover:border-primary"
+              >
+                Select
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to change the shipping address?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This{' '}
+                  <span className="text-destructive">
+                    maybe delete all your cart items
+                  </span>
+                  . This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={async () => {
+                    await handleChangeAddress.mutateAsync(address.id);
+                    dispatch(fetchCart());
+                    dispatch(fetchCartItemCount());
+                  }}
+                >
+                  Continue
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardHeader>
       ) : null}
     </Card>
