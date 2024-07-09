@@ -23,6 +23,7 @@ export class ProductRouter {
     this.router.post('/', AuthMiddleware.superAdmin, uploader('PRODUCT').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.createProduct);
     this.router.put('/:id', AuthMiddleware.superAdmin, uploader('PRODUCT').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.updateProduct);
     this.router.delete('/:id', AuthMiddleware.superAdmin, this.productController.deleteProduct);
+    this.router.get('/detail/:slug', AuthMiddleware.authed, this.productController.getProductBySlug);
   }
 
 

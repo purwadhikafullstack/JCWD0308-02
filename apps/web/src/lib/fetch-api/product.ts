@@ -56,3 +56,10 @@ export const deleteProduct = async (id: string) => {
   });
   return response.data;
 };
+
+export const fetchProductBySlug = async (slug: string) => {
+  const response = await axios.get(`http://localhost:8000/api/product/detail/${slug}`, {
+    withCredentials: true,
+  });
+  return response.data;
+};
