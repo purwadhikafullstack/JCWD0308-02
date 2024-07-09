@@ -1,4 +1,4 @@
-import { User } from "@/app/(admin)/type";
+import { User } from "./user";
 
 export interface Store {
   id: string;

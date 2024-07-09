@@ -14,15 +14,13 @@ export class AuthController {
     try {
       const user = await AuthService.registerByEmail(req.body);
 
-      const session = await lucia.createSession(user.id, {});
-
       return res
         .status(201)
-        .appendHeader(
-          'Set-Cookie',
-          lucia.createSessionCookie(session.id).serialize(),
-        )
-        .json({ status: 'OK', message: 'Created new User', user });
+        .json({
+          status: 'OK',
+          message: 'Welcome to Grosirun, please check your email to set your account!',
+          user
+        });
     } catch (error) {
       next(error);
     }
@@ -95,7 +93,7 @@ export class AuthController {
       const user = await AuthService.githubOAuth(code);
 
       const session = await lucia.createSession(user.id, {});
-      
+
       await AuthHelper.setCookies(user!, res)
 
       return res
@@ -134,8 +132,7 @@ export class AuthController {
   };
 
   googleCallback: ICallback = async (req, res, next) => {
-    const { code, state, storedState, codeVerifier } =
-      AuthHelper.getGoogleCodesFromURL(req);
+    const { code, state, storedState, codeVerifier } = AuthHelper.getGoogleCodesFromURL(req);
     try {
       if (
         !code ||
@@ -149,9 +146,9 @@ export class AuthController {
       const user = await AuthService.googleOAuth(code, codeVerifier);
 
       const session = await lucia.createSession(user.id, {});
-      
+
       await AuthHelper.setCookies(user!, res)
-      
+
       return res
         .clearCookie('google_oauth_state')
         .clearCookie('google_code_verifier')
@@ -178,4 +175,111 @@ export class AuthController {
       next(error);
     }
   };
+
+  checkToken: ICallback = async (req, res, next) => {
+    const token = req.params.token
+
+    try {
+      const { user, isTokenExpired } = await AuthService.checkToken(token)
+
+      if (!user) throw new ResponseError(400, "Your link is invalid!")
+
+      return res
+        .status(200)
+        .json({ status: 'OK', user, isTokenExpired });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  resendVerify: ICallback = async (req, res, next) => {
+    const token = req.params.token
+
+    try {
+      const { user } = await AuthService.checkToken(token)
+
+      if (!user) throw new ResponseError(400, "Your link verification is invalid!")
+
+      const updatedUser = await AuthService.resendToken(user.id)
+
+      return res
+        .status(200)
+        .json({
+          status: 'OK',
+          message: 'Welcome to Grosirun, please check your email to set your account!',
+          user: updatedUser
+        });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  verifyAccount: ICallback = async (req, res, next) => {
+    const token = req.params.token
+
+    try {
+      const { user, isTokenExpired } = await AuthService.checkToken(token)
+
+      if (!user) throw new ResponseError(400, "Your link verification is invalid!")
+
+      if (isTokenExpired) {
+        await AuthService.resendToken(user.id)
+        throw new ResponseError(400, "Your link verification is expired! please check your email, we already resend new email verification!")
+      }
+
+      const updatedUser = await AuthService.verifyAccount(req.body, user.id)
+
+      return res
+        .status(200)
+        .json({
+          status: 'OK',
+          message: 'Welcome to Grosirun, you can signin now!',
+          user: updatedUser
+        });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  resetRequest: ICallback = async (req, res, next) => {
+    try {
+
+      await AuthService.resetRequest(req.body)
+
+      res
+        .status(200)
+        .json({ status: 'OK', message: "Please check your email, we already send you link reset password" })
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  resetPassword: ICallback = async (req, res, next) => {
+    const token = req.params.token
+    try {
+      const { user, isTokenExpired } = await AuthService.checkToken(token)
+
+      if (!user) throw new ResponseError(400, "Your link reset password is invalid!")
+
+      if (isTokenExpired) throw new ResponseError(400, "Your link reset password is expired!")
+
+      const updatedUser = await AuthService.resetPassword(req.body, user?.id!)
+      
+      await lucia.invalidateUserSessions(updatedUser.id)
+      
+      const session = await lucia.createSession(updatedUser.id, {});
+
+      await AuthHelper.setCookies(user!, res)
+
+      return res
+        .status(200)
+        .appendHeader(
+          'Set-Cookie',
+          lucia.createSessionCookie(session.id).serialize(),
+        )
+        .json({ status: 'OK', message: "Your account password has been reset!", user: updatedUser })
+    } catch (error) {
+      next(error);
+    }
+  }
 }
