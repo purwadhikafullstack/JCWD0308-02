@@ -5,14 +5,32 @@ import { signout } from '@/lib/fetch-api/user/client';
 import { useMutation } from '@tanstack/react-query';
 import { LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export const Signout = () => {
-  const router = useRouter();
-  const { mutateAsync } = useMutation({
-    mutationFn: signout,
-    onSuccess: () => {
-      router.refresh();
-      router.push('/auth/signin');
+  const router = useRouter()
+  const { mutateAsync } = useMutation<{ message: string }, { error: string }>({
+    mutationFn: async () => {
+      try {
+        const res = await signout();
+
+        if (!res.ok) throw await res.json();
+
+        const data = await res.json();
+
+        router.refresh()
+        router.replace('/auth/signin')
+
+        return data;
+      } catch (error) {
+        throw error;
+      }
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+    },
+    onError: (error) => {
+      toast.error(error.error);
     },
   });
   return (

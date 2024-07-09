@@ -7,19 +7,8 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import {
-  DollarSign,
-  Heart,
-  LogOut,
-  Percent,
-  ReceiptText,
-  Settings,
-  ShoppingCart,
-  Ticket,
-  User,
-} from 'lucide-react';
+import { Heart, Percent, ReceiptText, ShoppingCart, User } from 'lucide-react';
 import Link from 'next/link';
-import { Signout } from './signout';
 
 const UserDropdown = () => {
   const { data } = useSuspenseQuery({
@@ -34,10 +23,12 @@ const UserDropdown = () => {
       <DropdownMenuLabel>My Account</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <DropdownMenuItem>
-          <User className="mr-2 h-4 w-4" />
-          <span>{data?.user.displayName}</span>
-        </DropdownMenuItem>
+        <Link href={'/profile'}>
+          <DropdownMenuItem>
+            <User className="mr-2 h-4 w-4" />
+            <span>{data?.user.displayName}</span>
+          </DropdownMenuItem>
+        </Link>
         <Link href={'/cart'}>
           <DropdownMenuItem>
             <ShoppingCart className="mr-2 h-4 w-4" />
