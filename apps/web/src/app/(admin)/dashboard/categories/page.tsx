@@ -1,15 +1,20 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { fetchCategories, deleteCategory, updateCategory, createCategory } from '@/lib/fetch-api/category/client';
 import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '@/components/ui/card';
-import { FaEdit, FaTrashAlt } from 'react-icons/fa';
-import CreateForm from './_components/forms/CreateCategoryForm';
-import EditForm from './_components/forms/EditCategoryForm';
-import { Toaster, toast } from '@/components/ui/sonner';
+import Image from 'next/image';
+import { CreateCategoryForm } from './_components/create-category/CreateCategoryForm';
+import { EditCategoryForm } from './_components/update-category/EditCategoryForm';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Category } from '@/lib/types/category';
+import { Card, CardHeader, CardFooter, CardTitle, CardContent } from '@/components/ui/card';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
+import { handleApiError, showSuccess } from '@/components/toast/toastutils';
 import DeleteCategoryDialog from './_components/dialogs/DeleteCategoriesDialog';
+
+const DEFAULT_ICON_URL = '/default-icon.png';
+const DEFAULT_IMAGE_URL = '/default-image-category.jpg';
 
 const CategoryList = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,46 +43,37 @@ const CategoryList = () => {
     fetchCategoryData();
   }, []);
 
-  const handleEdit = (category: Category) => {
-    setSelectedCategory(category);
-  };
-
-  const handleCreate = async (categoryData: { name: string }) => {
+  const handleCreate = async (formData: FormData) => {
     try {
-      const newCategory: Category = { id: '', superAdminId: '', ...categoryData };
-      const createdCategory = await createCategory(newCategory);
+      const createdCategory = await createCategory(formData);
       setCategories([createdCategory, ...categories]);
       setCreatingCategory(false);
-      toast.success('Category created successfully!', {
-        className: 'bg-green-500 text-white',
-      });
+      showSuccess('Category created successfully!');
     } catch (error) {
-      console.error('Error creating category:', error);
-      toast.error('Failed to create category', {
-        className: 'bg-red-500 text-white',
-      });
+      handleApiError(error, 'Failed to create category');
     }
   };
 
-  const handleUpdate = async (categoryData: { id: string, name: string }) => {
+  const handleUpdate = async (id: string, formData: FormData) => {
     try {
-      const updatedCategory: Category = { ...selectedCategory!, ...categoryData };
-      const result = await updateCategory(categoryData.id, updatedCategory);
+      const result = await updateCategory(id, formData);
       setCategories(categories.map(cat => (cat.id === result.id ? result : cat)));
       setSelectedCategory(null);
-      toast.success('Category updated successfully!', {
-        className: 'bg-green-500 text-white',
-      });
+      showSuccess('Category updated successfully!');
     } catch (error) {
-      console.error('Error updating category:', error);
-      toast.error('Failed to update category', {
-        className: 'bg-red-500 text-white',
-      });
+      handleApiError(error, 'Failed to update category');
     }
   };
 
-  const handleDelete = (category: Category) => {
-    setDeletingCategory(category);
+  const handleDelete = async (category: Category) => {
+    try {
+      await deleteCategory(category.id);
+      setCategories(categories.filter(cat => cat.id !== category.id));
+      setDeletingCategory(null);
+      showSuccess('Category deleted successfully!');
+    } catch (error) {
+      handleApiError(error, 'Failed to delete category');
+    }
   };
 
   if (loading) {
@@ -90,45 +86,85 @@ const CategoryList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Toaster />
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-indigo-600">Categories</h2>
+      <h2 className="text-4xl font-extrabold mb-6 text-center text-primary">Categories</h2>
       <Button onClick={() => setCreatingCategory(true)} className="mb-4">
         Create Category
       </Button>
+      <Dialog open={creatingCategory} onOpenChange={setCreatingCategory}>
+        <DialogTrigger asChild>
+          <div />
+        </DialogTrigger>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-bold text-primary">Create Category</DialogTitle>
+            <DialogDescription className="mb-4">
+              Fill in the form below to create a new category.
+            </DialogDescription>
+          </DialogHeader>
+          <CreateCategoryForm
+            handleClose={() => setCreatingCategory(false)}
+            onSave={handleCreate}
+          />
+        </DialogContent>
+      </Dialog>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {categories.map((category) => (
-          <Card key={category.id} className="shadow-lg">
-            <CardHeader>
-              <CardTitle>{category.name}</CardTitle>
+          <Card key={category.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+            <CardHeader className="flex items-center ">
+              <div className="flex-shrink-0 w-16 h-16">
+                <Image
+                  src={category.iconUrl || DEFAULT_ICON_URL}
+                  alt="Icon"
+                  width={64}
+                  height={64}
+                  className="object-cover w-16 h-16"
+                  style={{ width: '64px', height: '64px' }}
+                />
+              </div>
+              <CardTitle className="text-primary text-2xl font-bold">{category.name}</CardTitle>
             </CardHeader>
-            <CardContent>
-              <p><strong>ID:</strong> {category.id}</p>
-              <p><strong>Admin ID:</strong> {category.superAdminId}</p>
+            <CardContent className="flex justify-center mb-2">
+              <div className="w-full h-48 relative">
+                <Image
+                  src={category.imageUrl || DEFAULT_IMAGE_URL}
+                  alt="Image"
+                  layout="fill"
+                  objectFit="cover"
+                  className="rounded-lg"
+                />
+              </div>
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
-              <Button variant="secondary" onClick={() => handleEdit(category)}>
-                <FaEdit />
-              </Button>
-              <Button variant="destructive" onClick={() => handleDelete(category)}>
+              <Dialog open={selectedCategory?.id === category.id} onOpenChange={(open) => open || setSelectedCategory(null)}>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" onClick={() => setSelectedCategory(category)}>
+                    <FaEdit />
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold text-primary">Edit Category</DialogTitle>
+                    <DialogDescription className="mb-4">
+                      Update the category details below.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <EditCategoryForm
+                    category={category}
+                    handleClose={() => setSelectedCategory(null)}
+                    onSave={handleUpdate}
+                  />
+                </DialogContent>
+              </Dialog>
+
+              <Button variant="destructive" onClick={() => setDeletingCategory(category)}>
                 <FaTrashAlt />
               </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
-      {creatingCategory && (
-        <CreateForm
-          onSave={handleCreate}
-          onCancel={() => setCreatingCategory(false)}
-        />
-      )}
-      {selectedCategory && (
-        <EditForm
-          category={selectedCategory}
-          onSave={handleUpdate}
-          onCancel={() => setSelectedCategory(null)}
-        />
-      )}
+
       {deletingCategory && (
         <DeleteCategoryDialog
           category={deletingCategory}
