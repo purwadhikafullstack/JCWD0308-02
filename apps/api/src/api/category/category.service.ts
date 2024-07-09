@@ -2,6 +2,8 @@ import { prisma } from '@/db.js';
 import { Validation } from '@/utils/validation.js';
 import { CategoryValidation } from './category.validation.js';
 import { CreateCategoryRequest, UpdateCategoryRequest } from '@/types/category.type.js';
+import { Request, Response } from 'express';
+import { API_URL } from '@/config.js';
 
 export class CategoryService {
   static getCategories = async () => {
@@ -14,15 +16,43 @@ export class CategoryService {
     });
   }
 
-  static createCategory = async (req: CreateCategoryRequest, superAdminId: string) => {
-    const newCategory = Validation.validate(CategoryValidation.createCategory, req);
+  static createCategory = async (req: Request, res: Response, superAdminId: string) => {
+    if (await CategoryService.categoryNameExists(req.body.name)) {
+      res.status(400).json({ error: "Category name already exists" });
+      return;
+    }
+    
+    if (req.files && !Array.isArray(req.files)) {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      if (files.iconUrl) {
+        req.body.iconUrl = `${API_URL}/public/images/${files.iconUrl[0].filename}`;
+      }
+      if (files.imageUrl) {
+        req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
+      }
+    }
+    const newCategory = Validation.validate(CategoryValidation.createCategory, req.body as CreateCategoryRequest);
     return await prisma.category.create({
       data: { ...newCategory, superAdminId },
     });
   }
 
-  static updateCategory = async (id: string, req: UpdateCategoryRequest) => {
-    const updatedCategory = Validation.validate(CategoryValidation.updateCategory, req);
+  static updateCategory = async (req: Request, res: Response, id: string) => {
+    if (await CategoryService.categoryNameExists(req.body.name, id)) {
+      res.status(400).json({ error: "Category name already exists" });
+      return;
+    }
+    
+    if (req.files && !Array.isArray(req.files)) {
+      const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+      if (files.iconUrl) {
+        req.body.iconUrl = `${API_URL}/public/images/${files.iconUrl[0].filename}`;
+      }
+      if (files.imageUrl) {
+        req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
+      }
+    }
+    const updatedCategory = Validation.validate(CategoryValidation.updateCategory, req.body as UpdateCategoryRequest);
     return await prisma.category.update({
       where: { id },
       data: updatedCategory,
@@ -33,5 +63,13 @@ export class CategoryService {
     return await prisma.category.delete({
       where: { id },
     });
+  }
+
+  static categoryNameExists = async (name: string, excludeId?: string): Promise<boolean> => {
+    const whereClause = excludeId ? { name, NOT: { id: excludeId } } : { name };
+    const category = await prisma.category.findFirst({
+      where: whereClause,
+    });
+    return !!category;
   }
 }

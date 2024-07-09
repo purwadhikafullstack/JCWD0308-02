@@ -259,10 +259,11 @@ model StoreAdmin {
 model Category {
   id           String   @id @default(uuid())
   name         String   @unique
+  iconUrl         String?   @map("icon_url")
+  imageUrl        String?  @map("image_url")
   superAdminId String   @map("super_admin_id")
   updatedAt    DateTime @updatedAt @map("updated_at")
   createdAt    DateTime @default(now()) @map("created_at")
-
   //relation
   products   Product[]
   superAdmin User      @relation("SuperAdminCategories", fields: [superAdminId], references: [id], onDelete: Cascade)
