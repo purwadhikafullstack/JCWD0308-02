@@ -19,6 +19,7 @@ export const UserFields = {
   displayName : true,
   role: true,
   avatarUrl : true,
+  accountType: true,
   referralCode: true,
   registerCode: true,
   status: true,

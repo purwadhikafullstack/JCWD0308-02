@@ -3,28 +3,17 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
 } from '@/components/ui/dropdown-menu';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import {
   Building2,
-  CalendarRange,
-  DollarSign,
-  Heart,
   Home,
   LineChart,
-  LogOut,
   PanelsTopLeft,
-  Percent,
   ReceiptText,
-  Settings,
-  ShoppingCart,
-  Ticket,
-  User,
 } from 'lucide-react';
 import Link from 'next/link';
-import { Signout } from './signout';
 
 const AdminDropdown = () => {
   const { data } = useSuspenseQuery({
@@ -39,7 +28,7 @@ const AdminDropdown = () => {
       <DropdownMenuLabel>Organization</DropdownMenuLabel>
       <DropdownMenuSeparator />
       <DropdownMenuGroup>
-        <Link href={'/'}>
+        <Link href={'/profile'}>
           <DropdownMenuItem>
             <Building2 className="mr-2 h-4 w-4" />
             <span>{data.user.displayName}</span>

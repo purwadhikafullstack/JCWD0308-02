@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useRef, useState } from 'react';
 import { MapOptions } from '@maptiler/sdk';
 import * as maptilersdk from '@maptiler/sdk';
@@ -31,7 +32,6 @@ export default function Map({
   maptilersdk.config.apiKey = '6ZnThUh4eqovc7VjsFBV';
 
   // const center = longitude && latitude ? [longitude && latitude] : undefined
-  
 
   useEffect(() => {
     if (map.current) return; // stops map from intializing more than once

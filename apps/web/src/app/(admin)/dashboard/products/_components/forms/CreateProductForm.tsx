@@ -44,7 +44,7 @@ const CreateProductForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) =>
   };
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="z-20 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <Card className="w-[900px] max-h-[90vh] overflow-y-auto">
         <CardHeader>
           <CardTitle className='text-primary'>Create Product</CardTitle>

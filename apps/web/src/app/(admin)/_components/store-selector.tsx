@@ -1,7 +1,5 @@
 'use client';
 
-import * as React from 'react';
-
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,8 +19,8 @@ import { Check, ChevronsUpDown, Store } from 'lucide-react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { getSelectedStore, getStores } from '@/lib/fetch-api/store/client';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
-import { useRouter } from 'next/navigation';
 import { changeStore } from './action';
+import { useMemo, useState } from 'react';
 
 export const StoreSelector = ({
   storeId,
@@ -33,7 +31,6 @@ export const StoreSelector = ({
   className?: string;
   disable?: boolean;
 }) => {
-  const router = useRouter();
   const stores = useSuspenseQuery({
     queryKey: ['stores'],
     queryFn: getStores,
@@ -49,7 +46,7 @@ export const StoreSelector = ({
     queryFn: getUserProfile,
   });
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const superAdminOnly = userProfile.data?.user?.role === 'SUPER_ADMIN';
 
@@ -59,9 +56,11 @@ export const StoreSelector = ({
     },
   });
 
-  
-  const [selectedStoreId, setSelectedStoreId] = React.useState(storeId || selectedStore?.data?.store?.id)
-
+  const selectedStoreId = useMemo(() => {
+    return storeId !== undefined && storeId !== selectedStore?.data?.store?.id
+      ? storeId
+      : selectedStore?.data?.store?.id;
+  }, [selectedStore?.data?.store?.id, storeId]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -97,16 +96,13 @@ export const StoreSelector = ({
                   key={store.id}
                   value={store.id}
                   onSelect={async (currentValue) => {
-                    // setValue(currentValue === value ? (selectedStore.data.store.id || '') : currentValue);
                     await handleChangeStore.mutateAsync(
                       currentValue === selectedStoreId
                         ? selectedStoreId || ''
                         : currentValue,
                     );
 
-                    setOpen(() =>false);
-
-                    setSelectedStoreId(() => selectedStore?.data?.store?.id);
+                    setOpen(() => false);
                   }}
                 >
                   <Check

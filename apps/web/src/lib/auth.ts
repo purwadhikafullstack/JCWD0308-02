@@ -64,7 +64,6 @@ export const validateRequest = cache(async (): Promise<auth> => {
 
 	// return result;
 	const res = await fetchSSR(`${env.NEXT_PUBLIC_BASE_API_URL}/auth/session`)
-	console.log(res);
 	const auth = await res.json()
 	
 	return auth
