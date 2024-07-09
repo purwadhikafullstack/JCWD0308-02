@@ -14,7 +14,7 @@ export class AuthRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.post('/register', AuthMiddleware.noAuthOnly, this.authController.createUserByEmail);
+    this.router.post('/signup', AuthMiddleware.noAuthOnly, this.authController.createUserByEmail);
     this.router.post('/signin', AuthMiddleware.noAuthOnly, this.authController.signin);
     this.router.post('/signout', AuthMiddleware.authed, this.authController.signout);
     this.router.get('/github', AuthMiddleware.noAuthOnly, this.authController.github);
@@ -22,6 +22,12 @@ export class AuthRouter {
     this.router.get('/google', AuthMiddleware.noAuthOnly, this.authController.google);
     this.router.get('/google/callback', AuthMiddleware.noAuthOnly, this.authController.googleCallback);
     this.router.get('/session', this.authController.getSession);
+    this.router.post('/verify/resend/:token', AuthMiddleware.noAuthOnly, this.authController.resendVerify);
+    this.router.get('/verify/:token', AuthMiddleware.noAuthOnly, this.authController.checkToken);
+    this.router.patch('/verify/:token', AuthMiddleware.noAuthOnly, this.authController.verifyAccount);
+    this.router.post('/reset', AuthMiddleware.noAuthOnly, this.authController.resetRequest);
+    this.router.get('/reset/:token', AuthMiddleware.noAuthOnly, this.authController.checkToken);
+    this.router.patch('/reset/:token', AuthMiddleware.noAuthOnly, this.authController.resetPassword);
   }
 
   getRouter(): Router {
