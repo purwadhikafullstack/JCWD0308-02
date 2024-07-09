@@ -30,7 +30,7 @@ export default function FeaturedProducts() {
       </div>
     );
 
-  const addressId = selectedAddress.data?.address.id;
+  const addressId = selectedAddress.data?.address?.id;
 
   return (
     <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
