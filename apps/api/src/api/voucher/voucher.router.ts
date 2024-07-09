@@ -16,7 +16,7 @@ export class VoucherRouter {
   private initializeRoutes(): void {
     this.router.get(
       '/',
-      AuthMiddleware.authed,
+     
       this.voucherController.getVouchers,
     );
     this.router.get(
