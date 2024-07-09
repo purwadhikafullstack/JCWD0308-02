@@ -84,8 +84,8 @@ export function CreateStoreForm({
           form={form}
           errorMessage={createNewStore?.error?.errors?.fieldErrors?.status}
         />
-        <Button type="submit">Submit</Button>
-        {/* <Submit type="submit">Submit</Submit> */}
+        {/* <Button type="submit">Submit</Button> */}
+        <Submit type="submit">Submit</Submit>
       </form>
     </Form>
   );
