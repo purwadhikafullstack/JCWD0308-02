@@ -36,7 +36,7 @@ export default function FeaturedProducts() {
     <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
       <div className="container px-4 md:px-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl text-primary">
+          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
             Featured Products
           </h2>
           <Link
@@ -57,7 +57,7 @@ export default function FeaturedProducts() {
             >
               <Link
                 href={`/product/${stock.product.slug}`}
-                className="absolute inset-0 z-10"
+                className="absolute inset-0"
                 prefetch={false}
               >
                 <span className="sr-only">View</span>
@@ -69,7 +69,7 @@ export default function FeaturedProducts() {
                 height={200}
                 className="rounded-lg object-cover w-full aspect-square group-hover:opacity-80 transition-opacity"
               />
-              <div className="grid gap-2 relative z-20 mt-2">
+              <div className="grid gap-2 relative mt-2">
                 <div className="flex items-center justify-between">
                   <h3 className="font-semibold text-lg text-primary max-w-36 truncate">
                     {stock?.product?.title}

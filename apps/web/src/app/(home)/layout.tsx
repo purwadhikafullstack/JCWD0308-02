@@ -23,7 +23,7 @@ export default async function RootLayout({
             auth?.user && !auth?.user && 'top-10',
           )}
         >
-          <NavbBar category={categories} />
+          <NavbBar category={categories.categories} />
         </div>
         {children}
         <Footer />
