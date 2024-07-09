@@ -1,8 +1,11 @@
 export interface CreateCategoryRequest {
-    name: string;
-  }
-  
-  export interface UpdateCategoryRequest {
-    name?: string;
-  }
-  
+  name: string;
+  iconUrl?: string;
+  imageUrl?: string;
+}
+
+export interface UpdateCategoryRequest {
+  name?: string;
+  iconUrl?: string;
+  imageUrl?: string;
+}
