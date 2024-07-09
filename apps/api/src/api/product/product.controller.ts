@@ -87,4 +87,20 @@ export class ProductController {
       next(error);
     }
   };
+
+  getProductBySlug: ICallback = async (req, res, next) => {
+    try {
+      const { slug } = req.params;
+      const product = await ProductService.getProductBySlug(slug);
+
+      if (!product) {
+        return res.status(404).json({ status: "ERROR", message: "Product not found" });
+      }
+
+      res.status(200).json(product);
+    } catch (error) {
+      next(error);
+    }
+  };
+
 }

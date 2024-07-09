@@ -91,54 +91,57 @@ const ProductDetail = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 flex flex-col items-center">
       <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">{product.title}</h2>
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <Carousel ref={carouselRef} className="max-w-xs mx-auto">
           <CarouselContent className="flex">
             {product.images.length > 0 ? (
               product.images.map((image, index) => (
-                <CarouselItem key={index} className="w-full aspect-square">
+                <CarouselItem key={index} className="w-[240px] h-[240px]">
                   <div className="relative w-full h-full">
                     <Image
                       src={image.imageUrl}
                       alt={`${product.title} image ${index + 1}`}
-                      layout="fill"
-                      objectFit="cover"
-                      className="rounded-t-lg"
+                      width={240}
+                      height={240}
+                      className="rounded-t-lg border-b-2 border-primary"
                       priority={index === 0}
                     />
                   </div>
                 </CarouselItem>
               ))
             ) : (
-              <CarouselItem className="w-full aspect-square">
+              <CarouselItem className="w-[240px] h-[240px]">
                 <div className="relative w-full h-full flex items-center justify-center bg-gray-200">
                   <span className="text-gray-500">No Image Available</span>
                 </div>
               </CarouselItem>
             )}
           </CarouselContent>
-          <CarouselPrevious className="carousel-previous absolute left-0 top-1/2 transform -translate-y-1/2 bg-primary text-secondary p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
-          <CarouselNext className="carousel-next absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-secondary p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
+          <CarouselPrevious className="carousel-previous absolute left-0 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
+          <CarouselNext className="carousel-next absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
         </Carousel>
         <div className="p-6">
-          <p className="text-md text-gray-600 mb-2"><strong>Slug:</strong> {product.slug}</p>
           <p className="text-md text-gray-600 mb-2"><strong>Description:</strong> {product.description}</p>
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.price?.toLocaleString() ?? 'N/A'}</p>
-            <p className="text-lg font-semibold text-green-500">Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}</p>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-lg font-semibold text-red-500 line-through">Rp {product.price?.toLocaleString() ?? 'N/A'}</p>
+              <p className="text-lg font-semibold text-green-500">Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}</p>
+            </div>
+            <div>
+              <p className="text-lg font-semibold text-red-500 line-through">Rp {product.packPrice?.toLocaleString() ?? 'N/A'}</p>
+              <p className="text-lg font-semibold text-green-500">Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}</p>
+            </div>
           </div>
-          <div className="flex justify-between items-center mb-2">
-            <p className="text-lg font-semibold text-red-500 line-through">Rp {product.packPrice?.toLocaleString() ?? 'N/A'}</p>
-            <p className="text-lg font-semibold text-green-500">Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}</p>
+          <div className="grid grid-cols-2 gap-2 mb-4">
+            <p className="text-sm text-gray-600"><strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'} units</p>
+            <p className="text-sm text-gray-600"><strong>Bonus:</strong> {product.bonus ?? 'No bonus'}</p>
+            <p className="text-sm text-gray-600"><strong>Min Order:</strong> {product.minOrderItem ?? 'No min order'}</p>
+            <p className="text-sm text-gray-600"><strong>Status:</strong> {product.status}</p>
+            <p className="text-sm text-gray-600"><strong>Updated At:</strong> {new Date(product.updatedAt).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600"><strong>Created At:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
           </div>
-          <p className="text-md text-gray-600 mb-2"><strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'} units</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Bonus:</strong> {product.bonus ?? 'No bonus'}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Min Order:</strong> {product.minOrderItem ?? 'No min order'}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Status:</strong> {product.status}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Updated At:</strong> {new Date(product.updatedAt).toLocaleDateString()}</p>
-          <p className="text-md text-gray-600 mb-2"><strong>Created At:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
           <div className="flex justify-end space-x-2 mt-4">
             <Button onClick={() => handleEdit(product)} className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"><FaEdit /></Button>
             <Button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all"><FaTrashAlt /></Button>

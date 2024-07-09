@@ -1,19 +1,21 @@
 'use client';
 import React, { useEffect, useRef } from 'react';
-import { getSelectedAddress } from '@/lib/fetch-api/address/client';
-import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { NearestStock } from '@/lib/types/stock';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/components/ui/carousel';
+import { Product } from '@/lib/types/product';
 
-interface ProductItemProps {
-  stock: NearestStock;
-  addressId: string | undefined;
+interface ProductCardProps {
+  product: Product;
+  onTitleClick: (slug: string) => void;
 }
 
-const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onTitleClick }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,8 +30,6 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
 
     return () => clearInterval(interval);
   }, []);
-
-  const product = stock.product;
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105">
@@ -63,11 +63,14 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
       </Carousel>
       <div className="relative z-20 mt-2">
         <div className="h-20 flex items-center justify-center text-center">
-          <h3 className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3">
+          <h3
+            className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3 cursor-pointer"
+            onClick={() => onTitleClick(product.slug)}
+          >
             {product.title}
           </h3>
         </div>
-        <div className="h-12 mt-2 flex flex-col justify-center">
+        <div className="h-12 mt-2 flex flex-col justify-center ml-4">
           <p className="text-xs font-semibold text-gray-500 line-through">
             Rp {product.price?.toLocaleString() ?? 'N/A'}
           </p>
@@ -76,57 +79,15 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
           </p>
         </div>
       </div>
-      <div className="mt-4">
-        <Link href={`/product/detail/${product.slug}`}>
-          <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">
+      <div className="mt-4 px-4">
+        <button onClick={() => onTitleClick(product.slug)} className="w-full">
+          <div className="bg-primary text-white text-center py-2 rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg mb-2">
             Buy
           </div>
-        </Link>
+        </button>
       </div>
     </div>
   );
 };
 
-export default function FeaturedProducts() {
-  const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks'],
-    queryFn: getNearestStocks,
-  });
-  const selectedAddress = useSuspenseQuery({
-    queryKey: ['selected-address'],
-    queryFn: getSelectedAddress,
-  });
-
-  if (!nearestStocks.data?.stocks?.length)
-    return (
-      <div className="h-full w-full flex items-center justify-center">
-        <h1>Sorry, we are out of stock! :(</h1>
-      </div>
-    );
-
-  const addressId = selectedAddress.data?.address?.id;
-
-  return (
-    <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
-      <div className="container px-4 md:px-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
-            Featured Products
-          </h2>
-          <Link
-            href="/product"
-            className="text-sm font-medium text-primary hover:underline underline-offset-4"
-            prefetch={false}
-          >
-            View All
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-6">
-          {nearestStocks.data.stocks.map((stock: NearestStock, index: number) => (
-            <ProductItem key={index} stock={stock} addressId={addressId} />
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
+export default ProductCard;

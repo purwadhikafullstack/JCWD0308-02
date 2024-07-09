@@ -1,3 +1,6 @@
+import { Stock } from "./stock";
+
+
 export interface Product {
   isPack: any;
   id: string;
@@ -6,7 +9,7 @@ export interface Product {
   description: string;
   price: number;
   packPrice: number;
-  images: ProductImage[]; // Menggunakan ProductImage dengan id
+  images: ProductImage[]; 
   discountPrice?: number;
   discountPackPrice?: number;
   packQuantity?: number;
@@ -17,6 +20,7 @@ export interface Product {
   superAdminId: string;
   status: 'DRAFT' | 'PUBLISHED' | 'INACTIVE' | 'SUSPENDED';
   categoryId: string;
+  stock: Stock[]
   resetDiscountCode?: string;
   resetDiscountAt?: Date;
   createdAt: string;
