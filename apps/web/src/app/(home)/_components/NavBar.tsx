@@ -3,7 +3,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn } from '@/lib/utils';
+import { cn, shuffleArray } from '@/lib/utils';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,7 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { CarTaxiFront, Menu, Search } from 'lucide-react';
+import { CarTaxiFront, LayoutGrid, Menu, Search, ShoppingBag } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,32 +51,23 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
                   <NavigationMenuTrigger>
                     <span className="hidden md:block">Category</span>
                     <>
-                      <Menu className="h-6 w-6 md:hidden" />
+                      <LayoutGrid className="h-6 w-6 md:hidden" />
                       <span className="sr-only">Toggle navigation</span>
                     </>
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 w-80 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
-                          <a className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md" href="/">
-                            <CarTaxiFront className="h-6 w-6" />
-                            <div className="mb-2 mt-4 text-lg font-medium">shadcn/ui</div>
-                            <p className="text-sm leading-tight text-muted-foreground">
-                              Beautifully designed components built with Radix UI and Tailwind CSS.
-                            </p>
-                          </a>
-                        </NavigationMenuLink>
-                      </li>
-                      <ListItem href="/docs" title="Introduction">
-                        Re-usable components built using Radix UI and Tailwind CSS.
-                      </ListItem>
-                      <ListItem href="/docs/installation" title="Installation">
-                        How to install dependencies and structure your app.
-                      </ListItem>
-                      <ListItem href="/docs/primitives/typography" title="Typography">
-                        Styles for headings, paragraphs, lists...etc
-                      </ListItem>
+                    <ul className="grid w-[600px] gap-3 p-4 md:grid-cols-4">
+                      {category.length > 0 ? (
+                        category.map((item: Category) => (
+                          <ListItem
+                            key={item.id}
+                            title={item.name}
+                            href={`/category`}
+                          />
+                        ))
+                      ) : (
+                        <></>
+                      )}
                     </ul>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
@@ -152,10 +143,9 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none">{title}</div>
-          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
-            {children}
-          </p>
+          <div className="leading-none">
+            {title}
+          </div>
         </a>
       </NavigationMenuLink>
     </li>

@@ -1,5 +1,5 @@
 export interface CartRequest {
-  addressId?: string;
+  addressId?: any;
   stockId: string;
   quantity: number;
   isPack: boolean;

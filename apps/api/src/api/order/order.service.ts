@@ -18,7 +18,6 @@ export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
     const orderRequest = Validation.validate(OrderValidation.ORDER, req);
     const userId = res.locals.user?.id;
-
     const userAddress = await getAddress(res);
     const { address, cityId } = userAddress;
     const { updatedCartItem, nearestStore } = await handleCartItems(userId, address);
@@ -37,7 +36,6 @@ export class OrderService {
       discounts,
     );
 
-
     const newOrder = await createOrder(
       orderRequest,
       userId,
@@ -52,15 +50,16 @@ export class OrderService {
       totalPayment,
     );
 
-
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
     const paymentLink = await handlePaymentLinkCreation(orderRequest, newOrder, totalPayment);
 
     return { ...newOrder, paymentLink };
-
   };
   static getOrder = async (orderId: string) => {
-    const orders = await prisma.order.findUnique({ where: { id: orderId }, include: { user: true, orderItems: true } });
+    const orders = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { user: true, orderItems: true },
+    });
     return orders;
   };
 
@@ -70,11 +69,20 @@ export class OrderService {
     if (!orderStatus) throw new ResponseError(401, `Invalid order status: ${status}`);
     if (date) {
       const parsedDate = new Date(date);
-      filters.updatedAt = { gte: parsedDate.setHours(0, 0, 0, 0), lt: parsedDate.setHours(23, 59, 59, 999) };
+      filters.updatedAt = {
+        gte: parsedDate.setHours(0, 0, 0, 0),
+        lt: parsedDate.setHours(23, 59, 59, 999),
+      };
     }
     const orders = await prisma.order.findMany({
       where: filters,
-      include: { orderItems: { include: { stock: { include: { product: { include: { images: true } } } } } } },
+      include: {
+        orderItems: {
+          include: {
+            stock: { include: { product: { include: { images: true } } } },
+          },
+        },
+      },
     });
     return orders;
   };
@@ -102,7 +110,10 @@ export class OrderService {
     const fileName = path.basename(filePath);
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { paymentPicture: `http://localhost:3000/public/${fileName}`, orderStatus: "AWAITING_CONFIRMATION" },
+      data: {
+        paymentPicture: `${process.env.WEB_URL}/public/${fileName}`,
+        orderStatus: "AWAITING_CONFIRMATION",
+      },
     });
     return updatedOrder;
   };
@@ -110,11 +121,17 @@ export class OrderService {
   static confirmOrder = async (req: OrderId, res: Response) => {
     const { orderId } = Validation.validate(OrderIdValidation.ORDER_ID, req);
     const userId = res.locals?.user?.id;
-    const order = await prisma.order.findUnique({ where: { id: orderId }, include: { user: true } });
+    const order = await prisma.order.findUnique({
+      where: { id: orderId },
+      include: { user: true },
+    });
     if (!order) throw new ResponseError(404, "Order not found");
     if (order.userId !== userId) throw new ResponseError(403, "Unauthorized");
     if (order.orderStatus !== "DELIVERED") throw new ResponseError(400, "Order is not delivered yet");
-    const updatedOrder = await prisma.order.update({ where: { id: orderId }, data: { orderStatus: "CONFIRMED" } });
+    const updatedOrder = await prisma.order.update({
+      where: { id: orderId },
+      data: { orderStatus: "CONFIRMED" },
+    });
     return updatedOrder;
   };
 }

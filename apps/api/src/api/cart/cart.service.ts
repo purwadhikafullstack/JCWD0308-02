@@ -9,7 +9,6 @@ import { OrderItemType } from "@prisma/client";
 
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
-
     const cartRequest: CartRequest = Validation.validate(CartValidation.CART, req);
     console.log("cartRequest:", cartRequest);
 
@@ -18,45 +17,25 @@ export class CartService {
       select: { id: true, status: true, role: true, addresses: true },
     });
 
-
     const userAddress = user?.addresses.find((address: any) => address.id === cartRequest.addressId);
 
     if (!userAddress) throw new ResponseError(401, "Address not found!");
 
-    //toko terdekat
-    const nearbyStore = await findStoresInRange(userAddress.coordinate, 20);
+    // Find the nearest store based on the user's address
+    const { nearestStore } = await findNearestStore(cartRequest.addressId);
+    if (!nearestStore) throw new ResponseError(404, "Nearest store not found!");
 
-    let stock;
-    for (const store of nearbyStore) {
-      stock = await prisma.stock.findFirst({
-        where: { productId: cartRequest.productId, storeId: store.id },
-      });
-      if (stock) break;
-    }
+    const stock = await prisma.stock.findFirst({
+      where: { productId: cartRequest.productId, storeId: nearestStore.id },
+    });
+    if (!stock) throw new ResponseError(400, "Stock not found!");
 
-    if (!stock) {
-      const centralStore = await prisma.store.findUnique({
-        where: { slug: "grosirun-pusat" },
-      });
-      if (centralStore) {
-        stock = await prisma.stock.findFirst({
-          where: {
-            productId: cartRequest.productId,
-            storeId: centralStore.id,
-          },
-        });
-      }
-    }
-
-    if (!stock) throw new ResponseError(400, "Stock not found in the nearest or central store!");
-    console.log("pingpongpongprong");
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
         userId: user?.id,
         stockId: stock.id,
         orderItemType: OrderItemType.CART_ITEM,
         isPack: cartRequest.isPack,
-        // isChecked: false,
         isDeleted: false,
       },
     });
@@ -73,6 +52,7 @@ export class CartService {
       console.log("Updated cart item:", updatedCartItem);
       return updatedCartItem;
     }
+
     console.log("No existing cart item, creating a new one.");
     // If the item is not in the cart
     const orderItem = await prisma.orderItem.create({
@@ -81,11 +61,10 @@ export class CartService {
         stockId: stock.id,
         quantity: cartRequest.quantity,
         isPack: cartRequest.isPack,
-
         isChecked: false,
-
-      } as any,
-    });
+        orderItemType: OrderItemType.CART_ITEM,
+      },
+    } as any);
     console.log("orderItem:", orderItem);
     return orderItem;
   };
@@ -188,29 +167,49 @@ export class CartService {
     return deleteCart;
   };
 
-  static getCart = async (userId: string) => {
-    const cartItems = await prisma.orderItem.findMany({
+  static getCart = async (userId: string, res: Response) => {
+    const newAddressId = res.locals.address?.id;
+    // const userId = res.locals.user?.id;
+    if (!newAddressId || !userId) {
+      throw new ResponseError(403, "there is no address and user");
+    }
+    const { nearestStore: newNearestStore } = await findNearestStore(newAddressId);
+    const carts = await prisma.orderItem.findMany({
       where: {
-        userId: userId,
+        userId,
         orderItemType: OrderItemType.CART_ITEM,
         isDeleted: false,
-        // isChecked: false,
       },
-      include: {
-        stock: {
-          include: {
-            product: { include: { images: true } },
-          },
-        },
-        user: true,
-      },
+      include: { stock: { include: { product: { include: { images: true } } } } },
     });
-    console.log("Cart Items:", cartItems);
-    return cartItems;
+
+    // Determine which items belong to a different store
+    const itemsToDelete = carts.filter((item) => item.stock.storeId !== newNearestStore?.id).map((item) => item.id);
+
+    // Mark items belonging to a different store as deleted
+    if (itemsToDelete.length > 0) {
+      await prisma.orderItem.updateMany({
+        where: { id: { in: itemsToDelete } },
+        data: { isDeleted: true, deletedAt: new Date() },
+      });
+    }
+
+    // Fetch the updated cart items to return to the user
+    const updatedCarts = await prisma.orderItem.findMany({
+      where: {
+        userId,
+        orderItemType: OrderItemType.CART_ITEM,
+        isDeleted: false,
+      },
+      include: { stock: { include: { product: { include: { images: true } } } } },
+    });
+
+    console.log("Updated Cart Items:", updatedCarts);
+    return updatedCarts;
   };
 
-  static getCartItemCount = async (userId: string) => {
-    const cartItems = await CartService.getCart(userId);
+  static getCartItemCount = async (userId: string, res: Response) => {
+    const cartItems = await CartService.getCart(userId, res);
     return cartItems.reduce((total, item) => total + item.quantity, 0);
   };
 }

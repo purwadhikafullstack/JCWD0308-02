@@ -1,44 +1,21 @@
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { TableRow, TableCell } from '@/components/ui/table';
-import { Order } from '@/lib/types/order';
-import React from 'react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { TableRow, TableCell } from "@/components/ui/table";
+import { Order } from "@/lib/types/order";
+import Image from "next/image";
+import React from "react";
 type OrderTableRowProps = {
   index: number;
   order: Order;
   handleStatusChange: (orderId: string, newStatus: string) => void;
 };
 
-export const OrderTableRow: React.FC<OrderTableRowProps> = ({
-  index,
-  order,
-  handleStatusChange,
-}) => (
+export const OrderTableRow: React.FC<OrderTableRowProps> = ({ index, order, handleStatusChange }) => (
   <TableRow>
     <TableCell>{index + 1}</TableCell>
     <TableCell>{order.id}</TableCell>
     <TableCell>
-      {[
-        'AWAITING_PAYMENT',
-        'AWAITING_CONFIRMATION',
-        'PROCESS',
-        'SHIPPING',
-        'DELIVERED',
-
-        'CANCELLED',
-
-      ].includes(order.orderStatus) ? (
-        <select
-          className="bg-gray-300 p-2 rounded-xl"
-          value={order.orderStatus}
-          onChange={(e) => handleStatusChange(order.id, e.target.value)}
-        >
+      {["AWAITING_PAYMENT", "AWAITING_CONFIRMATION", "PROCESS", "SHIPPING", "DELIVERED", "CANCELLED"].includes(order.orderStatus) ? (
+        <select className="bg-gray-300 p-2 rounded-xl" value={order.orderStatus} onChange={(e) => handleStatusChange(order.id, e.target.value)}>
           <option value="AWAITING_PAYMENT">Awaiting Payment</option>
           <option value="AWAITING_CONFIRMATION">Awaiting Confirmation</option>
           <option value="PROCESS">Process</option>
@@ -46,7 +23,6 @@ export const OrderTableRow: React.FC<OrderTableRowProps> = ({
           <option value="DELIVERED">Delivered</option>
 
           <option value="CANCELLED">Cancelled</option>
-
         </select>
       ) : (
         <span>{order.orderStatus}</span>
@@ -70,20 +46,21 @@ export const OrderTableRow: React.FC<OrderTableRowProps> = ({
           <DialogTrigger className="text-primary">Open</DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>{order.paymentPicture}</DialogTitle>
+              <DialogTitle>Payment Picture</DialogTitle>
             </DialogHeader>
+            <figure>
+              <Image src={order.paymentPicture} width={50} height={50} alt="payment proof" />
+            </figure>
           </DialogContent>
         </Dialog>
       ) : (
-        ''
+        "payment picture error or not found"
       )}
     </TableCell>
     <TableCell>{order.storeId}</TableCell>
     <TableCell>{order.storeAdminId}</TableCell>
-    <TableCell>{order.isDeleted ? 'Yes' : 'No'}</TableCell>
-    <TableCell>
-      {order.deletedAt ? new Date(order.deletedAt).toLocaleDateString() : 'N/A'}
-    </TableCell>
+    <TableCell>{order.isDeleted ? "Yes" : "No"}</TableCell>
+    <TableCell>{order.deletedAt ? new Date(order.deletedAt).toLocaleDateString() : "N/A"}</TableCell>
     <TableCell>{new Date(order.updatedAt).toLocaleDateString()}</TableCell>
     <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
   </TableRow>
