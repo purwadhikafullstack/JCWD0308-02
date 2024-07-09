@@ -1,26 +1,20 @@
 import Link from 'next/link';
-import { SigninForm } from './_components/signin-form';
+import { UserAuthForm } from './_components/user-auth-form';
 
-export default function Signin() {
+export default function Signup() {
   return (
     <div className="container relative h-[inherit] flex flex-col items-center justify-center ">
       <div className="lg:p-8">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-4 sm:w-[350px]">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
           <div className="flex flex-col space-y-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Sign in to Grosirun
+              Create an account
             </h1>
             <p className="text-sm text-muted-foreground">
-              Don&apos;t have an account?{' '}
-              <Link
-                className="text-primary hover:underline"
-                href={'/auth/signup'}
-              >
-                Sign Up
-              </Link>
+              Enter your email below to create your account
             </p>
           </div>
-          <SigninForm />
+          <UserAuthForm />
           <p className="px-8 text-center text-sm text-muted-foreground">
             By clicking continue, you agree to our{' '}
             <Link
