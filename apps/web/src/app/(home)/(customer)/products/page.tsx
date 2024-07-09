@@ -69,7 +69,7 @@ const ProductList = () => {
   };
 
   const handleTitleClick = (slug: string) => {
-    router.push(`/product/detail/${slug}`);
+    router.push(`/products/detail/${slug}`);
   };
 
   return (
