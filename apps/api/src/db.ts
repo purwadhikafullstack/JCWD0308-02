@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { logger } from './utils/logger.js';
 import { createPool } from 'mysql2/promise';
+import { DATABASE_HOST, DATABASE_NAME, DATABASE_PASSWORD, DATABASE_PORT, DATABASE_USER } from './config.js';
 
 export const prisma = new PrismaClient({
   log: [
@@ -39,11 +40,11 @@ prisma.$on('error', (e) => {
   logger.error(e)
 })
 
-export const db = createPool({
+export const pool = createPool({
   connectionLimit: 10,
-  database: "",
-  host: "",
-  port: 3306,
-  user: "",
-  password: "",
+  database: DATABASE_NAME,
+  host: DATABASE_HOST,
+  port: DATABASE_PORT,
+  user: DATABASE_USER,
+  password: DATABASE_PASSWORD,
 })
