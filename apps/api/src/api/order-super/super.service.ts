@@ -1,26 +1,17 @@
-import { prisma } from '@/db.js';
-import { ChangeStatusRequest } from '@/types/order.type.js';
-import { ResponseError } from '@/utils/error.response.js';
-import { Validation } from '@/utils/validation.js';
-import { Response } from 'express';
-import { ConfirmPaymentValidation } from './super.validation.js';
-import { OrderStatus, PaymentMethod } from '@prisma/client';
+import { prisma } from "@/db.js";
+import { ChangeStatusRequest } from "@/types/order.type.js";
+import { ResponseError } from "@/utils/error.response.js";
+import { Validation } from "@/utils/validation.js";
+import { Response } from "express";
+import { ConfirmPaymentValidation } from "./super.validation.js";
+import { OrderStatus, PaymentMethod } from "@prisma/client";
 
-import {
-  getEmailTemplate,
-  getOrderWithUser,
-  sendConfirmationEmail,
-  updateOrderStatus,
-} from '@/helpers/order/confirmPaymentByAdmin.js';
-import { mapNewStatus } from '@/helpers/order/mapNewStatus.js';
+import { getEmailTemplate, getOrderWithUser, sendConfirmationEmail, updateOrderStatus } from "@/helpers/order/confirmPaymentByAdmin.js";
+import { mapNewStatus } from "@/helpers/order/mapNewStatus.js";
 export class OrderSuperService {
   //for super admin
 
-  static getAllOrders = async (
-    page: number,
-    perPage: number,
-    res: Response,
-  ) => {
+  static getAllOrders = async (page: number, perPage: number, res: Response) => {
     const storeId = res.locals.store?.id;
     const role = res.locals.user?.role;
     const store = await prisma.store.findUnique({
@@ -32,12 +23,12 @@ export class OrderSuperService {
     const storeAdminId = storeAdmin?.storeAdminId;
 
     let whereClause;
-    if (role === 'SUPER_ADMIN') {
+    if (role === "SUPER_ADMIN") {
       whereClause = { storeId };
-    } else if (role === 'STORE_ADMIN') {
-      whereClause = { storeAdminId };
+    } else if (role === "STORE_ADMIN") {
+      whereClause = { storeId };
     } else {
-      throw new ResponseError(401, 'Unauthorized role');
+      throw new ResponseError(401, "Unauthorized role");
     }
 
     const orders = await prisma.order.findMany({
@@ -45,7 +36,7 @@ export class OrderSuperService {
       include: {
         orderItems: { include: { stock: { include: { product: true } } } },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       skip: perPage * (page - 1),
       take: perPage,
     });
@@ -56,27 +47,22 @@ export class OrderSuperService {
   };
 
   static confirmPayment = async (req: ChangeStatusRequest, res: Response) => {
-    const { orderId, newStatus } = Validation.validate(
-      ConfirmPaymentValidation.CONFIRM_PAYMENT,
-      req,
-    );
+    const { orderId, newStatus } = Validation.validate(ConfirmPaymentValidation.CONFIRM_PAYMENT, req);
     const order = await getOrderWithUser(orderId);
 
-    if (!order) throw new ResponseError(404, 'Order not found');
-    if (order.orderStatus !== 'AWAITING_CONFIRMATION')
-      throw new ResponseError(400, 'Order is not awaiting confirmation');
-    if (PaymentMethod.MANUAL && !order.paymentPicture)
-      throw new ResponseError(400, 'Order can not be processed');
+    if (!order) throw new ResponseError(404, "Order not found");
+    if (order.orderStatus !== "AWAITING_CONFIRMATION") throw new ResponseError(400, "Order is not awaiting confirmation");
+    if (PaymentMethod.MANUAL && !order.paymentPicture) throw new ResponseError(400, "Order can not be processed");
     const user = order.user;
     const mappedStatus: OrderStatus = mapNewStatus(newStatus);
-    const templateName =
-      newStatus === 'PROCESS'
-        ? 'paymentConfirmed.html'
-        : 'paymentRejected.html';
-    const subject = 'Welcome to Grosirun - Payment Confirmation';
-    const html = getEmailTemplate(templateName, { name: user.displayName });
+    // const templateName =
+    //   newStatus === 'PROCESS'
+    //     ? 'paymentConfirmed.html'
+    //     : 'paymentRejected.html';
+    // const subject = 'Welcome to Grosirun - Payment Confirmation';
+    // const html = getEmailTemplate(templateName, { name: user.displayName });
 
-    await sendConfirmationEmail(user.email, subject, html);
+    // await sendConfirmationEmail(user.email, subject, html);
     const updated = await updateOrderStatus(orderId, mappedStatus);
 
     return updated;

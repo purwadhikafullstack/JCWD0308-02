@@ -13,6 +13,7 @@ import FieldProvince from './field/province';
 import FieldCity from './field/city';
 import FieldStatus from './field/status';
 import { Store } from '@/lib/types/store';
+import { Button } from '@/components/ui/button';
 
 export function UpdateStoreForm({
   store,
@@ -92,7 +93,7 @@ export function UpdateStoreForm({
           form={form}
           errorMessage={createNewStore?.error?.errors?.fieldErrors?.status}
         />
-        <Submit type="submit">Save new changes</Submit>
+        <Button type="submit">Save new changes</Button>
       </form>
     </Form>
   );
