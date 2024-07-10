@@ -58,18 +58,6 @@ export default function FieldCoordinate({
                 value={field.value || ''}
                 {...form.register('coordinate')}
               />
-              {/* <Input
-                type="hidden"
-                id="latitude"
-                value={form.getValues('latitude')}
-                {...form.register('latitude')}
-              />
-              <Input
-                type="hidden"
-                id="longitude"
-                value={form.getValues('longitude')}
-                {...form.register('longitude')}
-              /> */}
             </>
           </FormControl>
           <FormDescription>

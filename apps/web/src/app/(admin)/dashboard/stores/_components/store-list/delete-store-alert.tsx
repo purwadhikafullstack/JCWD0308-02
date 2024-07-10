@@ -29,8 +29,6 @@ export default function DeleteStoreDialog({ store }: { store: Store }) {
     onSuccess: (data) => {
       router.refresh()
       toast(`${data.deletedStore?.name} store has been deleted!`, { duration: 4000 });
-      // handleClose();
-      // router.push(`/dashboard/stores/${data.store.id}`)
     },
     onError: (data) => {
 
@@ -38,7 +36,6 @@ export default function DeleteStoreDialog({ store }: { store: Store }) {
         description: data.error,
         duration: 4000,
       });
-      // handleClose();
     },
   });
   return (
@@ -55,7 +52,6 @@ export default function DeleteStoreDialog({ store }: { store: Store }) {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>Cancel</AlertDialogCancel>
-        {/* <AlertDialogAction asChild> */}
         <Button
           onClick={async () => {
             await action.mutateAsync(store.id);
@@ -64,7 +60,6 @@ export default function DeleteStoreDialog({ store }: { store: Store }) {
         >
           Delete
         </Button>
-        {/* </AlertDialogAction> */}
       </AlertDialogFooter>
     </AlertDialogContent>
   );

@@ -33,27 +33,18 @@ const UserDropdown = () => {
           <DropdownMenuItem>
             <ShoppingCart className="mr-2 h-4 w-4" />
             <span>Cart</span>
-            <DropdownMenuShortcut>10</DropdownMenuShortcut>
           </DropdownMenuItem>
         </Link>
         <Link href={'/orders'}>
           <DropdownMenuItem>
             <ReceiptText className="mr-2 h-4 w-4" />
             <span>Orders</span>
-            <DropdownMenuShortcut>3</DropdownMenuShortcut>
           </DropdownMenuItem>
         </Link>
         <Link href={'/vouchers'}>
           <DropdownMenuItem>
             <Percent className="mr-2 h-4 w-4" />
             <span>Vouchers</span>
-            <DropdownMenuShortcut>3</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </Link>
-        <Link href={'/dashboard/wishlist'}>
-          <DropdownMenuItem>
-            <Heart className="mr-2 h-4 w-4" />
-            <span>Wishlist</span>
           </DropdownMenuItem>
         </Link>
       </DropdownMenuGroup>

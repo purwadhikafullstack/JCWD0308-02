@@ -3,8 +3,7 @@
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-import { FaGithub, FaGoogle, FaSpinner } from 'react-icons/fa';
-import { z } from 'zod';
+import { FaSpinner } from 'react-icons/fa';
 import { Form, Submit } from '@/components/ui/form';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import fetchAPI from '@/lib/fetchAPI';

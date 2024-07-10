@@ -26,8 +26,8 @@ export class StockService {
       take: limit,
       where,
       include: {
-        product: true, 
-        store: true,  
+        product: true,
+        store: true,
       },
     });
     const total = await prisma.stock.count({ where });

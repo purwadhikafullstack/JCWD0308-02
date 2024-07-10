@@ -1,6 +1,8 @@
 'use client';
 
 import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { fetchCart, fetchCartItemCount } from '@/lib/features/cart/cartSlice';
+import { useAppDispatch } from '@/lib/features/hooks';
 import { signout } from '@/lib/fetch-api/user/client';
 import { useMutation } from '@tanstack/react-query';
 import { LogOut } from 'lucide-react';
@@ -8,7 +10,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 export const Signout = () => {
-  const router = useRouter()
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const { mutateAsync } = useMutation<{ message: string }, { error: string }>({
     mutationFn: async () => {
       try {
@@ -18,8 +21,8 @@ export const Signout = () => {
 
         const data = await res.json();
 
-        router.refresh()
-        router.replace('/auth/signin')
+        router.refresh();
+        router.replace('/auth/signin');
 
         return data;
       } catch (error) {
@@ -27,6 +30,8 @@ export const Signout = () => {
       }
     },
     onSuccess: (data) => {
+      dispatch(fetchCart());
+      dispatch(fetchCartItemCount());
       toast.success(data.message);
     },
     onError: (error) => {

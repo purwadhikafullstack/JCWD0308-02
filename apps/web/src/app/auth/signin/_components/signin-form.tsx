@@ -21,13 +21,15 @@ interface SigninFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function SigninForm({ className, ...props }: SigninFormProps) {
   const searchParams = useSearchParams();
-  const [isShow, setIsShow] = React.useState(false);
-  const form = useSigninForm();
+  const redirect = searchParams.get('redirect') || '/';
 
+  const [isShow, setIsShow] = React.useState(false);
+
+  const form = useSigninForm();
+  
   const signin = useSignin();
 
   async function onSubmit(values: z.infer<typeof SigninFormSchema>) {
-    const redirect = searchParams.get('redirect');
     await signin.mutateAsync({ data: values, redirect: redirect || '/' });
   }
 
@@ -86,12 +88,14 @@ export function SigninForm({ className, ...props }: SigninFormProps) {
       <div className="flex flex-col items-center gap-2 w-full">
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full flex p-0 items-center justify-center"
           type="button"
           disabled={signin.isPending}
-          asChild
         >
-          <Link href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/github`}>
+          <Link
+            className="flex items-center justify-center w-full text-center"
+            href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/github?redirectTo=${redirect}`}
+          >
             {signin.isPending ? (
               <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (
@@ -102,12 +106,14 @@ export function SigninForm({ className, ...props }: SigninFormProps) {
         </Button>
         <Button
           variant="outline"
-          className="w-full"
+          className="w-full flex p-0 items-center justify-center"
           type="button"
           disabled={signin.isPending}
-          asChild
         >
-          <Link href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/google`}>
+          <Link
+            className="flex items-center justify-center w-full text-center"
+            href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/google?redirectTo=${redirect}`}
+          >
             {signin.isPending ? (
               <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
             ) : (

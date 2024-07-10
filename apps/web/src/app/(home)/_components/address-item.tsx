@@ -76,6 +76,7 @@ export default function AddressItem({
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button
+                disabled={address.id === data?.address?.id}
                 variant={'ghost'}
                 size={'icon'}
                 className="h-3 w-3 text-destructive"

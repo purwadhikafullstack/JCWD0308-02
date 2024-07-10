@@ -5,7 +5,6 @@ import { getUserProfile } from "@/lib/fetch-api/user/client";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { MapPinIcon } from "lucide-react";
 import React, { useState } from "react";
-import dynamic from "next/dynamic";
 import UserAddressDialog from "./user-address-dialog";
 
 export default function UserAddress() {
