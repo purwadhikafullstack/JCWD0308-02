@@ -6,7 +6,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 interface CartSlice {
   items: CartItemType[];
   itemCount: number;
-  error: string | null;
+  error: any | null;
 }
 
 const initialState: CartSlice = {
@@ -20,8 +20,8 @@ export const deleteCartItem = createAsyncThunk("cart/deleteCartItem", async (car
     const res = await deleteCart(cartId);
     console.log("res from cartslice:", res);
     return cartId;
-  } catch (error) {
-    return rejectWithValue(error);
+  } catch (error: any) {
+    return rejectWithValue(error.message);
   }
 });
 
@@ -30,8 +30,8 @@ export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ a
     const res = await updateCart({ addressId, productId, quantity });
     console.log("res from updatedCartItem: ", res);
     return res;
-  } catch (error) {
-    return rejectWithValue(error);
+  } catch (error: any) {
+    return rejectWithValue(error.message);
   }
 });
 
@@ -61,8 +61,8 @@ export const fetchCartItemCount = createAsyncThunk("cart/fetchCartItemCount", as
   try {
     const response = await getCartItemCount();
     return response.data;
-  } catch (error) {
-    return rejectWithValue(error);
+  } catch (error: any) {
+    return rejectWithValue(error.message);
   }
 });
 
@@ -70,8 +70,8 @@ export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { rejectWi
   try {
     const response = await getCart();
     return response.data;
-  } catch (error) {
-    return rejectWithValue(error);
+  } catch (error: any) {
+    return rejectWithValue(error.message);
   }
 });
 

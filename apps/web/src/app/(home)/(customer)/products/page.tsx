@@ -1,14 +1,14 @@
-'use client';
-import React, { useState } from 'react';
-import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Category } from '@/lib/types/category';
-import { Product } from '@/lib/types/product';
-import { fetchProducts } from '@/lib/fetch-api/product';
-import { fetchCategories } from '@/lib/fetch-api/category/client';
-import Pagination from '@/components/partial/pagination';
-import { handleApiError } from '@/components/toast/toastutils';
-import ProductCard from './_component/ProductCard';
+"use client";
+import React, { useState } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Category } from "@/lib/types/category";
+import { Product } from "@/lib/types/product";
+import { fetchProducts } from "@/lib/fetch-api/product";
+import { fetchCategories } from "@/lib/fetch-api/category/client";
+import Pagination from "@/components/partial/pagination";
+import { handleApiError } from "@/components/toast/toastutils";
+import ProductCard from "./_component/ProductCard";
 
 const ProductList = () => {
   const router = useRouter();
@@ -25,7 +25,7 @@ const ProductList = () => {
   const fetchData = async () => {
     setLoading(true);
     setError(null);
-    const query = searchParams.get('search');
+    const query = searchParams.get("search");
     const filters: any = {};
     if (query) {
       filters.search = query;
@@ -34,11 +34,11 @@ const ProductList = () => {
       const [productData, categoryData] = await Promise.all([fetchProducts(page, limit, filters), fetchCategories()]);
       setProducts(productData.products);
       setTotal(productData.total);
-      setCategories([{ id: 'all', name: 'All Categories', superAdminId: '' }, ...categoryData]);
+      setCategories([{ id: "all", name: "All Categories", superAdminId: "" }, ...categoryData]);
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('Failed to fetch data');
-      handleApiError(error, 'Failed to fetch data');
+      console.error("Error fetching data:", error);
+      setError("Failed to fetch data");
+      handleApiError(error, "Failed to fetch data");
     } finally {
       setLoading(false);
     }
@@ -51,19 +51,19 @@ const ProductList = () => {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     const params = new URLSearchParams(searchParams);
-    params.set('page', newPage.toString());
+    params.set("page", newPage.toString());
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
 
   const handleCategoryFilterChange = (categoryId: string) => {
     const params = new URLSearchParams(searchParams);
-    if (categoryId === 'all') {
-      params.delete('categoryId');
+    if (categoryId === "all") {
+      params.delete("categoryId");
     } else {
-      params.set('categoryId', categoryId);
+      params.set("categoryId", categoryId);
     }
-    params.set('page', '1');
+    params.set("page", "1");
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
@@ -87,7 +87,7 @@ const ProductList = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Categories</SelectLabel>
-                {categories.map(category => (
+                {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -107,7 +107,7 @@ const ProductList = () => {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {products.map(product => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} onTitleClick={handleTitleClick} />
             ))}
           </div>

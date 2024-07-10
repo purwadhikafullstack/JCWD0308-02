@@ -1,9 +1,19 @@
-import { prisma } from '@/db.js';
-import { transporter } from '@/helpers/nodemailers.js';
-import handlebars from 'handlebars';
-import path from 'path';
-import fs from 'fs';
-import { OrderStatus } from '@prisma/client';
+import { prisma } from "@/db.js";
+import { transporter } from "@/helpers/nodemailers.js";
+import handlebars from "handlebars";
+import path from "path";
+import fs from "fs";
+import { OrderStatus } from "@prisma/client";
+import { MAIL_USER, WEB_URL } from "@/config.js";
+import { fileURLToPath } from "url";
+
+type ISendEmailVerifyProps = { id?: number; isActive?: boolean; displayName?: string; email: string; token: String };
+type ISendEmailVerify = (props: ISendEmailVerifyProps) => Promise<void>;
+
+const __filename = fileURLToPath(import.meta.url);
+
+const __dirname = path.dirname(__filename);
+
 export const getOrderWithUser = async (orderId: string) => {
   return prisma.order.findUnique({
     where: { id: orderId },
@@ -12,17 +22,13 @@ export const getOrderWithUser = async (orderId: string) => {
 };
 
 export const getEmailTemplate = (templateName: string, context: any) => {
-  const templatePath = path.join(__dirname, '../template', templateName);
-  const templateSource = fs.readFileSync(templatePath, 'utf-8');
+  const templatePath = path.join(__dirname, "../template", templateName);
+  const templateSource = fs.readFileSync(templatePath, "utf-8");
   const compiledTemplate = handlebars.compile(templateSource);
   return compiledTemplate(context);
 };
 
-export const sendConfirmationEmail = async (
-  userEmail: any,
-  subject: string,
-  html: string,
-) => {
+export const sendConfirmationEmail = async (userEmail: any, subject: string, html: string) => {
   await transporter.sendMail({
     from: process.env.MAIL_USER,
     to: userEmail,
@@ -31,10 +37,7 @@ export const sendConfirmationEmail = async (
   });
 };
 
-export const updateOrderStatus = async (
-  orderId: string,
-  newStatus: OrderStatus,
-) => {
+export const updateOrderStatus = async (orderId: string, newStatus: OrderStatus) => {
   await prisma.order.update({
     where: { id: orderId },
     data: { orderStatus: newStatus },

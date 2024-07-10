@@ -1,12 +1,13 @@
-'use client';
-import React, { useEffect, useRef } from 'react';
-import { getSelectedAddress } from '@/lib/fetch-api/address/client';
-import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { NearestStock } from '@/lib/types/stock';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
+"use client";
+import React, { useEffect, useRef } from "react";
+import { getSelectedAddress } from "@/lib/fetch-api/address/client";
+import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { NearestStock } from "@/lib/types/stock";
+import Image from "next/image";
+import Link from "next/link";
+import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { getUserProfile } from "@/lib/fetch-api/user/client";
 
 interface ProductItemProps {
   stock: NearestStock;
@@ -14,12 +15,16 @@ interface ProductItemProps {
 }
 
 const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+  });
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const interval = setInterval(() => {
       if (carouselRef.current) {
-        const nextButton = carouselRef.current.querySelector('.carousel-next') as HTMLButtonElement;
+        const nextButton = carouselRef.current.querySelector(".carousel-next") as HTMLButtonElement;
         if (nextButton) {
           nextButton.click();
         }
@@ -39,14 +44,7 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
             product.images.map((image, index) => (
               <CarouselItem key={index} className="w-full h-64">
                 <div className="relative w-full h-64">
-                  <Image
-                    src={image.imageUrl}
-                    alt={`${product.title} image ${index + 1}`}
-                    layout="fill"
-                    objectFit="cover"
-                    className="rounded-t-lg"
-                    priority={index === 0}
-                  />
+                  <Image src={image.imageUrl} alt={`${product.title} image ${index + 1}`} layout="fill" objectFit="cover" className="rounded-t-lg" priority={index === 0} />
                 </div>
               </CarouselItem>
             ))
@@ -63,24 +61,16 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
       </Carousel>
       <div className="relative z-20 mt-2">
         <div className="h-20 flex items-center justify-center text-center">
-          <h3 className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3">
-            {product.title}
-          </h3>
+          <h3 className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3">{product.title}</h3>
         </div>
         <div className="h-12 mt-2 flex flex-col justify-center">
-          <p className="text-xs font-semibold text-gray-500 line-through">
-            Rp {product.price?.toLocaleString() ?? 'N/A'}
-          </p>
-          <p className="text-xl font-semibold text-primary">
-            Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}
-          </p>
+          <p className="text-xs font-semibold text-gray-500 line-through">Rp {product.price?.toLocaleString() ?? "N/A"}</p>
+          <p className="text-xl font-semibold text-primary">Rp {product.discountPrice?.toLocaleString() ?? "N/A"}</p>
         </div>
       </div>
       <div className="mt-4">
-        <Link href={`/product/detail/${product.slug}`}>
-          <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">
-            Buy
-          </div>
+        <Link href={`/products/detail/${product.slug}`}>
+          <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">Buy</div>
         </Link>
       </div>
     </div>
@@ -89,11 +79,11 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
 
 export default function FeaturedProducts() {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks'],
+    queryKey: ["nearest-stocks"],
     queryFn: getNearestStocks,
   });
   const selectedAddress = useSuspenseQuery({
-    queryKey: ['selected-address'],
+    queryKey: ["selected-address"],
     queryFn: getSelectedAddress,
   });
 
@@ -110,14 +100,8 @@ export default function FeaturedProducts() {
     <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
       <div className="container px-4 md:px-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
-            Featured Products
-          </h2>
-          <Link
-            href="/product"
-            className="text-sm font-medium text-primary hover:underline underline-offset-4"
-            prefetch={false}
-          >
+          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">Featured Products</h2>
+          <Link href="/product" className="text-sm font-medium text-primary hover:underline underline-offset-4" prefetch={false}>
             View All
           </Link>
         </div>
