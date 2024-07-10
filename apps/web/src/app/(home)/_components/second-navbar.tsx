@@ -73,8 +73,12 @@ export default function SecondNavbar() {
   });
 
   const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks'],
-    queryFn: getNearestStocks,
+    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryFn: async ({ queryKey }) => {
+      // const [_, page, limit, queryString] = queryKey;
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    }
   });
 
   const form = useForm<z.infer<typeof formSchema>>({

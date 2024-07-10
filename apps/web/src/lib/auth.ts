@@ -15,59 +15,19 @@ export interface User {
 }
 
 export type auth = { user: User; session: Session; } | { user: null; session: null; }
-
-// export const adapter = new Mysql2Adapter(pool, {
-// 	user: "users",
-// 	session: 'sessions'
-// })
-
-// export const lucia = new Lucia(adapter, {
-// 	sessionCookie: {
-// 		attributes: {
-// 			secure: env.NODE_ENV === "production"
-// 		}
-// 	},
-// 	getUserAttributes: (attributes) => {
-// 		return {
-// 			displayName: attributes.display_name,
-// 			role: attributes.role,
-// 		}
-// 	}
-// })
-
-// declare module "lucia" {
-// 	interface Register {
-// 		Lucia: typeof lucia;
-// 		DatabaseUserAttributes: Omit<DatabaseUser, "id">;
-// 	}
-// }
-
-// const setSession = (result: auth) => {
-// 	try {
-// 		if (result.session && result.session.fresh) {
-// 			const sessionCookie = lucia.createSessionCookie(result.session.id);
-// 			cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-// 		}
-// 		if (!result.session) {
-// 			const sessionCookie = lucia.createBlankSessionCookie();
-// 			cookies().set(sessionCookie.name, sessionCookie.value, sessionCookie.attributes);
-// 		}
-// 	} catch { }
-// }
-
 export const validateRequest = cache(async (): Promise<auth> => {
-	// const sessionId = cookies().get(lucia.sessionCookieName)?.value ?? null;
-
-	// const result = await lucia.validateSession(sessionId!);
-
-	// setSession(result);
-
-	// return result;
+	
 	const res = await fetchSSR(`${env.NEXT_PUBLIC_BASE_API_URL}/auth/session`)
 	const auth = await res.json()
 	
 	return auth
 })
+
+
+export const getUserRole = async (): Promise<string | null> => {
+	const auth = await validateRequest();
+	return auth.user ? auth.user.role : null;
+  }
 
 const authenticated = cache(async () => {
 	const request = await validateRequest()

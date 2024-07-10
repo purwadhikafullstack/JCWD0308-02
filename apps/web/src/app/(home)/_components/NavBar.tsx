@@ -31,7 +31,7 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (query) {
-      router.push(`/product?search=${query}`);
+      router.push(`/products?search=${query}`);
     }
   };
 
@@ -62,7 +62,7 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
                           <ListItem
                             key={item.id}
                             title={item.name}
-                            href={`/category`}
+                            href={`/products?categoryId=${item.id}`}
                           />
                         ))
                       ) : (

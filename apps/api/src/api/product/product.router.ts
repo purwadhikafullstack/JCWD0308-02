@@ -17,12 +17,14 @@ export class ProductRouter {
   }
 
   private initializeRoutes(): void {
-    this.router.get("/", this.productController.getProducts);
-    this.router.get("/:id", AuthMiddleware.authed, this.productController.getProductById);
-    this.router.post("/", AuthMiddleware.superAdmin, uploader("PRODUCT").array("images", 10), convertSpecificFieldsToNumber(numberFields), this.productController.createProduct);
-    this.router.put("/:id", AuthMiddleware.superAdmin, uploader("PRODUCT").array("images", 10), convertSpecificFieldsToNumber(numberFields), this.productController.updateProduct);
-    this.router.delete("/:id", AuthMiddleware.superAdmin, this.productController.deleteProduct);
-    this.router.get("/detail/:slug", this.productController.getProductBySlug);
+
+    this.router.get('/', this.productController.getProducts);
+    this.router.get('/:id', this.productController.getProductById);
+    this.router.post('/', AuthMiddleware.superAdmin, uploader('PRODUCT').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.createProduct);
+    this.router.put('/:id', AuthMiddleware.superAdmin, uploader('PRODUCT').array('images', 10), convertSpecificFieldsToNumber(numberFields), this.productController.updateProduct);
+    this.router.delete('/:id', AuthMiddleware.superAdmin, this.productController.deleteProduct);
+    this.router.get('/detail/:slug', AuthMiddleware.authed, this.productController.getProductBySlug);
+
   }
 
   public getRouter(): Router {

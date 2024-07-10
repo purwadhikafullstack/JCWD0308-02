@@ -69,9 +69,19 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
         </div>
       </div>
       <div className="mt-4">
-        <Link href={`/products/detail/${product.slug}`}>
-          <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">Buy</div>
-        </Link>
+
+        {stock.amount > 0 ? (
+          <Link href={`/products/detail/${product.slug}`}>
+            <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">
+              Buy
+            </div>
+          </Link>
+        ) : (
+          <div className="bg-gray-500 text-white text-center py-2 w-full rounded-lg cursor-not-allowed text-base">
+            Product Out of Stock 
+          </div>
+        )}
+
       </div>
     </div>
   );
@@ -79,9 +89,13 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
 
 export default function FeaturedProducts() {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ["nearest-stocks"],
-    queryFn: getNearestStocks,
+    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryFn: async ({ queryKey }) => {
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    }
   });
+
   const selectedAddress = useSuspenseQuery({
     queryKey: ["selected-address"],
     queryFn: getSelectedAddress,
@@ -100,8 +114,15 @@ export default function FeaturedProducts() {
     <section className="w-full py-6 sm:py-10 md:py-12 lg:py-14">
       <div className="container px-4 md:px-6">
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">Featured Products</h2>
-          <Link href="/product" className="text-sm font-medium text-primary hover:underline underline-offset-4" prefetch={false}>
+
+          <h2 className="text-2xl font-bold sm:text-3xl md:text-4xl">
+            Featured Products
+          </h2>
+          <Link
+            href="/products"
+            className="text-sm font-medium text-primary hover:underline underline-offset-4"
+            prefetch={false}
+          >
             View All
           </Link>
         </div>
