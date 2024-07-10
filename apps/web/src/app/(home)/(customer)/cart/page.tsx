@@ -13,14 +13,23 @@ import { formatCurrency } from "@/lib/currency";
 import { useRouter } from "next/navigation";
 import { CartItemType } from "@/lib/types/cart";
 import { Separator } from "@/components/ui/separator";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
+import { Alert } from "@/components/ui/alert";
 
 export default function Cart() {
   const dispatch = useAppDispatch();
   const carts = useAppSelector((state: RootState) => state.cart.items);
-  console.log("carts:", carts);
   const [selectedItem, setSelectedItems] = useState<{ [key: string]: boolean }>({});
   const [selectAll, setSelectAll] = useState<boolean>(false);
+  const [isCheckoutDisabled, setIsCheckoutDisabled] = useState<boolean>(true);
   const router = useRouter();
+  const nearestStocks = useSuspenseQuery({
+    queryKey: ["nearest-stocks"],
+    queryFn: getNearestStocks,
+  });
+
+  const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
 
   useEffect(() => {
     const fetchCartData = async () => {
@@ -31,8 +40,6 @@ export default function Cart() {
           isChecked: false,
         }));
         dispatch(setCart(updatedCartData));
-        console.log("cartData:", updatedCartData);
-        console.log("updated:", updatedCartData);
       } catch (error) {
         console.error("Error fetching cart data:", error);
       }
@@ -47,8 +54,6 @@ export default function Cart() {
         const price = item.isPack ? item.stock.product.packPrice : item.stock.product.price;
         return acc + item.quantity * price;
       }
-      console.log("items:", items);
-      console.log("items pack:", items[0].isPack);
       return acc;
     }, 0);
   }
@@ -65,6 +70,7 @@ export default function Cart() {
     }
     setSelectedItems(newSelectedItems);
     setSelectAll(!selectAll);
+    setIsCheckoutDisabled(!Object.values(newSelectedItems).some((isSelected) => isSelected));
   };
 
   useEffect(() => {
@@ -73,17 +79,14 @@ export default function Cart() {
       initialSelectedItems[`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`] = cart.isChecked || false;
     });
     setSelectedItems(initialSelectedItems);
-    console.log("initialSelectedItems:", initialSelectedItems);
+    setIsCheckoutDisabled(!Object.values(initialSelectedItems).some((isSelected) => isSelected));
   }, [carts]);
 
   const handleSelectedItem = async (itemId: string, isPack: boolean) => {
-    console.log("handle selected items");
     const key = `${itemId}-${isPack !== undefined ? isPack.toString() : "missing"}`;
-    const newSelectedItems = {
-      ...selectedItem,
-      [key]: !selectedItem[key],
-    };
+    const newSelectedItems = { ...selectedItem, [key]: !selectedItem[key] };
     setSelectedItems(newSelectedItems);
+    setIsCheckoutDisabled(!Object.values(newSelectedItems).some((isSelected) => isSelected));
     try {
       await checkCart(itemId, newSelectedItems[key]);
       console.log(`Item ${itemId} isChecked updated to ${newSelectedItems[key]}`);
@@ -96,9 +99,7 @@ export default function Cart() {
   };
 
   const handleCheckout = () => {
-    console.log("handle checkout");
     const selectedCarts = Object.keys(selectedItem).filter((key) => selectedItem[key]);
-    console.log("selected carts:", selectedCarts);
     const selectedItems = carts.filter((cart: any) => selectedCarts.includes(`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`));
 
     if (selectedItems.length > 0) {
@@ -137,10 +138,17 @@ export default function Cart() {
 
             <Separator className="mb-4" />
             <div className="flex justify-center">
-              <Button variant="default" className="w-full" onClick={handleCheckout}>
+              <Button variant="default" className="w-full" onClick={isCheckoutDisabled || !isServiceAvailable ? undefined : handleCheckout} disabled={isCheckoutDisabled || !isServiceAvailable}>
                 Checkout
               </Button>
             </div>
+            {(isCheckoutDisabled || !isServiceAvailable) && (
+              <div className="mt-4 ">
+                <Alert variant="default" className="text-destructive">
+                  {!isServiceAvailable ? "Service is not available in your area." : "Please select at least one item to checkout."}
+                </Alert>
+              </div>
+            )}
           </div>
           <div className="flex max-md:hidden max-md:overflow-y-hidden"></div>
         </div>
