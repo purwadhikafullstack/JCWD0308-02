@@ -8,6 +8,7 @@ export const OrderValidation = {
     service: z.string(),
     note: z.string(),
     voucherId: z.string().uuid().optional(),
+    serviceDescription: z.string().optional(),
   }),
 };
 

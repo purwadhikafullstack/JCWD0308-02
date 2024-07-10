@@ -1,7 +1,6 @@
 import { prisma } from "@/db.js";
 import { getCourierType, OrderRequest } from "@/types/order.type.js";
 import { getPaymentLink } from "./paymentGateway.js";
-import { getEstimatedDeliveryDate } from "./addOrderHelper.js";
 import { PaymentMethod } from "@prisma/client";
 import { Response } from "express";
 
@@ -9,7 +8,6 @@ export const prepareOrderData = async (orderRequest: any, userId: any, nearestSt
   const { discountProducts, discountShippingCost } = discounts;
   const { finalTotalPrice, finalShippingCost, totalPayment } = calculateFinalPrices(totalPrice, cost, discountProducts, discountShippingCost);
   const orderStatus = "AWAITING_PAYMENT";
-  const formattedEstimation = getEstimatedDeliveryDate(estimation);
   return {
     orderRequest,
     userId,
@@ -17,7 +15,7 @@ export const prepareOrderData = async (orderRequest: any, userId: any, nearestSt
     updatedCartItem,
     finalTotalPrice,
     finalShippingCost,
-    formattedEstimation,
+    estimation,
     orderStatus,
     discountProducts,
     discountShippingCost,
@@ -38,10 +36,6 @@ export const createOrder = async (
   discountShippingCost: number,
   totalPayment: number,
 ) => {
-  const storeId = nearestStore?.id;
-
-  // console.log("Store Admin tes:", storeAdmin);
-  console.log("nearestStore:", nearestStore);
   return await prisma.order.create({
     data: {
       userId,
@@ -49,11 +43,9 @@ export const createOrder = async (
       paymentMethod: orderRequest.paymentMethod as PaymentMethod,
       courier: getCourierType(orderRequest.courier),
       service: orderRequest.service,
-      serviceDescription: "Layanan Reguler",
+      serviceDescription: orderRequest.serviceDescription,
       estimation,
       storeId: nearestStore?.id,
-      // storeAdmin: storeAdmin?.id,
-      // storeAdminId: 'grosirun admin',
       note: orderRequest.note,
       totalPrice: finalTotalPrice,
       shippingCost: finalShippingCost,
