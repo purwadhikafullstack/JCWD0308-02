@@ -25,30 +25,9 @@ export class OrderService {
     const { cost, estimation } = await calculateShipping(nearestStore, cityId, weight, orderRequest.courier);
 
     const discounts = await applyDiscounts(orderRequest, totalPrice, cost, updatedCartItem.length);
-    const { finalTotalPrice, finalShippingCost, orderStatus, discountProducts, discountShippingCost, totalPayment } = await prepareOrderData(
-      orderRequest,
-      userId,
-      nearestStore,
-      updatedCartItem,
-      totalPrice,
-      cost,
-      estimation,
-      discounts,
-    );
+    const { finalTotalPrice, finalShippingCost, orderStatus, discountProducts, discountShippingCost, totalPayment } = await prepareOrderData(orderRequest, userId, nearestStore, updatedCartItem, totalPrice, cost, estimation, discounts);
 
-    const newOrder = await createOrder(
-      orderRequest,
-      userId,
-      nearestStore,
-      updatedCartItem,
-      finalTotalPrice,
-      finalShippingCost,
-      estimation,
-      orderStatus,
-      discountProducts,
-      discountShippingCost,
-      totalPayment,
-    );
+    const newOrder = await createOrder(orderRequest, userId, nearestStore, updatedCartItem, finalTotalPrice, finalShippingCost, estimation, orderStatus, discountProducts, discountShippingCost, totalPayment);
 
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
     const paymentLink = await handlePaymentLinkCreation(orderRequest, newOrder, totalPayment);
@@ -112,7 +91,7 @@ export class OrderService {
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
-        paymentPicture: `${process.env.WEB_URL}/public/${fileName}`,
+        paymentPicture: `${process.env.API_URL}/public/images/${fileName}`,
         orderStatus: "AWAITING_CONFIRMATION",
       },
     });
