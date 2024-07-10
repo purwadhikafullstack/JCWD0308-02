@@ -1,14 +1,32 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { fetchCategories, deleteCategory, updateCategory, createCategory } from '@/lib/fetch-api/category/client';
+import {
+  fetchCategories,
+  deleteCategory,
+  updateCategory,
+  createCategory,
+} from '@/lib/fetch-api/category/client';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { CreateCategoryForm } from './_components/create-category/CreateCategoryForm';
 import { EditCategoryForm } from './_components/update-category/EditCategoryForm';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Category } from '@/lib/types/category';
-import { Card, CardHeader, CardFooter, CardTitle, CardContent } from '@/components/ui/card';
+import {
+  Card,
+  CardHeader,
+  CardFooter,
+  CardTitle,
+  CardContent,
+} from '@/components/ui/card';
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { handleApiError, showSuccess } from '@/components/toast/toastutils';
 import DeleteCategoryDialog from './_components/dialogs/DeleteCategoriesDialog';
@@ -22,12 +40,16 @@ const CategoryList = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<Category | null>(
+    null,
+  );
   const [creatingCategory, setCreatingCategory] = useState<boolean>(false);
-  const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
+  const [deletingCategory, setDeletingCategory] = useState<Category | null>(
+    null,
+  );
 
   const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
+    queryKey: ['user-profile'],
     queryFn: getUserProfile,
   });
 
@@ -66,7 +88,9 @@ const CategoryList = () => {
   const handleUpdate = async (id: string, formData: FormData) => {
     try {
       const result = await updateCategory(id, formData);
-      setCategories(categories.map(cat => (cat.id === result.id ? result : cat)));
+      setCategories(
+        categories.map((cat) => (cat.id === result.id ? result : cat)),
+      );
       setSelectedCategory(null);
       showSuccess('Category updated successfully!');
     } catch (error) {
@@ -77,7 +101,7 @@ const CategoryList = () => {
   const handleDelete = async (category: Category) => {
     try {
       await deleteCategory(category.id);
-      setCategories(categories.filter(cat => cat.id !== category.id));
+      setCategories(categories.filter((cat) => cat.id !== category.id));
       setDeletingCategory(null);
       showSuccess('Category deleted successfully!');
     } catch (error) {
@@ -85,9 +109,12 @@ const CategoryList = () => {
     }
   };
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
 
   if (error) {
     return <p>{error}</p>;
@@ -95,7 +122,9 @@ const CategoryList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-4xl font-extrabold mb-6 text-center text-primary">Categories</h2>
+      <h2 className="text-4xl font-extrabold mb-6 text-center text-primary">
+        Categories
+      </h2>
       {!isStoreAdmin && (
         <Button onClick={() => setCreatingCategory(true)} className="mb-4">
           Create Category
@@ -107,7 +136,9 @@ const CategoryList = () => {
         </DialogTrigger>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-primary">Create Category</DialogTitle>
+            <DialogTitle className="text-2xl font-bold text-primary">
+              Create Category
+            </DialogTitle>
             <DialogDescription className="mb-4">
               Fill in the form below to create a new category.
             </DialogDescription>
@@ -121,7 +152,10 @@ const CategoryList = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {categories.map((category) => (
-          <Card key={category.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <Card
+            key={category.id}
+            className="shadow-lg hover:shadow-xl transition-shadow duration-300"
+          >
             <CardHeader className="flex items-center ">
               <div className="flex-shrink-0 w-16 h-16">
                 <Image
@@ -133,7 +167,9 @@ const CategoryList = () => {
                   style={{ width: '64px', height: '64px' }}
                 />
               </div>
-              <CardTitle className="text-primary text-2xl font-bold">{category.name}</CardTitle>
+              <CardTitle className="text-primary text-2xl font-bold">
+                {category.name}
+              </CardTitle>
             </CardHeader>
             <CardContent className="flex justify-center mb-2">
               <div className="w-full h-48 relative">
@@ -149,15 +185,23 @@ const CategoryList = () => {
             <CardFooter className="flex justify-end space-x-2">
               {!isStoreAdmin && (
                 <>
-                  <Dialog open={selectedCategory?.id === category.id} onOpenChange={(open) => open || setSelectedCategory(null)}>
+                  <Dialog
+                    open={selectedCategory?.id === category.id}
+                    onOpenChange={(open) => open || setSelectedCategory(null)}
+                  >
                     <DialogTrigger asChild>
-                      <Button variant="secondary" onClick={() => setSelectedCategory(category)}>
+                      <Button
+                        variant="secondary"
+                        onClick={() => setSelectedCategory(category)}
+                      >
                         <FaEdit />
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle className="text-2xl font-bold text-primary">Edit Category</DialogTitle>
+                        <DialogTitle className="text-2xl font-bold text-primary">
+                          Edit Category
+                        </DialogTitle>
                         <DialogDescription className="mb-4">
                           Update the category details below.
                         </DialogDescription>
@@ -170,7 +214,10 @@ const CategoryList = () => {
                     </DialogContent>
                   </Dialog>
 
-                  <Button variant="destructive" onClick={() => setDeletingCategory(category)}>
+                  <Button
+                    variant="destructive"
+                    onClick={() => setDeletingCategory(category)}
+                  >
                     <FaTrashAlt />
                   </Button>
                 </>
@@ -184,7 +231,11 @@ const CategoryList = () => {
         <DeleteCategoryDialog
           category={deletingCategory}
           onClose={() => setDeletingCategory(null)}
-          onDeleteSuccess={() => setCategories(categories.filter(cat => cat.id !== deletingCategory.id))}
+          onDeleteSuccess={() =>
+            setCategories(
+              categories.filter((cat) => cat.id !== deletingCategory.id),
+            )
+          }
         />
       )}
     </div>

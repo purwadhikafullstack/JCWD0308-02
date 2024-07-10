@@ -3,7 +3,15 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Toaster } from '@/components/ui/sonner';
 import { Category } from '@/lib/types/category';
 import { Product } from '@/lib/types/product';
@@ -44,10 +52,16 @@ const ProductList = () => {
       setError(null);
 
       try {
-        const [productData, categoryData] = await Promise.all([fetchProducts(page, limit, filters), fetchCategories()]);
+        const [productData, categoryData] = await Promise.all([
+          fetchProducts(page, limit, filters),
+          fetchCategories(),
+        ]);
         setProducts(productData.products);
         setTotal(productData.total);
-        setCategories([{ id: 'all', name: 'All Categories', superAdminId: '' }, ...categoryData]);
+        setCategories([
+          { id: 'all', name: 'All Categories', superAdminId: '' },
+          ...categoryData,
+        ]);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to fetch data');
@@ -122,12 +136,19 @@ const ProductList = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">Products</h2>
-      <p className="text-lg mb-8 text-center text-gray-700">Manage your products here.</p>
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">
+        Products
+      </h2>
+      <p className="text-lg mb-8 text-center text-gray-700">
+        Manage your products here.
+      </p>
       <SearchBar onSearch={handleSearch} />
       <div className="flex justify-between items-center mb-6">
-        {userProfile.data?.user?.role !== 'STORE_ADMIN' && ( 
-          <Button onClick={() => setCreatingProduct(true)} className="px-6 py-2">
+        {userProfile.data?.user?.role !== 'STORE_ADMIN' && (
+          <Button
+            onClick={() => setCreatingProduct(true)}
+            className="px-6 py-2"
+          >
             Create Product
           </Button>
         )}
@@ -139,7 +160,7 @@ const ProductList = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Categories</SelectLabel>
-                {categories.map(category => (
+                {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -150,14 +171,29 @@ const ProductList = () => {
         </div>
       </div>
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="h-screen flex justify-center items-center">
+          <span className="loader"></span>
+        </div>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <ProductTable products={products} onTitleClick={(id: string) => router.push(`products/${id}`)} />
-          <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
-          {creatingProduct && <CreateProductForm onCreate={handleCreate} onCancel={() => setCreatingProduct(false)} />}
+          <ProductTable
+            products={products}
+            onTitleClick={(id: string) => router.push(`products/${id}`)}
+          />
+          <Pagination
+            total={total}
+            page={page}
+            limit={limit}
+            onPageChange={handlePageChange}
+          />
+          {creatingProduct && (
+            <CreateProductForm
+              onCreate={handleCreate}
+              onCancel={() => setCreatingProduct(false)}
+            />
+          )}
         </>
       )}
     </div>

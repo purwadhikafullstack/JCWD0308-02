@@ -60,9 +60,6 @@ const ListOrderItem: React.FC<OrderItemProps> = ({ order }) => {
               Quantity: {item.quantity}
               {item.isPack && ` (Pack of ${item.stock.product.packQuantity})`}
             </p>
-            <div className="flex gap-2 mt-2">
-              <Button className="hover:underline">View Product</Button>
-            </div>
           </div>
         </div>
       ))}

@@ -1,61 +1,50 @@
-import axios from 'axios';
+import axios from "axios";
+import { API_URL } from "./lib";
 
-export const fetchStocks = async (
-  page: number = 1,
-  limit: number = 8,
-  filters: any = {},
-) => {
+export const fetchStocks = async (page: number = 1, limit: number = 8, filters: any = {}) => {
   const query = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
     ...filters,
   }).toString();
-  const res = await axios.get(`http://localhost:8000/api/stock?${query}`, {
+  const res = await axios.get(`${API_URL}/stock?${query}`, {
     withCredentials: true,
   });
   if (res.status !== 200) {
-    throw new Error('Failed to fetch stocks');
+    throw new Error("Failed to fetch stocks");
   }
   return res.data;
 };
 
 export const fetchStockById = async (id: string) => {
-  const response = await axios.get(`http://localhost:8000/api/stock/${id}`, {
+  const response = await axios.get(`${API_URL}/stock/${id}`, {
     withCredentials: true,
   });
   return response.data;
 };
 
 export const createStock = async (stockData: any) => {
-  const response = await axios.post(
-    `http://localhost:8000/api/stock`,
-    stockData,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
+  const response = await axios.post(`${API_URL}/stock`, stockData, {
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    withCredentials: true,
+  });
   return response.data;
 };
 
 export const updateStockAmount = async (id: string, stockData: any) => {
-  const response = await axios.put(
-    `http://localhost:8000/api/stock/${id}`,
-    stockData,
-    {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      withCredentials: true,
+  const response = await axios.put(`${API_URL}/stock/${id}`, stockData, {
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    withCredentials: true,
+  });
   return response.data;
 };
 
 export const deleteStock = async (id: string) => {
-  const response = await axios.delete(`http://localhost:8000/api/stock/${id}`, {
+  const response = await axios.delete(`${API_URL}/stock/${id}`, {
     withCredentials: true,
   });
   return response.data;
@@ -63,10 +52,10 @@ export const deleteStock = async (id: string) => {
 
 export const postStockId = async (productId: string, addressId: string) => {
   const res = await axios.post(
-    `http://localhost:8000/api/stock/post-stock-id`,
+    `${API_URL}/stock/post-stock-id`,
     { productId, addressId },
     {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { "Content-Type": "application/json" },
       withCredentials: true,
     },
   );

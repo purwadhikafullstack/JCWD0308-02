@@ -1,38 +1,31 @@
-import { prisma } from '@/db.js';
-import { CartRequest, UpdateCartRequest } from '@/types/cart.type.js';
-import { ResponseError } from '@/utils/error.response.js';
-import { Validation } from '@/utils/validation.js';
-import { CartValidation, patchCartValidation } from './cart.validation.js';
-import { Response } from 'express';
-import {
-  findNearestStore,
-} from '../distance/distance.service.js';
-import { OrderItemType } from '@prisma/client';
+import { prisma } from "@/db.js";
+import { CartRequest, UpdateCartRequest } from "@/types/cart.type.js";
+import { ResponseError } from "@/utils/error.response.js";
+import { Validation } from "@/utils/validation.js";
+import { CartValidation, patchCartValidation } from "./cart.validation.js";
+import { Response } from "express";
+import { findNearestStore, findStoresInRange } from "../distance/distance.service.js";
+import { OrderItemType } from "@prisma/client";
 
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
-    const cartRequest: CartRequest = Validation.validate(
-      CartValidation.CART,
-      req,
-    );
+    const cartRequest: CartRequest = Validation.validate(CartValidation.CART, req);
 
     const user = await prisma.user.findUnique({
       where: { id: res.locals.user?.id },
       select: { id: true, status: true, role: true, addresses: true },
     });
 
-    const userAddress = user?.addresses.find(
-      (address: any) => address.id === cartRequest.addressId,
-    );
+    const userAddress = user?.addresses.find((address: any) => address.id === cartRequest.addressId);
 
-    if (!userAddress) throw new ResponseError(401, 'Address not found!');
+    if (!userAddress) throw new ResponseError(401, "Address not found!");
     const { nearestStore } = await findNearestStore(cartRequest.addressId);
-    if (!nearestStore) throw new ResponseError(404, 'Nearest store not found!');
+    if (!nearestStore) throw new ResponseError(404, "Nearest store not found!");
 
     const stock = await prisma.stock.findFirst({
       where: { productId: cartRequest.productId, storeId: nearestStore.id },
     });
-    if (!stock) throw new ResponseError(400, 'Stock not found!');
+    if (!stock) throw new ResponseError(400, "Stock not found!");
 
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
@@ -45,7 +38,6 @@ export class CartService {
     });
 
     if (existingCartItem) {
-      console.log('Updating existing cart item:', existingCartItem);
       const updatedCartItem = await prisma.orderItem.update({
         where: { id: existingCartItem.id },
         data: {
@@ -53,7 +45,7 @@ export class CartService {
           isChecked: false,
         },
       });
-      console.log('Updated cart item:', updatedCartItem);
+      console.log("Updated cart item:", updatedCartItem);
       return updatedCartItem;
     }
     const orderItem = await prisma.orderItem.create({
@@ -66,47 +58,38 @@ export class CartService {
         orderItemType: OrderItemType.CART_ITEM,
       },
     } as any);
-    console.log('orderItem:', orderItem);
+    console.log("orderItem:", orderItem);
     return orderItem;
   };
 
   static updateCart = async (req: UpdateCartRequest, res: Response) => {
-    const patchCart: UpdateCartRequest = Validation.validate(
-      patchCartValidation.CART,
-      req,
-    );
+    const patchCart: UpdateCartRequest = Validation.validate(patchCartValidation.CART, req);
     const userId = res.locals.user?.id;
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: { addresses: true },
     });
 
-    const userAddress = user?.addresses.find(
-      (address: any) => address.id === patchCart?.addressId,
-    );
+    const userAddress = user?.addresses.find((address: any) => address.id === patchCart?.addressId);
 
-    if (!userAddress) throw new ResponseError(401, 'Address not found!');
+    if (!userAddress) throw new ResponseError(401, "Address not found!");
     const { nearestStore } = await findNearestStore(patchCart.addressId);
-    if (!nearestStore) throw new ResponseError(404, 'Nearest store not found!');
+    if (!nearestStore) throw new ResponseError(404, "Nearest store not found!");
 
     const stock = await prisma.stock.findFirst({
       where: { productId: patchCart.productId, storeId: nearestStore.id },
     });
-    if (!stock)
-      throw new ResponseError(
-        400,
-        'Stock not found in any nearby or central store!',
-      );
+    if (!stock) throw new ResponseError(400, "Stock not found in any nearby or central store!");
     const cartItem = await prisma.orderItem.findFirst({
       where: {
         userId,
         stockId: stock.id,
-        orderItemType: 'CART_ITEM',
+        orderItemType: "CART_ITEM",
         isDeleted: false,
       },
     });
 
-    if (!cartItem) throw new ResponseError(401, 'Item not found in cart!');
+    if (!cartItem) throw new ResponseError(401, "Item not found in cart!");
 
     const newQuantity = patchCart.quantity || 0;
     if (newQuantity <= 0) {
@@ -138,12 +121,12 @@ export class CartService {
       where: {
         id: cartId,
         userId,
-        orderItemType: 'CART_ITEM',
+        orderItemType: "CART_ITEM",
         isDeleted: false,
       },
     });
 
-    if (!cartItem) throw new ResponseError(404, 'Cart item not found');
+    if (!cartItem) throw new ResponseError(404, "Cart item not found");
 
     const deleteCart = await prisma.orderItem.update({
       where: { id: cartItem.id },
@@ -156,10 +139,9 @@ export class CartService {
     const newAddressId = res.locals.address?.id;
     // const userId = res.locals.user?.id;
     if (!newAddressId || !userId) {
-      throw new ResponseError(403, 'there is no address and user');
+      throw new ResponseError(403, "there is no address and user");
     }
-    const { nearestStore: newNearestStore } =
-      await findNearestStore(newAddressId);
+    const { nearestStore: newNearestStore } = await findNearestStore(newAddressId);
     const carts = await prisma.orderItem.findMany({
       where: {
         userId,
@@ -170,9 +152,7 @@ export class CartService {
         stock: { include: { product: { include: { images: true } } } },
       },
     });
-    const itemsToDelete = carts
-      .filter((item) => item.stock.storeId !== newNearestStore?.id)
-      .map((item) => item.id);
+    const itemsToDelete = carts.filter((item) => item.stock.storeId !== newNearestStore?.id).map((item) => item.id);
 
     if (itemsToDelete.length > 0) {
       await prisma.orderItem.updateMany({

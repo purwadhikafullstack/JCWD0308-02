@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
@@ -7,14 +7,20 @@ import { Toaster, toast } from '@/components/ui/sonner';
 import { Voucher } from '@/lib/types/voucher';
 import { Button } from '@/components/ui/button';
 import EditForm from '../_components/forms/EditVoucherForm';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 const VoucherDetail: React.FC = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const id = pathname.split('/').pop(); 
+  const id = pathname.split('/').pop();
   const [voucher, setVoucher] = useState<Voucher | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,8 +29,8 @@ const VoucherDetail: React.FC = () => {
   const API_BASE_URL = 'http://localhost:8000'; // Define your API base URL here
 
   const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
-    queryFn: getUserProfile
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
   });
 
   const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
@@ -62,7 +68,11 @@ const VoucherDetail: React.FC = () => {
   };
 
   if (loading) {
-    return <p className="text-center text-gray-500">Loading...</p>;
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
   }
 
   if (error) {
@@ -82,7 +92,9 @@ const VoucherDetail: React.FC = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">{voucher.name}</h2>
+      <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">
+        {voucher.name}
+      </h2>
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <div className="relative w-full h-64 bg-indigo-100">
           {voucher.imageUrl && (
@@ -98,6 +110,7 @@ const VoucherDetail: React.FC = () => {
         <div className="p-4">
           <p className="text-lg mb-4 text-gray-700">{voucher.description}</p>
           <div className="space-y-1 text-sm">
+
             <p className="text-gray-800"><strong>Claimable:</strong> {voucher.isClaimable ? 'Yes' : 'No'}</p>
             <p className="text-gray-800"><strong>Private:</strong> {voucher.isPrivate ? 'Yes' : 'No'}</p>
             <p className="text-gray-800"><strong>Type:</strong> {voucher.voucherType}</p>
@@ -128,7 +141,11 @@ const VoucherDetail: React.FC = () => {
               Update the details of the voucher below.
             </DialogDescription>
           </DialogHeader>
-          <EditForm voucher={voucher} onUpdate={handleUpdate} onCancel={() => setEditing(false)} />
+          <EditForm
+            voucher={voucher}
+            onUpdate={handleUpdate}
+            onCancel={() => setEditing(false)}
+          />
         </DialogContent>
       </Dialog>
     </div>

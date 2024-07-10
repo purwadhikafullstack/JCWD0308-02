@@ -1,7 +1,11 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { getVouchers, createVoucher, deleteVoucher } from '@/lib/fetch-api/voucher';
+import {
+  getVouchers,
+  createVoucher,
+  deleteVoucher,
+} from '@/lib/fetch-api/voucher';
 import { Toaster } from '@/components/ui/sonner';
 import { Voucher } from '../../../../lib/types/voucher';
 import VoucherCard from './_components/cards/VoucherCard';
@@ -9,7 +13,13 @@ import VoucherFilters from './_components/filters/VoucherFilters';
 import CreateForm from './_components/forms/CreateVoucherForm';
 import Pagination from '@/components/partial/pagination';
 import SearchBar from '@/components/partial/SearchBar';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { handleApiError } from '@/components/toast/toastutils';
 import { showSuccess } from '@/components/toast/toastutils';
@@ -41,8 +51,8 @@ const VoucherManagement = () => {
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
 
   const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
-    queryFn: getUserProfile
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
   });
 
   const selectedStore = useSuspenseQuery({
@@ -118,36 +128,56 @@ const VoucherManagement = () => {
   };
 
   const getVoucherIcon = (voucher: Voucher): StaticImageData => {
-    if (voucher.voucherType === 'PRODUCT' && voucher.discountType === 'FIXED_DISCOUNT') {
+    if (
+      voucher.voucherType === 'PRODUCT' &&
+      voucher.discountType === 'FIXED_DISCOUNT'
+    ) {
       return fixedDiscountProduct;
-    } else if (voucher.voucherType === 'PRODUCT' && voucher.discountType === 'DISCOUNT') {
+    } else if (
+      voucher.voucherType === 'PRODUCT' &&
+      voucher.discountType === 'DISCOUNT'
+    ) {
       return discountProduct;
-    } else if (voucher.voucherType === 'SHIPPING_COST' && voucher.discountType === 'FIXED_DISCOUNT') {
+    } else if (
+      voucher.voucherType === 'SHIPPING_COST' &&
+      voucher.discountType === 'FIXED_DISCOUNT'
+    ) {
       return shippingCash;
-    } else if (voucher.voucherType === 'SHIPPING_COST' && voucher.discountType === 'DISCOUNT') {
+    } else if (
+      voucher.voucherType === 'SHIPPING_COST' &&
+      voucher.discountType === 'DISCOUNT'
+    ) {
       return shippingDiscount;
     }
-    return fixedDiscountProduct; 
+    return fixedDiscountProduct;
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">Vouchers</h2>
-      <p className="text-lg mb-8 text-center text-gray-700">Manage your vouchers here.</p>
+      <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">
+        Vouchers
+      </h2>
+      <p className="text-lg mb-8 text-center text-gray-700">
+        Manage your vouchers here.
+      </p>
       <SearchBar onSearch={handleSearch} />
+
       <VoucherFilters handleCreate={() => setCreatingVoucher(true)} />
+
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="h-screen flex justify-center items-center">
+          <span className="loader"></span>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {vouchers.map((voucher) => (
-              <VoucherCard 
-                key={voucher.id} 
-                voucher={voucher} 
-                handleDelete={() => setDeletingVoucher(voucher)} 
-                getVoucherIcon={getVoucherIcon} 
+              <VoucherCard
+                key={voucher.id}
+                voucher={voucher}
+                handleDelete={() => setDeletingVoucher(voucher)}
+                getVoucherIcon={getVoucherIcon}
                 isStoreAdmin={isStoreAdmin}
               />
             ))}
@@ -157,7 +187,10 @@ const VoucherManagement = () => {
               <DialogHeader>
                 <DialogTitle>Create New Voucher</DialogTitle>
                 <DialogDescription>
-                  <CreateForm onCreate={handleCreate} onCancel={() => setCreatingVoucher(false)} />
+                  <CreateForm
+                    onCreate={handleCreate}
+                    onCancel={() => setCreatingVoucher(false)}
+                  />
                 </DialogDescription>
               </DialogHeader>
             </DialogContent>
@@ -169,7 +202,12 @@ const VoucherManagement = () => {
               onDeleteSuccess={() => setUpdateFlag(!updateFlag)}
             />
           )}
-          <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
+          <Pagination
+            total={total}
+            page={page}
+            limit={limit}
+            onPageChange={handlePageChange}
+          />
         </>
       )}
     </div>

@@ -28,8 +28,12 @@ const OrderDetailPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  console.log('order:', order);
-  if (!order) return <p>Loading...</p>;
+  if (!order)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
 
   return (
     <div className="h-screen flex flex-col justify-center items-center">
