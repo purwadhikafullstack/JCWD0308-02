@@ -12,7 +12,8 @@ export const getNearestStocks = async (
   total: number,
   page: number,
   limit: number,
-  store: Store
+  store: Store,
+  isServiceAvailable : boolean
 }> => {
   const query = new URLSearchParams({
     ...filters,

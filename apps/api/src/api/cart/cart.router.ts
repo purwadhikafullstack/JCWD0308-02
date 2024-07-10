@@ -2,7 +2,7 @@ import { Router } from "express";
 import { CartController } from "./cart.controller.js";
 import { AuthMiddleware } from "@/middlewares/auth.middleware.js";
 import multer from "multer";
-import { CartMiddleWare } from "@/middlewares/cart.middleware.js";
+
 
 export class CartRouter {
   private router: Router;

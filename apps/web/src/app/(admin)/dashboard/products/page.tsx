@@ -1,9 +1,8 @@
-"use client";
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-
 import { Button } from '@/components/ui/button';
-
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Toaster } from '@/components/ui/sonner';
 import { Category } from '@/lib/types/category';
@@ -15,6 +14,8 @@ import Pagination from '@/components/partial/pagination';
 import ProductTable from './_components/table/ProductTable';
 import CreateProductForm from './_components/forms/CreateProductForm';
 import { handleApiError, showSuccess } from '@/components/toast/toastutils';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 const ProductList = () => {
   const router = useRouter();
@@ -30,6 +31,12 @@ const ProductList = () => {
   const [limit, setLimit] = useState<number>(8);
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
+
+  // Fetch user profile to determine role
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,7 +126,11 @@ const ProductList = () => {
       <p className="text-lg mb-8 text-center text-gray-700">Manage your products here.</p>
       <SearchBar onSearch={handleSearch} />
       <div className="flex justify-between items-center mb-6">
-        <Button onClick={() => setCreatingProduct(true)} className="px-6 py-2">Create Product</Button>
+        {userProfile.data?.user?.role !== 'STORE_ADMIN' && ( 
+          <Button onClick={() => setCreatingProduct(true)} className="px-6 py-2">
+            Create Product
+          </Button>
+        )}
         <div className="w-1/4">
           <Select onValueChange={handleCategoryFilterChange}>
             <SelectTrigger aria-label="Category Filter">

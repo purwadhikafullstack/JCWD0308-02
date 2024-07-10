@@ -10,8 +10,8 @@ const FormFields: React.FC = () => {
   const { control, register } = useFormContext();
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      <div>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 col-span-full">
+      <div className='col-span-2'>
         <Label htmlFor="name">Name</Label>
         <Controller
           name="name"

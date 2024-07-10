@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Category } from '@/lib/types/category';
 import { useFormData } from '../hooks/UseFormData';
 import FormFields from '../fields/FormFields';
-import ImageUploader from './ImageProductUploader';
+import ImageUploader, { validateFileExtension } from './ImageProductUploader';
+
 
 interface CreateFormProps {
   onCreate: (product: FormData) => void;
@@ -43,6 +44,19 @@ const CreateProductForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) =>
     onCreate(data);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => validateFileExtension(file.name));
+
+    if (validFiles.length !== files.length) {
+      alert('Some files have invalid extensions and were not added.');
+    }
+
+    setImages(validFiles);
+    const urls = validFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+  };
+
   return (
     <div className="z-20 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <Card className="w-[900px] max-h-[90vh] overflow-y-auto">
@@ -55,7 +69,7 @@ const CreateProductForm: React.FC<CreateFormProps> = ({ onCreate, onCancel }) =>
             <FormFields formData={formData} handleChange={handleChange} categories={categories} />
             <ImageUploader
               previewUrls={previewUrls}
-              handleImageChange={handleImageChange}
+              handleImageChange={handleFileChange}
               setImages={setImages}
               setPreviewUrls={setPreviewUrls}
             />

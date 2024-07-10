@@ -9,7 +9,7 @@ import { Stock } from '@/lib/types/stock';
 import { Product } from '@/lib/types/product';
 import { Store } from '@/lib/types/store';
 import { handleApiError, showSuccess } from '@/components/toast/toastutils';
-import { getAllStores } from '@/lib/fetch-api/store/client';
+import { getAllStores, getSelectedStore } from '@/lib/fetch-api/store/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import StockTable from './_components/tables/StockTable';
@@ -35,6 +35,26 @@ const StockList = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [storeFilter, setStoreFilter] = useState<string>('all');
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile
+  });
+
+  const selectedStore = useSuspenseQuery({
+    queryKey: ["selected-store"],
+    queryFn: getSelectedStore
+  });
+
+  const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
+  const selectedStoreId = selectedStore.data?.store?.id;
+
+  useEffect(() => {
+    if (isStoreAdmin && selectedStoreId) {
+      setStoreFilter(selectedStoreId);
+      setFilters((prevFilters: any) => ({ ...prevFilters, storeId: selectedStoreId }));
+    }
+  }, [isStoreAdmin, selectedStoreId]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -130,11 +150,6 @@ const StockList = () => {
     router.replace(url);
   };
 
-  const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
-    queryFn: getUserProfile
-  })
-
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">Stocks</h2>
@@ -144,7 +159,8 @@ const StockList = () => {
         stores={stores}
         storeFilter={storeFilter}
         handleStoreFilterChange={handleStoreFilterChange}
-        handleCreate={() => setCreatingStock(true)}
+        handleCreate={() => !isStoreAdmin && setCreatingStock(true)}
+        isStoreAdmin={isStoreAdmin}
       />
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -161,16 +177,21 @@ const StockList = () => {
                 setDeletingStock(stock);
               }
             }}
+            isStoreAdmin={isStoreAdmin}
           />
-          {creatingStock && (
-            <CreateStockForm onCreate={handleCreate} onCancel={() => setCreatingStock(false)} products={products} stores={stores} />
-          )}
-          {deletingStock && (
-            <DeleteStockDialog
-              stock={deletingStock}
-              onClose={() => setDeletingStock(null)}
-              onDeleteSuccess={() => setUpdateFlag(!updateFlag)}
-            />
+          {!isStoreAdmin && (
+            <>
+              {creatingStock && (
+                <CreateStockForm onCreate={handleCreate} onCancel={() => setCreatingStock(false)} products={products} stores={stores} />
+              )}
+              {deletingStock && (
+                <DeleteStockDialog
+                  stock={deletingStock}
+                  onClose={() => setDeletingStock(null)}
+                  onDeleteSuccess={() => setUpdateFlag(!updateFlag)}
+                />
+              )}
+            </>
           )}
           <Pagination
             total={total}

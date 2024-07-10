@@ -12,6 +12,8 @@ import { Card, CardHeader, CardFooter, CardTitle, CardContent } from '@/componen
 import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 import { handleApiError, showSuccess } from '@/components/toast/toastutils';
 import DeleteCategoryDialog from './_components/dialogs/DeleteCategoriesDialog';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 const DEFAULT_ICON_URL = '/default-icon.png';
 const DEFAULT_IMAGE_URL = '/default-image-category.jpg';
@@ -23,6 +25,13 @@ const CategoryList = () => {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [creatingCategory, setCreatingCategory] = useState<boolean>(false);
   const [deletingCategory, setDeletingCategory] = useState<Category | null>(null);
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+  });
+
+  const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
 
   useEffect(() => {
     const fetchCategoryData = async () => {
@@ -87,9 +96,11 @@ const CategoryList = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-4xl font-extrabold mb-6 text-center text-primary">Categories</h2>
-      <Button onClick={() => setCreatingCategory(true)} className="mb-4">
-        Create Category
-      </Button>
+      {!isStoreAdmin && (
+        <Button onClick={() => setCreatingCategory(true)} className="mb-4">
+          Create Category
+        </Button>
+      )}
       <Dialog open={creatingCategory} onOpenChange={setCreatingCategory}>
         <DialogTrigger asChild>
           <div />
@@ -136,30 +147,34 @@ const CategoryList = () => {
               </div>
             </CardContent>
             <CardFooter className="flex justify-end space-x-2">
-              <Dialog open={selectedCategory?.id === category.id} onOpenChange={(open) => open || setSelectedCategory(null)}>
-                <DialogTrigger asChild>
-                  <Button variant="secondary" onClick={() => setSelectedCategory(category)}>
-                    <FaEdit />
-                  </Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle className="text-2xl font-bold text-primary">Edit Category</DialogTitle>
-                    <DialogDescription className="mb-4">
-                      Update the category details below.
-                    </DialogDescription>
-                  </DialogHeader>
-                  <EditCategoryForm
-                    category={category}
-                    handleClose={() => setSelectedCategory(null)}
-                    onSave={handleUpdate}
-                  />
-                </DialogContent>
-              </Dialog>
+              {!isStoreAdmin && (
+                <>
+                  <Dialog open={selectedCategory?.id === category.id} onOpenChange={(open) => open || setSelectedCategory(null)}>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" onClick={() => setSelectedCategory(category)}>
+                        <FaEdit />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle className="text-2xl font-bold text-primary">Edit Category</DialogTitle>
+                        <DialogDescription className="mb-4">
+                          Update the category details below.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <EditCategoryForm
+                        category={category}
+                        handleClose={() => setSelectedCategory(null)}
+                        onSave={handleUpdate}
+                      />
+                    </DialogContent>
+                  </Dialog>
 
-              <Button variant="destructive" onClick={() => setDeletingCategory(category)}>
-                <FaTrashAlt />
-              </Button>
+                  <Button variant="destructive" onClick={() => setDeletingCategory(category)}>
+                    <FaTrashAlt />
+                  </Button>
+                </>
+              )}
             </CardFooter>
           </Card>
         ))}

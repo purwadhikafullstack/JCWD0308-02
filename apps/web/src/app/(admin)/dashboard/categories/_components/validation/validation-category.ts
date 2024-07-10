@@ -17,61 +17,93 @@ export const FormSchema = z.object({
     })
     .min(1, 'This field is required'),
   iconUrl: z
-    .instanceof(FileList)
-    .refine((files) => files?.length === 1, 'Icon is required.')
+    .any()
+    .optional()
     .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 1MB.`,
+      (file) =>
+        file.length == 1
+          ? ACCEPTED_IMAGE_TYPES.includes(file?.[0]?.type)
+            ? true
+            : false
+          : true,
+      'Invalid file. choose either JPEG or PNG image',
     )
     .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      '.jpg, .jpeg, .png and .webp files are accepted.',
+      (file) =>
+        file.length == 1
+          ? file[0]?.size <= MAX_FILE_SIZE
+            ? true
+            : false
+          : true,
+      'Max file size allowed is 1MB.',
     ),
   imageUrl: z
-    .instanceof(FileList)
-    .refine((files) => files?.length === 1, 'Image is required.')
+    .any()
+    .optional()
     .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 1MB.`,
+      (file) =>
+        file.length == 1
+          ? ACCEPTED_IMAGE_TYPES.includes(file?.[0]?.type)
+            ? true
+            : false
+          : true,
+      'Invalid file. choose either JPEG or PNG image',
     )
     .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      '.jpg, .jpeg, .png and .webp files are accepted.',
+      (file) =>
+        file.length == 1
+          ? file[0]?.size <= MAX_FILE_SIZE
+            ? true
+            : false
+          : true,
+      'Max file size allowed is 1MB.',
     ),
 });
 
 export const UpdateFormSchema = z.object({
   name: z.string().min(1, 'This field is required').optional(),
   iconUrl: z
-    .instanceof(FileList)
-    .refine(
-      (files) => files?.length === 1,
-      'Icon should be one file.'
-    )
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 1MB.`,
-    )
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      '.jpg, .jpeg, .png and .webp files are accepted.',
-    )
-    .optional(),
+  .any()
+  .optional()
+  .refine(
+    (file) =>
+      file.length == 1
+        ? ACCEPTED_IMAGE_TYPES.includes(file?.[0]?.type)
+          ? true
+          : false
+        : true,
+    'Invalid file. choose either JPEG or PNG image',
+  )
+  .refine(
+    (file) =>
+      file.length == 1
+        ? file[0]?.size <= MAX_FILE_SIZE
+          ? true
+          : false
+        : true,
+    'Max file size allowed is 1MB.',
+  ),
   imageUrl: z
-    .instanceof(FileList)
-    .refine(
-      (files) => files?.length === 1,
-      'Image should be one file.'
-    )
-    .refine(
-      (files) => files?.[0]?.size <= MAX_FILE_SIZE,
-      `Max file size is 1MB.`,
-    )
-    .refine(
-      (files) => ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
-      '.jpg, .jpeg, .png and .webp files are accepted.',
-    )
-    .optional(),
+  .any()
+  .optional()
+  .refine(
+    (file) =>
+      file.length == 1
+        ? ACCEPTED_IMAGE_TYPES.includes(file?.[0]?.type)
+          ? true
+          : false
+        : true,
+    'Invalid file. choose either JPEG or PNG image',
+  )
+  .refine(
+    (file) =>
+      file.length == 1
+        ? file[0]?.size <= MAX_FILE_SIZE
+          ? true
+          : false
+        : true,
+    'Max file size allowed is 1MB.',
+  ),
 });
 
 export const useCategoryForm = (defaultValues?: Partial<z.infer<typeof FormSchema>>) =>
