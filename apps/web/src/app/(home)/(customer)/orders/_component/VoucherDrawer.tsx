@@ -5,23 +5,30 @@ import { useSuspenseQuery, useMutation } from '@tanstack/react-query';
 import { getVouchers, assignVoucherToUser, getUserVouchers } from '@/lib/fetch-api/voucher';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
+import {
+    Drawer,
+    DrawerTrigger,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerClose,
+} from '@/components/ui/drawer';
+import { Button } from '@/components/ui/button';
 import Image, { StaticImageData } from 'next/image';
 import { handleApiError, showSuccess } from '@/components/toast/toastutils';
-import {
-    Card,
-    CardHeader,
-    CardFooter,
-    CardTitle,
-    CardDescription,
-    CardContent
-} from '@/components/ui/card';
+
 import fixedDiscountProduct from '../../../../../../public/fixeddiscountproduct.png';
 import discountProduct from '../../../../../../public/discountproduct.png';
 import shippingCash from '../../../../../../public/shippingcash.png';
 import shippingDiscount from '../../../../../../public/shippingdiscount.png';
-import { Button } from '@/components/ui/button';
 
-const FullPageVouchers: React.FC = () => {
+interface VoucherDrawerProps {
+    onSelectVoucher: (voucherId: string, voucherName: string) => void;
+}
+
+const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
     const nearestStocks = useSuspenseQuery({
         queryKey: ['nearest-stocks', 1, 15, ''],
         queryFn: async ({ queryKey }) => {
@@ -55,6 +62,7 @@ const FullPageVouchers: React.FC = () => {
     }, [userVouchersError]);
 
     const [claimedVouchers, setClaimedVouchers] = useState<string[]>([]);
+    const [selectedVoucher, setSelectedVoucher] = useState<string | null>(null);
 
     useEffect(() => {
         if (userVouchers && Array.isArray(userVouchers)) {
@@ -91,39 +99,59 @@ const FullPageVouchers: React.FC = () => {
         },
     });
 
+    const handleUseVoucher = (voucherId: string, voucherName: string) => {
+        setSelectedVoucher(voucherId);
+        onSelectVoucher(voucherId, voucherName);
+        document.getElementById("voucher-drawer-close")?.click();
+    };
+
     return (
-        <div className="flex flex-col items-center  min-h-screen  bg-gray-50">
-            <h1 className="text-3xl font-bold mb-8">Available Vouchers</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full max-w-7xl px-4">
-                {filteredVouchers.map((voucher: any) => (
-                    <Card key={voucher.id} className="w-full">
-                        <CardHeader className="flex items-center p-2 bg-secondary text-secondary-foreground rounded-t-lg">
-                            <Image src={getVoucherIcon(voucher)} alt={voucher.name} width={300} height={80} className="rounded-lg" />
-                            <div className="">
-                                <CardTitle className="text-xl font-bold text-center text-primary">{voucher.name}</CardTitle>
-                                <CardDescription className="text-sm mt-4 text-center">{voucher.description}</CardDescription>
+        <Drawer>
+            <DrawerTrigger asChild>
+                <Button variant="outline">Use Voucher</Button>
+            </DrawerTrigger>
+            <DrawerContent>
+                <DrawerHeader>
+                    <DrawerTitle>Claim Your Voucher</DrawerTitle>
+                    <DrawerDescription>Select a voucher to claim it</DrawerDescription>
+                </DrawerHeader>
+                <div className="p-4 space-y-4 h-96 overflow-y-auto">
+                    {filteredVouchers.map((voucher: any) => (
+                        <div
+                            key={voucher.id}
+                            className="flex items-center p-4 border rounded-lg"
+                        >
+                            <Image src={getVoucherIcon(voucher)} alt={voucher.name} width={50} height={50} />
+                            <div className="ml-4 flex-1">
+                                <h2 className="text-lg font-bold">{voucher.name}</h2>
+                                <p className="text-sm">{voucher.description}</p>
                             </div>
-                        </CardHeader>
-                        <CardContent className="p-4">
-                            <p className="text-sm">Discount: {voucher.discountType === 'DISCOUNT' ? `${voucher.discount}%` : `Rp ${voucher.fixedDiscount.toLocaleString()}`}</p>
-                            <p className="text-sm">Minimum Order: Rp {voucher.minOrderPrice.toLocaleString()}</p>
-                            <p className="text-sm">Stock: {voucher.stock}</p>
-                            <p className="text-sm">Expires At: {new Date(voucher.expiresAt).toLocaleDateString()}</p>
-                        </CardContent>
-                        <CardFooter className="p-4 flex justify-end">
-                            <Button
-                                variant={claimedVouchers.includes(voucher.id) ? "secondary" : "default"}
-                                disabled={claimedVouchers.includes(voucher.id)}
-                                onClick={() => handleClaimVoucher.mutate(voucher.id)}
-                            >
-                                {claimedVouchers.includes(voucher.id) ? 'Claimed' : 'Claim'}
-                            </Button>
-                        </CardFooter>
-                    </Card>
-                ))}
-            </div>
-        </div>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant={claimedVouchers.includes(voucher.id) ? "secondary" : "default"}
+                                    disabled={claimedVouchers.includes(voucher.id)}
+                                    onClick={() => handleClaimVoucher.mutate(voucher.id)}
+                                >
+                                    {claimedVouchers.includes(voucher.id) ? 'Claimed' : 'Claim'}
+                                </Button>
+                                <Button
+                                    variant="default"
+                                    onClick={() => handleUseVoucher(voucher.id, voucher.name)}
+                                >
+                                    Use
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                <DrawerFooter>
+                    <DrawerClose asChild>
+                        <Button variant="outline" id="voucher-drawer-close">Close</Button>
+                    </DrawerClose>
+                </DrawerFooter>
+            </DrawerContent>
+        </Drawer>
     );
 };
 
-export default FullPageVouchers;
+export default VoucherDrawer;

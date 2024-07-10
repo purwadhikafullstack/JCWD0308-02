@@ -6,9 +6,9 @@ import { Percent, Truck } from "lucide-react";
 import { calculateShippingCost } from "@/lib/fetch-api/shipping";
 import { courierServices, formattedCourierNames } from "@/lib/courierServices";
 import { formatCurrency } from "@/lib/currency";
-import { getVouchers } from "@/lib/fetch-api/voucher";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
+import VoucherDrawer from "./VoucherDrawer";
 
 interface ShippingAndDiscountProps {
   shippingCourier: string;
@@ -39,7 +39,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
 }) => {
   const nearestStocks = useSuspenseQuery({
     queryKey: ['nearest-stocks', 1, 15, ''],
-    queryFn: async ({ queryKey }) => {
+    queryFn: async () => {
       const filters = Object.fromEntries(new URLSearchParams(String("")));
       return getNearestStocks(Number(1), Number(15), filters);
     },
@@ -83,27 +83,12 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
     setServiceDescription(selectedService?.description || "");
   };
 
-  const [productVouchers, setProductVouchers] = useState([]);
-  const [shippingVouchers, setShippingVouchers] = useState([]);
-  const [selectedProductVoucher, setSelectedProductVoucher] = useState("");
-  const [selectedShippingVoucher, setSelectedShippingVoucher] = useState("");
-
-  useEffect(() => {
-    fetchUserVouchers();
-  }, []);
-
-  const fetchUserVouchers = async () => {
-    console.log("voucher pong");
-    try {
-      const vouchers = await getVouchers();
-      const productVouchersList = vouchers.filter((voucher: any) => voucher.voucherType === "PRODUCT");
-      const shippingVouchersList = vouchers.filter((voucher: any) => voucher.voucherType === "SHIPPING COST");
-      setProductVouchers(productVouchersList);
-      setShippingVouchers(shippingVouchersList);
-    } catch (error) {
-      console.error("Error fetching vouchers:", error);
-    }
+  const handleSelectVoucher = (voucherId: string, voucherName: string) => {
+    setDiscount(voucherId);
+    setSelectedVoucherName(voucherName);
   };
+
+  const [selectedVoucherName, setSelectedVoucherName] = useState<string | null>(null);
 
   return (
     <div className="flex flex-col gap-6 md:flex-row">
@@ -156,22 +141,12 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
         </CardHeader>
         <CardContent className="p-4">
           <p>Use discount codes to save more.</p>
-          <select value={selectedProductVoucher} onChange={(e) => setSelectedProductVoucher(e.target.value)} className="w-full p-2 border rounded-md">
-            <option value="">Select Discount Product</option>
-            {productVouchers.map((voucher: any) => (
-              <option key={voucher.id} value={voucher.id}>
-                {voucher.name}
-              </option>
-            ))}
-          </select>
-          <select value={selectedShippingVoucher} onChange={(e) => setSelectedShippingVoucher(e.target.value)} className="w-full p-2 border rounded-md">
-            <option value="">Select Discount Shipping Cost</option>
-            {shippingVouchers.map((voucher: any) => (
-              <option key={voucher.id} value={voucher.id}>
-                {voucher.name}
-              </option>
-            ))}
-          </select>
+          <VoucherDrawer onSelectVoucher={handleSelectVoucher} />
+          {selectedVoucherName && (
+            <div className="mt-4">
+              <p>Selected Voucher: {selectedVoucherName}</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

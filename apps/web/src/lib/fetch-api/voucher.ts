@@ -67,6 +67,7 @@ export const deleteVoucher = async (id: string) => {
   return response.data;
 };
 
+
 export const getUserVouchers = async () => {
   try {
     const response = await axios.get(`${API_URL}/voucher-user`, {
@@ -74,6 +75,22 @@ export const getUserVouchers = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error('getuserVouchers:', error);
+    console.error('getUserVouchers:', error);
+    throw error; // Tambahkan ini untuk melemparkan kesalahan sehingga bisa ditangani di komponen React
   }
+};
+
+
+
+export const assignVoucherToUser = async (voucherId: string, userId: string) => {
+  const response = await axios.post(`${API_URL}/assign`, {
+    voucherId,
+    userId,
+  }, {
+    withCredentials: true,
+  });
+  if (response.status !== 201) {
+    throw new Error('Failed to assign voucher to user');
+  }
+  return response.data;
 };

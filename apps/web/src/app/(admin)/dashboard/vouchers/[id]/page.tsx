@@ -107,17 +107,16 @@ const VoucherDetail: React.FC = () => {
             <p className="text-gray-800"><strong>Stock:</strong> {voucher.stock}</p>
             <p className="text-gray-800"><strong>Min Order Price:</strong> {voucher.minOrderPrice}</p>
             <p className="text-gray-800"><strong>Min Order Item:</strong> {voucher.minOrderItem}</p>
+            <p className="text-gray-800"><strong>Store:</strong> {voucher.store ? voucher.store.name : 'Applicable to all stores'}</p>
             <p className="text-gray-800"><strong>Expires At:</strong> {new Date(voucher.expiresAt).toLocaleDateString()}</p>
           </div>
           <div className="flex justify-between mt-4">
             <Button variant="outline" onClick={() => router.back()}>
               Back
             </Button>
-            {!isStoreAdmin && (
-              <Button variant="secondary" onClick={() => setEditing(true)}>
-                Edit
-              </Button>
-            )}
+            <Button variant="secondary" onClick={() => setEditing(true)}>
+              Edit
+            </Button>
           </div>
         </div>
       </div>

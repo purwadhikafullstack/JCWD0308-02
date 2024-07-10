@@ -18,4 +18,5 @@ export const VoucherValidationSchema = z.object({
     if (typeof arg === 'string' || arg instanceof Date) return new Date(arg);
   }, z.date()),
   imageUrl: z.any().optional(),
+  storeId: z.string().optional().nullable(),
 });

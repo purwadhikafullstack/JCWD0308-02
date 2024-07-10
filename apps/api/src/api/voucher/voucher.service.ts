@@ -1,3 +1,4 @@
+// src/services/voucher.service.ts
 import { prisma } from '@/db.js';
 import { Validation } from '@/utils/validation.js';
 import { VoucherValidation } from './voucher.validation.js';
@@ -100,8 +101,7 @@ export class VoucherService {
     return userVoucher;
   };
 
-  static getUserVouchers = async (res: Response) => {
-    const userId = res.locals.user?.id;
+  static getUserVouchers = async (userId: string) => {
     const userVouchers = await prisma.userVoucher.findMany({
       where: { userId },
       include: { voucher: true },
