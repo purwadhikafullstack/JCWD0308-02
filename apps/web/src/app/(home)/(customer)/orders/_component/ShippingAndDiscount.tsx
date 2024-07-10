@@ -24,27 +24,16 @@ interface ShippingAndDiscountProps {
   setServiceDescription: (description: string) => void;
 }
 
-const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
-  shippingCourier,
-  setShippingCourier,
-  shippingMethod,
-  setShippingMethod,
-  discount,
-  setDiscount,
-  cityId,
-  totalWeight,
-  shippingCost,
-  setShippingCost,
-  setServiceDescription,
-}) => {
+const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({ shippingCourier, setShippingCourier, shippingMethod, setShippingMethod, discount, setDiscount, cityId, totalWeight, shippingCost, setShippingCost, setServiceDescription }) => {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks', 1, 15, ''],
-    queryFn: async () => {
+    queryKey: ["nearest-stocks", 1, 15, ""],
+    queryFn: async ({ queryKey }) => {
       const filters = Object.fromEntries(new URLSearchParams(String("")));
       return getNearestStocks(Number(1), Number(15), filters);
     },
   });
   const [shippingEstimation, setShippingEstimation] = useState<string | null>(null);
+  const [selectedVoucher, setSelectedVoucher] = useState<any>(null);
   const origin = nearestStocks?.data?.store?.cityId;
 
   useEffect(() => {
@@ -62,7 +51,6 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
           setShippingEstimation(result.estimation);
         } catch (error) {
           console.error("Failed to fetch shipping cost:", error);
-          alert("There is no this shipping service to your destination");
         }
       }
     };
@@ -89,6 +77,20 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   };
 
   const [selectedVoucherName, setSelectedVoucherName] = useState<string | null>(null);
+
+  const calculateDiscount = () => {
+    if (!selectedVoucher) return 0;
+    if (selectedVoucher.discountType === "DISCOUNT") {
+      return (selectedVoucher.discount / 100) * (shippingCost || 0);
+    }
+    if (selectedVoucher.discountType === "FIXED_DISCOUNT") {
+      return selectedVoucher.fixedDiscount;
+    }
+    return 0;
+  };
+
+  const discountAmount = calculateDiscount();
+  const subtotal = (shippingCost || 0) - discountAmount;
 
   return (
     <div className="flex flex-col gap-6 md:flex-row">

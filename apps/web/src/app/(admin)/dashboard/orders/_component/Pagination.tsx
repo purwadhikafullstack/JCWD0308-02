@@ -1,12 +1,5 @@
-import React from 'react';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from '@/components/ui/pagination';
+import React from "react";
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from "@/components/ui/pagination";
 
 interface PaginationProps {
   currentPage: number;
@@ -14,11 +7,7 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
 }
 
-export const PaginationDemo: React.FC<PaginationProps> = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}) => {
+export const PaginationDemo: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
   const handlePrevious = () => {
     if (currentPage > 1) {
       onPageChange(currentPage - 1);
@@ -31,14 +20,9 @@ export const PaginationDemo: React.FC<PaginationProps> = ({
     }
   };
 
-  // Generate pagination items
   const paginationItems = Array.from({ length: totalPages }, (_, index) => (
     <PaginationItem key={index}>
-      <PaginationLink
-        href="#"
-        isActive={currentPage === index + 1}
-        onClick={() => onPageChange(index + 1)}
-      >
+      <PaginationLink href="#" isActive={currentPage === index + 1} onClick={() => onPageChange(index + 1)}>
         {index + 1}
       </PaginationLink>
     </PaginationItem>
@@ -48,17 +32,11 @@ export const PaginationDemo: React.FC<PaginationProps> = ({
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious
-            onClick={handlePrevious}
-            aria-disabled={currentPage === 1}
-          />
+          <PaginationPrevious onClick={handlePrevious} aria-disabled={currentPage === 1} />
         </PaginationItem>
         {paginationItems}
         <PaginationItem>
-          <PaginationNext
-            onClick={handleNext}
-            aria-disabled={currentPage === totalPages}
-          />
+          <PaginationNext onClick={handleNext} aria-disabled={currentPage === totalPages} />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

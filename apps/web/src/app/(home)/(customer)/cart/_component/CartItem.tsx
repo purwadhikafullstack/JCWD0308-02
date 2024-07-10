@@ -1,13 +1,11 @@
 "use client";
 import Image from "next/image";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus, Trash } from "lucide-react";
+import { Minus, Plus, Trash } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { useAppDispatch } from "@/lib/features/hooks";
 import { deleteCartItem, fetchCartItemCount, updateCartItem, updateQuantity } from "@/lib/features/cart/cartSlice";
-import { RootState } from "@/lib/features/store";
 import { formatCurrency } from "@/lib/currency";
 import { CartItemType } from "@/lib/types/cart";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -114,6 +112,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
         </Button>
       </div>
       <Separator className="my-4" />
+      <Toaster />
     </div>
   );
 };

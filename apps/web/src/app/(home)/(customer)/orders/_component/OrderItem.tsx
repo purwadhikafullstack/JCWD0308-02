@@ -1,5 +1,4 @@
 import React from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { CartItemType } from "@/lib/types/cart";
 
 interface CartItemProps {
