@@ -1,6 +1,5 @@
 'use client';
 
-
 import React, { useState } from 'react';
 import {
   cancelOrderByAdmin,
@@ -51,7 +50,6 @@ export default function ListOrdersPage() {
 
   const orders = ordersData?.data || [];
   const totalPages = Math.ceil((ordersData?.totalCount || 0) / perPage);
-
 
   const handleStatusChange = (orderId: string, newStatus: string) => {
     confirmAlert({
@@ -122,13 +120,13 @@ export default function ListOrdersPage() {
     }
   };
   return (
-
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-screen-md">
-
       <h2 className="text-xl sm:text-2xl font-bold mb-4">Orders</h2>
       <div className="mt-4">
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="h-screen flex justify-center items-center">
+            <span className="loader"></span>
+          </div>
         ) : isError ? (
           <p className="text-red-500">Error: Failed to fetch orders.</p>
         ) : (

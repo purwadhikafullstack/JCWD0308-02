@@ -1,7 +1,11 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { fetchUsers, updateUser, createUser } from '@/lib/fetch-api/user/client';
+import {
+  fetchUsers,
+  updateUser,
+  createUser,
+} from '@/lib/fetch-api/user/client';
 import EditForm from './_components/forms/EditFormUser';
 import CreateForm from './_components/forms/CreateFormUser';
 import UserTable from './_components/tables/usertable';
@@ -34,7 +38,12 @@ const Users = () => {
 
       try {
         const data = await fetchUsers({ page, limit, search: searchQuery });
-        setUsers(data.users.sort((a: User, b: User) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
+        setUsers(
+          data.users.sort(
+            (a: User, b: User) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          ),
+        );
         setTotalUsers(data.total);
       } catch (error) {
         handleApiError(error, 'Failed to fetch users');
@@ -56,18 +65,22 @@ const Users = () => {
       const { avatarUrl, password, ...userToUpdate } = updatedUser;
       await updateUser(id, userToUpdate);
       setSelectedUser(null);
-      setUpdateFlag(prev => !prev);
+      setUpdateFlag((prev) => !prev);
       showSuccess('User updated successfully');
     } catch (error) {
       handleApiError(error, 'Failed to update user');
     }
   };
 
-  const handleCreate = async (newUser: Omit<User, 'id' | 'referralCode' | 'createdAt' | 'updatedAt'> & { password: string }) => {
+  const handleCreate = async (
+    newUser: Omit<User, 'id' | 'referralCode' | 'createdAt' | 'updatedAt'> & {
+      password: string;
+    },
+  ) => {
     try {
       await createUser(newUser);
       setCreatingUser(false);
-      setUpdateFlag(prev => !prev);
+      setUpdateFlag((prev) => !prev);
       showSuccess('User created successfully');
     } catch (error) {
       handleApiError(error, 'Failed to create user');
@@ -80,7 +93,7 @@ const Users = () => {
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    setPage(1); 
+    setPage(1);
     updateUrl({ search: query, page: 1 });
   };
 
@@ -89,7 +102,7 @@ const Users = () => {
     updateUrl({ search: searchQuery, page: newPage });
   };
 
-  const updateUrl = ({ search, page }: { search: string, page: number }) => {
+  const updateUrl = ({ search, page }: { search: string; page: number }) => {
     const params = new URLSearchParams(searchParams);
     if (search) {
       params.set('search', search);
@@ -113,7 +126,7 @@ const Users = () => {
   }, [searchParams]);
 
   const removeUserFromState = (userId: string) => {
-    setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+    setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
   };
 
   return (
@@ -121,11 +134,15 @@ const Users = () => {
       <h2 className="text-2xl font-bold mb-4 text-primary">Users</h2>
       <p>Manage your users here.</p>
       <div className="mt-4 mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <Button onClick={() => setCreatingUser(true)} className="mb-4 sm:mb-0">Create User Admin</Button>
+        <Button onClick={() => setCreatingUser(true)} className="mb-4 sm:mb-0">
+          Create User Admin
+        </Button>
         <SearchBar onSearch={handleSearch} />
       </div>
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="h-screen flex justify-center items-center">
+          <span className="loader"></span>
+        </div>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
@@ -137,9 +154,25 @@ const Users = () => {
             deletingUser={deletingUser}
             removeUserFromState={removeUserFromState}
           />
-          <Pagination total={totalUsers} page={page} limit={limit} onPageChange={handlePageChange} />
-          {selectedUser && <EditForm user={selectedUser} onUpdate={handleUpdate} onCancel={() => setSelectedUser(null)} />}
-          {creatingUser && <CreateForm onCreate={handleCreate} onCancel={() => setCreatingUser(false)} />}
+          <Pagination
+            total={totalUsers}
+            page={page}
+            limit={limit}
+            onPageChange={handlePageChange}
+          />
+          {selectedUser && (
+            <EditForm
+              user={selectedUser}
+              onUpdate={handleUpdate}
+              onCancel={() => setSelectedUser(null)}
+            />
+          )}
+          {creatingUser && (
+            <CreateForm
+              onCreate={handleCreate}
+              onCancel={() => setCreatingUser(false)}
+            />
+          )}
         </>
       )}
     </div>
