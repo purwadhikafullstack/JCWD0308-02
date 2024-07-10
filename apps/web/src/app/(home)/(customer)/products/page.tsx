@@ -1,3 +1,4 @@
+
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
@@ -64,6 +65,7 @@ const ProductCard: React.FC<{ product: NearestStock['product'], amount: number, 
   );
 };
 
+
 const ProductPage = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -74,6 +76,7 @@ const ProductPage = () => {
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(15);
+
 
   const selectedAddress = useSuspenseQuery({
     queryKey: ['selected-address'],
@@ -104,6 +107,7 @@ const ProductPage = () => {
 
   useEffect(() => {
     if (nearestStocks.data) {
+
       setLoading(false);
       setTotal(nearestStocks.data.total);
     }
@@ -112,19 +116,19 @@ const ProductPage = () => {
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
     const params = new URLSearchParams(searchParams);
-    params.set('page', newPage.toString());
+    params.set("page", newPage.toString());
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
 
   const handleCategoryFilterChange = (categoryId: string) => {
     const params = new URLSearchParams(searchParams);
-    if (categoryId === 'all') {
-      params.delete('categoryId');
+    if (categoryId === "all") {
+      params.delete("categoryId");
     } else {
-      params.set('categoryId', categoryId);
+      params.set("categoryId", categoryId);
     }
-    params.set('page', '1');
+    params.set("page", "1");
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
   };
@@ -155,7 +159,7 @@ const ProductPage = () => {
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Categories</SelectLabel>
-                {categories.map(category => (
+                {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
                     {category.name}
                   </SelectItem>
@@ -175,8 +179,10 @@ const ProductPage = () => {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+
             {nearestStocks.data.stocks.map((stock: NearestStock, index: number) => (
               <ProductCard key={index} product={stock.product} amount={stock.amount} onTitleClick={handleTitleClick} />
+
             ))}
           </div>
           <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />

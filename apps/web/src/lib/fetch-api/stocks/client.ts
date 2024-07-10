@@ -1,7 +1,7 @@
-import { env } from '@/app/env';
-import fetchAPI from '@/lib/fetchAPI';
-import { NearestStock } from '@/lib/types/stock';
-import { Store } from '@/lib/types/store';
+import { env } from "@/app/env";
+import fetchAPI from "@/lib/fetchAPI";
+import { NearestStock } from "@/lib/types/stock";
+import { Store } from "@/lib/types/store";
 
 export const getNearestStocks = async (
   page: number = 1,
@@ -21,3 +21,4 @@ export const getNearestStocks = async (
   }).toString();
   return (await fetchAPI(`${env.NEXT_PUBLIC_BASE_API_URL}/stock/nearest?${query}`)).json();
 };
+

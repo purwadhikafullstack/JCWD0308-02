@@ -1,10 +1,10 @@
-'use client';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardFooter } from '@/components/ui/card';
-import { uploadPaymentProof } from '@/lib/fetch-api/order';
-import { useParams } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
+"use client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { uploadPaymentProof } from "@/lib/fetch-api/order";
+import { useParams } from "next/navigation";
+import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
 export default function UploadPaymentProofPage() {
   const { orderId } = useParams();
@@ -28,14 +28,14 @@ export default function UploadPaymentProofPage() {
     try {
       if (file) {
         const res = await uploadPaymentProof(orderId as string, file);
-        setSuccess('File uploaded successfully!');
-        console.log('Response:', res);
+        setSuccess("File uploaded successfully!");
+        console.log("Response:", res);
       } else {
-        setError('Please select a file to upload.');
+        setError("Please select a file to upload.");
       }
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setError('Error uploading image. Please try again.');
+      console.error("Error uploading image:", error);
+      setError("Error uploading image. Please try again.");
     } finally {
       setUploading(false);
     }
@@ -47,23 +47,18 @@ export default function UploadPaymentProofPage() {
         <CardContent>
           <label className="input input-bordered flex items-center gap-2">
             Payment Proof
-            <input
-              accept="image/png, image/jpeg"
-              onChange={handleChange}
-              type="file"
-              ref={fileRef}
-            />
+            <input accept="image/png, image/jpeg" onChange={handleChange} type="file" ref={fileRef} />
           </label>
         </CardContent>
         <CardFooter className="flex justify-end">
           <Button type="submit" onClick={handleUpload} disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Submit'}
+            {uploading ? "Uploading..." : "Submit"}
           </Button>
         </CardFooter>
       </Card>
       {error && <p className="text-red-500 mt-2">{error}</p>}
       {success && (
-        <div>
+        <div className="flex flex-col gap-2">
           <p className="text-green-500 mt-2">Upload successful!</p>
           <Link href="/">Go to Home</Link>
         </div>
