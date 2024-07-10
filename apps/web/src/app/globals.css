@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -50,3 +49,12 @@
   }
 }
 
+.grid-summary {
+  grid-template-rows: 2fr 1fr;
+}
+
+@media (max-width: 992px) {
+  .grid-summary {
+    grid-template-rows: 1fr;
+  }
+}
