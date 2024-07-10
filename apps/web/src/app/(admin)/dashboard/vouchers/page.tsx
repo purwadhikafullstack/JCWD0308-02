@@ -45,7 +45,7 @@ const VoucherManagement = () => {
   const [deletingVoucher, setDeletingVoucher] = useState<Voucher | null>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(8); // Adjust limit to fit 4 cards per row
+  const [limit, setLimit] = useState<number>(8); 
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);

@@ -1,4 +1,3 @@
-// src/routes/voucher.router.ts
 import { Router } from 'express';
 import { VoucherController } from './voucher.controller.js';
 import { uploader } from '@/helpers/uploader.js';

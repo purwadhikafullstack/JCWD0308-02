@@ -91,7 +91,6 @@ export class StockService {
       }
     });
   
-    // Retrieve the stocks with pagination and sorting
     const stocks = await prisma.stock.findMany({
       where: {
         ...where
@@ -189,7 +188,7 @@ export class StockService {
   private static buildWhereClause(filters: any) {
     const where: any = {};
     for (const [key, value] of Object.entries(filters)) {
-      if (value && key !== 'page' && key !== 'limit') { // memastikan page dan limit tidak masuk dalam where
+      if (value && key !== 'page' && key !== 'limit') { 
         where[key] = value;
       }
     }

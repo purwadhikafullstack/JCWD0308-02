@@ -7,7 +7,7 @@ interface StockTableProps {
   stocks: Stock[];
   handleTitleClick: (id: string) => void;
   handleDelete: (id: string) => void;
-  isStoreAdmin: boolean; // Add this prop
+  isStoreAdmin: boolean; 
 }
 
 const StockTable: React.FC<StockTableProps> = ({ stocks, handleTitleClick, handleDelete, isStoreAdmin }) => {

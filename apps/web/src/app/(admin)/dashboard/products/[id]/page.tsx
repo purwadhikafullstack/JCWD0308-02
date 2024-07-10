@@ -92,7 +92,6 @@ const ProductDetail = () => {
     router.push('/dashboard/products');
   };
 
-  // Fetch user profile to determine role
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,

@@ -8,7 +8,7 @@ interface StockFiltersProps {
   storeFilter: string;
   handleStoreFilterChange: (storeId: string) => void;
   handleCreate: () => void;
-  isStoreAdmin: boolean; // Tambahkan prop ini
+  isStoreAdmin: boolean; 
 }
 
 const StockFilters: React.FC<StockFiltersProps> = ({ stores, storeFilter, handleStoreFilterChange, handleCreate, isStoreAdmin }) => {

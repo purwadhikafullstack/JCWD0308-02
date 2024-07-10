@@ -40,7 +40,6 @@ const ProductList = () => {
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
 
-  // Fetch user profile to determine role
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,

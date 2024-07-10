@@ -1,8 +1,6 @@
-// src/services/voucher.service.ts
 import { prisma } from '@/db.js';
 import { Validation } from '@/utils/validation.js';
 import { VoucherValidation } from './voucher.validation.js';
-import { Response } from 'express';
 
 export class VoucherService {
   static async getVouchers(page: number, limit: number, filters: any) {

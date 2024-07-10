@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 interface StockCardProps {
   stock: Stock;
   onTitleClick: () => void;
-  onDelete: () => void; // Add onDelete prop
+  onDelete: () => void;
 }
 
 const StockCard: React.FC<StockCardProps> = ({ stock, onTitleClick, onDelete }) => (

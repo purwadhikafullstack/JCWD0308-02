@@ -26,7 +26,7 @@ const VoucherDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:8000'; // Define your API base URL here
+  const API_BASE_URL = 'http://localhost:8000'; 
 
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
@@ -87,7 +87,7 @@ const VoucherDetail: React.FC = () => {
     ? voucher.imageUrl.startsWith('/public')
       ? `${API_BASE_URL}${voucher.imageUrl}`
       : voucher.imageUrl
-    : '/path/to/default-image.jpg'; // Provide a default image path
+    : '/path/to/default-image.jpg'; 
 
   return (
     <div className="container mx-auto px-4 py-8">
