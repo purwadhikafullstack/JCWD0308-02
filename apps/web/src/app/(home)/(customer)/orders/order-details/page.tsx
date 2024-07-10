@@ -17,7 +17,12 @@ const OrderDetail = ({ params }: { params: { orderId: string } }) => {
     fetchOrder();
   }, [orderId]);
 
-  if (!order) return <p>Loading...</p>;
+  if (!order)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
 
   return (
     <div>

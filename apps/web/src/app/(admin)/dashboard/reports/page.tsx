@@ -49,7 +49,9 @@ export default function ReportsPage() {
       <h2 className="text-xl sm:text-2xl font-bold mb-4">Reports</h2>
       <div className="mt-4">
         {isLoading ? (
-          <p>Loading...</p>
+          <div className="h-screen flex justify-center items-center">
+            <span className="loader"></span>
+          </div>
         ) : isError ? (
           <p className="text-red-500">Error: Failed to fetch reports.</p>
         ) : (

@@ -8,7 +8,14 @@ import { fetchProductBySlug } from '@/lib/fetch-api/product';
 import { Product } from '@/lib/types/product';
 import { formatCurrency } from '@/lib/currency';
 import { Button } from '@/components/ui/button';
-import { ShoppingCart, Plus, Minus, CheckCircle, Gift, Box } from 'lucide-react';
+import {
+  ShoppingCart,
+  Plus,
+  Minus,
+  CheckCircle,
+  Gift,
+  Box,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
@@ -31,9 +38,9 @@ const ProductDetail = () => {
   const nearestStocks = useSuspenseQuery({
     queryKey: ['nearest-stocks', 1, 15, ''],
     queryFn: async () => {
-      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      const filters = Object.fromEntries(new URLSearchParams(String('')));
       return getNearestStocks(1, 15, filters);
-    }
+    },
   });
 
   const selectedAddress = useSuspenseQuery({
@@ -110,7 +117,12 @@ const ProductDetail = () => {
     );
   };
 
-  if (loading) return <p>Loading...</p>;
+  if (loading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
   if (error) return <p>{error}</p>;
 
   const availableStock =
@@ -159,9 +171,7 @@ const ProductDetail = () => {
             <h1 className="text-4xl font-bold mb-2 text-primary">
               {product.title}
             </h1>
-            <p className="text-lg mb-4 text-gray-600">
-              {product.description}
-            </p>
+            <p className="text-lg mb-4 text-gray-600">{product.description}</p>
             <div className="flex space-x-4 mb-4">
               <Button
                 variant={!isPack ? 'default' : 'outline'}
