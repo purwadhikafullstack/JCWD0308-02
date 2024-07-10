@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Category } from '@/lib/types/category';
 import { Product, ProductImage } from '@/lib/types/product';
 import FormFields from '../fields/FormFields';
-import ImageUploader from './ImageProductUploader';
+import ImageUploader, { validateFileExtension } from './ImageProductUploader';
+
 
 interface EditFormProps {
   product: Product;
@@ -85,6 +86,19 @@ const EditProductForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel 
     }
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    const validFiles = files.filter(file => validateFileExtension(file.name));
+
+    if (validFiles.length !== files.length) {
+      alert('Some files have invalid extensions and were not added.');
+    }
+
+    setImages(validFiles);
+    const urls = validFiles.map(file => URL.createObjectURL(file));
+    setPreviewUrls(urls);
+  };
+
   const handleRemoveImage = (imageUrl: string, imageId?: string) => {
     if (imageId && existingImages.find(image => image.id === imageId)) {
       setImagesToDelete([...imagesToDelete, imageId]);
@@ -105,12 +119,7 @@ const EditProductForm: React.FC<EditFormProps> = ({ product, onUpdate, onCancel 
             <FormFields formData={formData} handleChange={(e) => setFormData({ ...formData, [e.target.name]: e.target.value })} categories={categories} />
             <ImageUploader
               previewUrls={previewUrls}
-              handleImageChange={(e) => {
-                const files = Array.from(e.target.files || []);
-                setImages(files);
-                const urls = files.map(file => URL.createObjectURL(file));
-                setPreviewUrls(urls);
-              }}
+              handleImageChange={handleFileChange}
               setImages={setImages}
               setPreviewUrls={setPreviewUrls}
               existingImages={existingImages}

@@ -8,6 +8,8 @@ import { Voucher } from '@/lib/types/voucher';
 import { Button } from '@/components/ui/button';
 import EditForm from '../_components/forms/EditVoucherForm';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 const VoucherDetail: React.FC = () => {
   const router = useRouter();
@@ -19,6 +21,13 @@ const VoucherDetail: React.FC = () => {
   const [editing, setEditing] = useState(false);
 
   const API_BASE_URL = 'http://localhost:8000'; // Define your API base URL here
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile
+  });
+
+  const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
 
   useEffect(() => {
     if (id) {
@@ -104,9 +113,11 @@ const VoucherDetail: React.FC = () => {
             <Button variant="outline" onClick={() => router.back()}>
               Back
             </Button>
-            <Button variant="secondary" onClick={() => setEditing(true)}>
-              Edit
-            </Button>
+            {!isStoreAdmin && (
+              <Button variant="secondary" onClick={() => setEditing(true)}>
+                Edit
+              </Button>
+            )}
           </div>
         </div>
       </div>

@@ -6,10 +6,11 @@ import { Stock } from '@/lib/types/stock';
 interface StockTableProps {
   stocks: Stock[];
   handleTitleClick: (id: string) => void;
-  handleDelete: (id: string) => void; 
+  handleDelete: (id: string) => void;
+  isStoreAdmin: boolean; // Add this prop
 }
 
-const StockTable: React.FC<StockTableProps> = ({ stocks, handleTitleClick, handleDelete }) => {
+const StockTable: React.FC<StockTableProps> = ({ stocks, handleTitleClick, handleDelete, isStoreAdmin }) => {
   return (
     <Table className="min-w-full bg-white">
       <TableHeader>
@@ -30,9 +31,11 @@ const StockTable: React.FC<StockTableProps> = ({ stocks, handleTitleClick, handl
               <Button variant="secondary" onClick={() => handleTitleClick(stock.id)}>
                 View
               </Button>
-              <Button variant="destructive" onClick={() => handleDelete(stock.id)}>
-                Delete
-              </Button>
+              {!isStoreAdmin && (
+                <Button variant="destructive" onClick={() => handleDelete(stock.id)}>
+                  Delete
+                </Button>
+              )}
             </TableCell>
           </TableRow>
         ))}

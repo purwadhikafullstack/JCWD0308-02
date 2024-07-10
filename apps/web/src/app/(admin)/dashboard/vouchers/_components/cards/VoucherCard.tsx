@@ -7,11 +7,12 @@ import { Voucher } from '../../../../../../lib/types/voucher';
 
 interface VoucherCardProps {
   voucher: Voucher;
-  handleDelete: (id: string) => void;
+  handleDelete: () => void;
   getVoucherIcon: (voucher: Voucher) => StaticImageData;
+  isStoreAdmin: boolean;
 }
 
-const VoucherCard: React.FC<VoucherCardProps> = ({ voucher, handleDelete, getVoucherIcon }) => {
+const VoucherCard: React.FC<VoucherCardProps> = ({ voucher, handleDelete, getVoucherIcon, isStoreAdmin }) => {
   const router = useRouter();
 
   const handleView = () => {
@@ -42,7 +43,9 @@ const VoucherCard: React.FC<VoucherCardProps> = ({ voucher, handleDelete, getVou
       </CardContent>
       <CardFooter className="p-4 bg-indigo-100 flex justify-end space-x-2">
         <Button variant="secondary" onClick={handleView}>View</Button>
-        <Button variant="secondary" onClick={() => handleDelete(voucher.id)}>Delete</Button>
+        {!isStoreAdmin && (
+          <Button variant="secondary" onClick={handleDelete}>Delete</Button>
+        )}
       </CardFooter>
     </Card>
   );

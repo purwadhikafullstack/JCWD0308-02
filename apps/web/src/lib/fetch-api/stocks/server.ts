@@ -12,7 +12,8 @@ export const getNearestStocks = async (
   total: number,
   page: number,
   limit: number,
-  store: Store
+  store: Store,
+  isServiceAvailable : boolean
 }> => {
   const skip = (page - 1) * limit;
   const query = new URLSearchParams({

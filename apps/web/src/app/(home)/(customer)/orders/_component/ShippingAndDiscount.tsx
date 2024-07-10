@@ -38,8 +38,11 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   setServiceDescription,
 }) => {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ["nearest-stocks"],
-    queryFn: getNearestStocks,
+    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryFn: async ({ queryKey }) => {
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    },
   });
   const [shippingEstimation, setShippingEstimation] = useState<string | null>(null);
   const origin = nearestStocks?.data?.store?.cityId;
