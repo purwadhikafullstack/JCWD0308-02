@@ -71,6 +71,23 @@ export const getUserVouchers = async () => {
     });
     return response.data;
   } catch (error) {
-    console.error("getuserVouchers:", error);
+    console.error(error);
   }
+};
+
+export const assignVoucherToUser = async (voucherId: string, userId: string) => {
+  const response = await axios.post(
+    `${URL}/assign`,
+    {
+      voucherId,
+      userId,
+    },
+    {
+      withCredentials: true,
+    },
+  );
+  if (response.status !== 201) {
+    throw new Error("Failed to assign voucher to user");
+  }
+  return response.data;
 };

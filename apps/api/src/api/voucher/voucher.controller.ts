@@ -1,3 +1,4 @@
+// src/controllers/voucher.controller.ts
 import { ICallback } from '@/types/index.js';
 import { VoucherService } from './voucher.service.js';
 import { User } from 'lucia';
@@ -152,7 +153,10 @@ export class VoucherController {
   getUserVouchers: ICallback = async (req, res, next) => {
     try {
       const userId = res.locals.user?.id;
-      const userVouchers = await VoucherService.getUserVouchers(res);
+      if (!userId) {
+        return res.status(401).json({ message: 'Unauthorized' });
+      }
+      const userVouchers = await VoucherService.getUserVouchers(userId);
       res.status(200).json(userVouchers);
     } catch (error) {
       next(error);

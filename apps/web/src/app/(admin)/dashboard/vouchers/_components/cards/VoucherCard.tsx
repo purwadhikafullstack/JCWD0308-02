@@ -3,7 +3,7 @@ import Image, { StaticImageData } from 'next/image';
 import { useRouter } from 'next/navigation';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Voucher } from '../../../../../../lib/types/voucher';
+import { Voucher } from '@/lib/types/voucher';
 
 interface VoucherCardProps {
   voucher: Voucher;
@@ -38,14 +38,13 @@ const VoucherCard: React.FC<VoucherCardProps> = ({ voucher, handleDelete, getVou
           <p className="text-gray-800"><strong>Stock:</strong> {voucher.stock}</p>
           <p className="text-gray-800"><strong>Min Order Price:</strong> {voucher.minOrderPrice}</p>
           <p className="text-gray-800"><strong>Min Order Item:</strong> {voucher.minOrderItem}</p>
+          <p className="text-gray-800"><strong>Store:</strong> {voucher.store ? voucher.store.name : 'Applicable to all stores'}</p>
           <p className="text-gray-800"><strong>Expires At:</strong> {new Date(voucher.expiresAt).toLocaleDateString()}</p>
         </div>
       </CardContent>
       <CardFooter className="p-4 bg-indigo-100 flex justify-end space-x-2">
         <Button variant="secondary" onClick={handleView}>View</Button>
-        {!isStoreAdmin && (
-          <Button variant="secondary" onClick={handleDelete}>Delete</Button>
-        )}
+        <Button variant="secondary" onClick={handleDelete}>Delete</Button>
       </CardFooter>
     </Card>
   );

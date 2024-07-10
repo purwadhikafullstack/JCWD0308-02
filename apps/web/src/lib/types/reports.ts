@@ -8,4 +8,9 @@ export interface StockMutation {
   orderId?: string | null;
   updatedAt: Date;
   createdAt: Date;
+  stock: {
+    product:{
+      title: string
+    } 
+  }
 }

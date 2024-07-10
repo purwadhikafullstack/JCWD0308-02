@@ -26,7 +26,7 @@ const VoucherDetail: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
 
-  const API_BASE_URL = 'http://localhost:8000'; // Define your API base URL here
+  const API_BASE_URL = 'http://localhost:8000'; 
 
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
@@ -87,7 +87,7 @@ const VoucherDetail: React.FC = () => {
     ? voucher.imageUrl.startsWith('/public')
       ? `${API_BASE_URL}${voucher.imageUrl}`
       : voucher.imageUrl
-    : '/path/to/default-image.jpg'; // Provide a default image path
+    : '/path/to/default-image.jpg'; 
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -110,47 +110,26 @@ const VoucherDetail: React.FC = () => {
         <div className="p-4">
           <p className="text-lg mb-4 text-gray-700">{voucher.description}</p>
           <div className="space-y-1 text-sm">
-            <p className="text-gray-800">
-              <strong>Claimable:</strong> {voucher.isClaimable ? 'Yes' : 'No'}
-            </p>
-            <p className="text-gray-800">
-              <strong>Private:</strong> {voucher.isPrivate ? 'Yes' : 'No'}
-            </p>
-            <p className="text-gray-800">
-              <strong>Type:</strong> {voucher.voucherType}
-            </p>
-            <p className="text-gray-800">
-              <strong>Discount Type:</strong> {voucher.discountType}
-            </p>
-            <p className="text-gray-800">
-              <strong>Fixed Discount:</strong> {voucher.fixedDiscount}
-            </p>
-            <p className="text-gray-800">
-              <strong>Discount:</strong> {voucher.discount}%
-            </p>
-            <p className="text-gray-800">
-              <strong>Stock:</strong> {voucher.stock}
-            </p>
-            <p className="text-gray-800">
-              <strong>Min Order Price:</strong> {voucher.minOrderPrice}
-            </p>
-            <p className="text-gray-800">
-              <strong>Min Order Item:</strong> {voucher.minOrderItem}
-            </p>
-            <p className="text-gray-800">
-              <strong>Expires At:</strong>{' '}
-              {new Date(voucher.expiresAt).toLocaleDateString()}
-            </p>
+
+            <p className="text-gray-800"><strong>Claimable:</strong> {voucher.isClaimable ? 'Yes' : 'No'}</p>
+            <p className="text-gray-800"><strong>Private:</strong> {voucher.isPrivate ? 'Yes' : 'No'}</p>
+            <p className="text-gray-800"><strong>Type:</strong> {voucher.voucherType}</p>
+            <p className="text-gray-800"><strong>Discount Type:</strong> {voucher.discountType}</p>
+            <p className="text-gray-800"><strong>Fixed Discount:</strong> {voucher.fixedDiscount}</p>
+            <p className="text-gray-800"><strong>Discount:</strong> {voucher.discount}%</p>
+            <p className="text-gray-800"><strong>Stock:</strong> {voucher.stock}</p>
+            <p className="text-gray-800"><strong>Min Order Price:</strong> {voucher.minOrderPrice}</p>
+            <p className="text-gray-800"><strong>Min Order Item:</strong> {voucher.minOrderItem}</p>
+            <p className="text-gray-800"><strong>Store:</strong> {voucher.store ? voucher.store.name : 'Applicable to all stores'}</p>
+            <p className="text-gray-800"><strong>Expires At:</strong> {new Date(voucher.expiresAt).toLocaleDateString()}</p>
           </div>
           <div className="flex justify-between mt-4">
             <Button variant="outline" onClick={() => router.back()}>
               Back
             </Button>
-            {!isStoreAdmin && (
-              <Button variant="secondary" onClick={() => setEditing(true)}>
-                Edit
-              </Button>
-            )}
+            <Button variant="secondary" onClick={() => setEditing(true)}>
+              Edit
+            </Button>
           </div>
         </div>
       </div>

@@ -25,13 +25,15 @@ import { handleApiError } from '@/components/toast/toastutils';
 import { showSuccess } from '@/components/toast/toastutils';
 import DeleteVoucherDialog from './_components/dialogs/DeleteVoucherDialog';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { getUserProfile } from '@/lib/fetch-api/user/client';
+
 
 import fixedDiscountProduct from '../../../../../public/fixeddiscountproduct.png';
 import discountProduct from '../../../../../public/discountproduct.png';
 import shippingCash from '../../../../../public/shippingcash.png';
 import shippingDiscount from '../../../../../public/shippingdiscount.png';
 import { StaticImageData } from 'next/image';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { getSelectedStore } from '@/lib/fetch-api/store/client';
 
 const VoucherManagement = () => {
   const router = useRouter();
@@ -43,7 +45,7 @@ const VoucherManagement = () => {
   const [deletingVoucher, setDeletingVoucher] = useState<Voucher | null>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(8); // Adjust limit to fit 4 cards per row
+  const [limit, setLimit] = useState<number>(8); 
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
@@ -53,13 +55,20 @@ const VoucherManagement = () => {
     queryFn: getUserProfile,
   });
 
+  const selectedStore = useSuspenseQuery({
+    queryKey: ['store'],
+    queryFn: getSelectedStore
+  });
+
   const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
+  const storeAdminStoreId = selectedStore.data?.store?.id;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const voucherData = await getVouchers(page, limit, filters);
+        const filterData = isStoreAdmin && storeAdminStoreId ? { ...filters, storeId: storeAdminStoreId } : filters;
+        const voucherData = await getVouchers(page, limit, filterData);
         setVouchers(voucherData.vouchers || []);
         setTotal(voucherData.total || 0);
       } catch (error) {
@@ -69,7 +78,7 @@ const VoucherManagement = () => {
       }
     };
     fetchData();
-  }, [page, limit, filters, updateFlag]);
+  }, [page, limit, filters, updateFlag, isStoreAdmin, storeAdminStoreId]);
 
   useEffect(() => {
     const query = searchParams.get('search');
@@ -153,9 +162,9 @@ const VoucherManagement = () => {
         Manage your vouchers here.
       </p>
       <SearchBar onSearch={handleSearch} />
-      {!isStoreAdmin && (
-        <VoucherFilters handleCreate={() => setCreatingVoucher(true)} />
-      )}
+
+      <VoucherFilters handleCreate={() => setCreatingVoucher(true)} />
+
       {loading ? (
         <div className="h-screen flex justify-center items-center">
           <span className="loader"></span>

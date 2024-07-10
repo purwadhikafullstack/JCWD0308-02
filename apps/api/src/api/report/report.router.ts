@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { AuthMiddleware } from '@/middlewares/auth.middleware.js';
 import { ReportController } from './report.controller.js';
+import { AuthMiddleware } from '@/middlewares/auth.middleware.js';
 
 export class ReportRouter {
   private router: Router;
@@ -13,14 +13,11 @@ export class ReportRouter {
   }
 
   private initializeRoutes(): void {
-    const storeAdmin = AuthMiddleware.storeAdmin;
-    const superAdmin = AuthMiddleware.superAdmin;
-
-    this.router.get('/', superAdmin, this.reportController.getStockMutation);
-    this.router.get('/store-admin', this.reportController.getStockMutationById);
+    this.router.get('/stock-mutations', AuthMiddleware.authed, this.reportController.getStockMutation);
+    this.router.get('/stock-mutations/:id', AuthMiddleware.authed, this.reportController.getStockMutationById);
   }
 
-  getRouter(): Router {
+  public getRouter(): Router {
     return this.router;
   }
 }

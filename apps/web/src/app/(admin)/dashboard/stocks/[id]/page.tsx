@@ -40,7 +40,6 @@ const StockDetail = () => {
   } = useStock(stockId);
 
   useEffect(() => {
-    // Contoh kondisi untuk mengatur isEditing
     if (isEditing) {
       console.log('Editing stock', stockId);
     }

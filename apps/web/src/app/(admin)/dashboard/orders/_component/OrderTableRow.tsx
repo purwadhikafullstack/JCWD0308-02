@@ -49,7 +49,7 @@ export const OrderTableRow: React.FC<OrderTableRowProps> = ({ index, order, hand
               <DialogTitle>Payment Picture</DialogTitle>
             </DialogHeader>
             <figure>
-              <Image src={order.paymentPicture} width={50} height={50} alt="payment proof" />
+              <Image src={order.paymentPicture} width={200} height={200} alt="payment proof" />
             </figure>
           </DialogContent>
         </Dialog>

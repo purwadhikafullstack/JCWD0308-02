@@ -1,22 +1,26 @@
-import axios from 'axios';
-import { API_URL } from './lib';
+import axios from "axios";
+import { API_URL } from "./lib"; 
+import { StockMutation } from "../types/reports";
 
-export const getStockMutation = async (page: number, perPage: number) => {
-  const response = await axios.get(`${API_URL}/report`, {
-    params: { page, perPage },
+export const fetchStockMutations = async (
+  yearMonth: string, 
+  page: number = 1,
+  perPage: number = 10,
+  storeId?: string,  
+  filters: any = {}
+): Promise<{ data: StockMutation[]; totalCount: number }> => {
+  const params: any = { yearMonth, page: page.toString(), perPage: perPage.toString(), ...filters };
+  if (storeId) {
+    params.storeId = storeId;
+  }
+
+  const query = new URLSearchParams(params).toString();
+  const res = await axios.get(`${API_URL}/report/stock-mutations?${query}`, {
     withCredentials: true,
   });
-  return response.data;
-};
 
-export const getStockMutationById = async (page: number, perPage: number) => {
-  try {
-    const response = await axios.get(`${API_URL}/report/store-admin`, {
-      params: { page, perPage },
-      withCredentials: true,
-    });
-    return response.data;
-  } catch (error) {
-    console.error('error getting stock mutation:', error);
+  if (res.status !== 200) {
+    throw new Error("Failed to fetch stock mutations");
   }
+  return res.data;
 };
