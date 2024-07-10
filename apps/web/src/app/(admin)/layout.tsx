@@ -4,12 +4,12 @@ import { Menu } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { StoreSelector } from './_components/store-selector';
-import SidebarMenu from './_components/sidebar';
 import { AvatarDropdown } from '@/components/shared/avatar-dropdown';
 import { getQueryClient } from '../get-query-client';
 import { getSelectedStore } from '@/lib/fetch-api/store/server';
 import { HydrationBoundary, dehydrate } from '@tanstack/react-query';
 import { getAllOrders } from '@/lib/fetch-api/order/server';
+import SidebarMenuWrapper from './_components/SideBarMenuWrapper';
 
 const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
   const session = await protectedRoute.storeAdmin();
@@ -39,7 +39,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
             </div>
             <div className="flex-1">
               <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-                <SidebarMenu />
+                <SidebarMenuWrapper />
               </nav>
             </div>
           </div>
@@ -62,7 +62,7 @@ const AdminLayout = async ({ children }: { children: React.ReactNode }) => {
                   <span className="mt-6">
                     <StoreSelector />
                   </span>
-                  <SidebarMenu />
+                  <SidebarMenuWrapper />
                 </nav>
               </SheetContent>
             </Sheet>

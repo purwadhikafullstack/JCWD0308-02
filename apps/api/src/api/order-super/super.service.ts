@@ -55,14 +55,11 @@ export class OrderSuperService {
     if (PaymentMethod.MANUAL && !order.paymentPicture) throw new ResponseError(400, "Order can not be processed");
     const user = order.user;
     const mappedStatus: OrderStatus = mapNewStatus(newStatus);
-    // const templateName =
-    //   newStatus === 'PROCESS'
-    //     ? 'paymentConfirmed.html'
-    //     : 'paymentRejected.html';
-    // const subject = 'Welcome to Grosirun - Payment Confirmation';
-    // const html = getEmailTemplate(templateName, { name: user.displayName });
+    const templateName = newStatus === "PROCESS" ? "paymentConfirmed.html" : "paymentRejected.html";
+    const subject = "Welcome to Grosirun - Payment Confirmation";
+    const html = getEmailTemplate(templateName, { name: user.displayName });
 
-    // await sendConfirmationEmail(user.email, subject, html);
+    await sendConfirmationEmail(user.email, subject, html);
     const updated = await updateOrderStatus(orderId, mappedStatus);
 
     return updated;

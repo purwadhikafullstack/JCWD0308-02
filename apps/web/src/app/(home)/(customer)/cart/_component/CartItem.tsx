@@ -14,6 +14,8 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSelectedAddress } from "@/lib/fetch-api/address/client";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/sonner";
 
 interface CartItemProps {
   cart: CartItemType;
@@ -28,7 +30,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   });
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
-  const error = useAppSelector((state: RootState) => state.cart.error);
 
   useEffect(() => {
     setQuantity(cart.quantity);
@@ -39,14 +40,10 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   }
 
   const { product } = cart.stock;
-  console.log("cart:", cart);
-  console.log("product:", cart.stock.product);
   const addressId = selectedAddress.data?.address.id;
   if (!addressId) router.push("/cart");
 
   const handleQuantityChange = async (newQuantity: number) => {
-    console.log("newQuantity:", newQuantity);
-
     if (newQuantity === 0) {
       dispatch(deleteCartItem(cart.id));
     } else {
@@ -65,6 +62,9 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
           dispatch(fetchCartItemCount());
         }
         setQuantity(newQuantity);
+        if (newQuantity > cart.stock.amount) {
+          toast.error(`Sorry, there are only ${cart.stock.amount} items available.`);
+        }
       } catch (error) {
         console.error("Update Cart Error:", error);
       }

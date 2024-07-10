@@ -73,11 +73,11 @@ export default function CreateAddressForm({
             <FieldPhone form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.phone} />
             <FieldProvince setProvinceId={setProvinceId} form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.provinceId} />
             <FieldCity provinceId={provinceId} form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.cityId} />
-            <FieldAddress form={form} errorMessage={createUserAddress.error?.errors.fieldErrors.address} />
-            <FieldCoordinate form={form} errorMessage={createUserAddress.error?.errors.fieldErrors.coordinate} latitude={latitude} longitude={longitude} />
-            <FieldLatitude form={form} errorMessage={createUserAddress.error?.errors.fieldErrors.latitude} />
-            <FieldLongitude form={form} errorMessage={createUserAddress.error?.errors.fieldErrors.longitude} />
-            <FieldNote form={form} errorMessage={createUserAddress.error?.errors.fieldErrors.note} />
+            <FieldAddress form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.address} />
+            <FieldCoordinate form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.coordinate} latitude={latitude} longitude={longitude} />
+            <FieldLatitude form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.latitude} />
+            <FieldLongitude form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.longitude} />
+            <FieldNote form={form} errorMessage={createUserAddress.error?.errors?.fieldErrors?.note} />
             <FieldCheckBox form={form} />
           </div>
         </ScrollArea>

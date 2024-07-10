@@ -72,10 +72,25 @@ export default async function RootLayout({
     queryFn: () => getCities(0),
   });
 
-  queryClient.prefetchQuery({
-    queryKey: ['nearest-stocks'],
-    queryFn: getNearestStocks,
+  await queryClient.prefetchQuery({
+    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryFn: async ({ queryKey }) => {
+      // const [_, page, limit, queryString] = queryKey;
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    },
   });
+
+  const query = new URLSearchParams({sortcol:"popular"})
+
+  await queryClient.prefetchQuery({
+   queryKey: ['nearest-stocks', 1, 15, query.toString()],
+    queryFn: async ({ queryKey }) => {
+      const filters = Object.fromEntries(new URLSearchParams({sortcol:"popular"}));
+      return getNearestStocks(Number(1), Number(15), filters);
+    }
+  });
+
 
   queryClient.prefetchQuery({
     queryKey: ['carousel-voucher'],
