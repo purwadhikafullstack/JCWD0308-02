@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/sonner";
+import { getUserProfile } from "@/lib/fetch-api/user/client";
 
 interface CartItemProps {
   cart: CartItemType;
@@ -26,6 +27,15 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
     queryKey: ["selected-address"],
     queryFn: getSelectedAddress,
   });
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+  });
+
+  if (!userProfile?.data?.user) {
+    router.push('/auth/signin')
+  }
+
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
 

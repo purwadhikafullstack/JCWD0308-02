@@ -1,5 +1,10 @@
 import Link from 'next/link';
 import { SigninForm } from './_components/signin-form';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Signin',
+}
 
 export default function Signin() {
   return (

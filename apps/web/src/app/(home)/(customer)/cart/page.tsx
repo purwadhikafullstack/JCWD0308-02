@@ -18,6 +18,7 @@ import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
 import { Alert } from "@/components/ui/alert";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/sonner";
+import { getUserProfile } from "@/lib/fetch-api/user/client";
 
 export default function Cart() {
   const dispatch = useAppDispatch();
@@ -33,6 +34,15 @@ export default function Cart() {
       return getNearestStocks(Number(1), Number(15), filters);
     },
   });
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+  });
+
+  if (!userProfile?.data?.user) {
+    router.push('/auth/signin')
+  }
 
   const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
 

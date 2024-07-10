@@ -1,10 +1,7 @@
 import "server-only"
-import { Mysql2Adapter } from "@lucia-auth/adapter-mysql";
-// import { pool } from "./db";
-import { Lucia, Session } from "lucia";
+import { Session } from "lucia";
 import { cache } from "react";
 import { env } from "@/app/env";
-import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import fetchSSR from "./fetchSSR";
 

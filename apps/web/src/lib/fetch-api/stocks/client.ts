@@ -8,7 +8,6 @@ export const getNearestStocks = async (
   limit: number = 10,
   filters?: Record<string, string | undefined>
 ): Promise<{
-  isServiceAvailable: boolean;
   stocks: NearestStock[],
   total: number,
   page: number,

@@ -1,6 +1,5 @@
 import { Stock } from "./stock";
 
-
 export interface Product {
   isPack: any;
   id: string;

@@ -11,7 +11,7 @@ const userNavItems = [
   },
   {
     title: 'Orders',
-    href: '/orders',
+    href: '/list-orders',
   },
   {
     title: 'Vouchers',

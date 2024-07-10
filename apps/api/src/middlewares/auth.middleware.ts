@@ -59,7 +59,7 @@ export class AuthMiddleware {
     if (res.locals.user?.role === "USER") {
 
       if (!req.cookies.addressId) {
-        const mainAddress = await prisma.userAddress.findFirst({ where: { userId: res.locals.user.id, isMainAddress: true } })
+        const mainAddress = await prisma.userAddress.findFirst({ where: { userId: res.locals.user.id } })
         res.appendHeader("Set-Cookie", serializeCookie('addressId', mainAddress?.id!, {
           path: '/',
           secure: NODE_ENV === 'production',

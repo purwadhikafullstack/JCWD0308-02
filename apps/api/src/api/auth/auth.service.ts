@@ -6,8 +6,6 @@ import { AuthValidation, RegisterRequest, ResetPasswordRequest, SetAccountReques
 import { SigninRequest } from '@/types/auth.type.js';
 import { UserFields } from '@/types/user.type.js';
 import { pool, prisma } from '@/db.js';
-import { github, google } from '@/auth.lucia.js';
-import { AuthHelper, ICreateUserByGitHub } from './auth.helper.js';
 import { API_URL } from '@/config.js';
 import { sendEmailVerification, sendResetPassword } from '@/utils/email.js';
 
@@ -158,28 +156,6 @@ export class AuthService {
       where: { id: findUser.id },
       select: { ...UserFields },
     })!;
-  };
-
-  static githubOAuth = async (code: string) => {
-    const tokens = await github.validateAuthorizationCode(code);
-    const githubUser = await AuthHelper.getGitHubUser(tokens.accessToken);
-
-    const existingUser = await AuthHelper.getUserByOAuthId(githubUser);
-
-    if (existingUser) return existingUser;
-
-    return await AuthHelper.createUserByGitHub(githubUser);
-  };
-
-  static googleOAuth = async (code: string, codeVerifier: string) => {
-    const tokens = await google.validateAuthorizationCode(code, codeVerifier);
-    const googleUser = await AuthHelper.getGoogleUser(tokens.accessToken);
-
-    const existingUser = await AuthHelper.getUserByOAuthId(googleUser);
-
-    if (existingUser) return existingUser;
-
-    return await AuthHelper.createUserByGoogle(googleUser);
   };
 
   static resetRequest = async (req: RegisterRequest) => {
