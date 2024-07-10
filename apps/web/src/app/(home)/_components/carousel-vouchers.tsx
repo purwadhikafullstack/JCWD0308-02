@@ -11,8 +11,6 @@ import {
 import { getVouchers } from '@/lib/fetch-api/voucher/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import Image from 'next/image';
-import { useRef } from 'react';
-import Autoplay from 'embla-carousel-autoplay';
 
 export default function CarouselPromo() {
   const vouchers = useSuspenseQuery({
@@ -30,11 +28,6 @@ export default function CarouselPromo() {
             align: 'start',
             loop: true,
           }}
-          plugins={[
-            Autoplay({
-              delay: 10000,
-            }),
-          ]}
           className="rounded-lg shadow-lg"
         >
           <CarouselContent>
