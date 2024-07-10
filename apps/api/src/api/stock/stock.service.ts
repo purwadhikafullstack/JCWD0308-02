@@ -36,52 +36,83 @@ export class StockService {
   }
 
   static async getNearestStocks(page: number, limit: number, filters: any, res: Response) {
-    const { search, storeId, ...filterOptions } = filters;
+    const { search, storeId, categoryId, sortcol, ...filterOptions } = filters;
     const where: any = {};
-
+  
     if (search) {
       where.OR = [
         { product: { title: { contains: search } } },
         { store: { name: { contains: search } } },
       ];
     }
-
-    let store = null
-    let isServiceAvailable = false
+  
+    if (categoryId) {
+      where.product = {
+        categoryId: categoryId
+      };
+    }
+  
+    for (const [key, value] of Object.entries(filterOptions)) {
+      if (value) {
+        where[key] = value;
+      }
+    }
+  
+    let store = null;
+    let isServiceAvailable = false;
     if (!res.locals.address?.id) {
-      
       store = await prisma.store.findFirst({
         orderBy: {
           createdAt: 'asc'
         }
-      })
+      });
       where.storeId = store?.id;
     } else {
-      const data = await findNearestStore(res.locals.address.id)
+      const data = await findNearestStore(res.locals.address.id);
       where.storeId = data?.nearestStore?.id;
-      store = data?.nearestStore
-      isServiceAvailable = data?.isServiceAvailable
+      store = data?.nearestStore;
+      isServiceAvailable = data?.isServiceAvailable;
     }
-    
-    const total = await prisma.stock.count({ where });
+  
+
+    let orderBy: any = {};
+    if (sortcol === 'popular') {
+      orderBy = {
+        OrderItem: {
+          _count: 'desc'
+        }
+      };
+    }
+  
+    delete where.skip   
+    const total = await prisma.stock.count({
+      where: {
+        ...where
+      }
+    });
+  
+    // Retrieve the stocks with pagination and sorting
     const stocks = await prisma.stock.findMany({
       where: {
-        ...where,
-        amount: { gt: 0 }
+        ...where
       },
       skip: (page - 1) * limit,
       take: limit,
+      orderBy: orderBy,
       include: {
         product: {
           include: {
             images: true
           }
-        },
-      },
+        }
+      }
     });
+  
     return { total, page, limit, stocks, store, isServiceAvailable };
   }
-
+  
+  
+  
   static async getStockById(id: string) {
     const stock = await prisma.stock.findUnique({
       where: { id },

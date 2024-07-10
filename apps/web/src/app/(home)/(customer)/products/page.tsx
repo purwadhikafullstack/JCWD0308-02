@@ -1,20 +1,73 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Category } from '@/lib/types/category';
-import { Product } from '@/lib/types/product';
-import { fetchProducts } from '@/lib/fetch-api/product';
-import { fetchCategories } from '@/lib/fetch-api/category/client';
+import { NearestStock } from '@/lib/types/stock';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import Pagination from '@/components/partial/pagination';
 import { handleApiError } from '@/components/toast/toastutils';
-import ProductCard from './_component/ProductCard';
+import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
+import { getSelectedAddress } from '@/lib/fetch-api/address/client';
+import { fetchCategories } from '@/lib/fetch-api/category/client';
+import Image from 'next/image';
+import Link from 'next/link';
 
-const ProductList = () => {
+const ProductCard: React.FC<{ product: NearestStock['product'], amount: number, onTitleClick: (slug: string) => void }> = ({ product, amount, onTitleClick }) => {
+  return (
+    <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105">
+      <div className="relative w-full h-64">
+        {product.images && product.images.length > 0 ? (
+          <Image
+            src={product.images[0].imageUrl}
+            alt={product.title}
+            layout="fill"
+            objectFit="cover"
+            className="rounded-t-lg"
+            priority
+          />
+        ) : (
+          <div className="relative w-full h-full flex items-center justify-center bg-gray-200">
+            <span className="text-gray-500">No Image Available</span>
+          </div>
+        )}
+      </div>
+      <div className="relative z-20 mt-2">
+        <div className="h-20 flex items-center justify-center text-center">
+          <h3 className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3" onClick={() => onTitleClick(product.slug)}>
+            {product.title}
+          </h3>
+        </div>
+        <div className="h-12 mt-2 flex flex-col justify-center">
+          <p className="text-xs font-semibold text-gray-500 line-through">
+            Rp {product.price?.toLocaleString() ?? 'N/A'}
+          </p>
+          <p className="text-xl font-semibold text-primary">
+            Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}
+          </p>
+        </div>
+      </div>
+      <div className="mt-4">
+        {amount > 0 ? (
+          <Link href={`/products/detail/${product.slug}`}>
+            <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">
+              Buy
+            </div>
+          </Link>
+        ) : (
+          <div className="bg-gray-500 text-white text-center py-2 w-full rounded-lg cursor-not-allowed">
+            Product Out of Stock
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const ProductPage = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,31 +75,39 @@ const ProductList = () => {
   const [total, setTotal] = useState<number>(0);
   const [limit, setLimit] = useState<number>(15);
 
-  const fetchData = async () => {
-    setLoading(true);
-    setError(null);
-    const query = searchParams.get('search');
-    const filters: any = {};
-    if (query) {
-      filters.search = query;
-    }
-    try {
-      const [productData, categoryData] = await Promise.all([fetchProducts(page, limit, filters), fetchCategories()]);
-      setProducts(productData.products);
-      setTotal(productData.total);
-      setCategories([{ id: 'all', name: 'All Categories', superAdminId: '' }, ...categoryData]);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      setError('Failed to fetch data');
-      handleApiError(error, 'Failed to fetch data');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const selectedAddress = useSuspenseQuery({
+    queryKey: ['selected-address'],
+    queryFn: getSelectedAddress,
+  });
 
-  React.useEffect(() => {
-    fetchData();
-  }, [page, limit, searchParams]);
+  const nearestStocks = useSuspenseQuery({
+    queryKey: ['nearest-stocks', page, limit, searchParams.toString()],
+    queryFn: async () => {
+      const filters = {
+        categoryId: searchParams.get('categoryId') || '',
+        search: searchParams.get('search') || '',
+        sortcol: searchParams.get('sortcol') || ''
+      };
+      return getNearestStocks(page, limit, filters);
+    },
+  });
+
+  useEffect(() => {
+    fetchCategories()
+      .then(data => setCategories([{ id: 'all', name: 'All Categories', superAdminId: '' }, ...data]))
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+        setError('Failed to fetch categories');
+        handleApiError(error, 'Failed to fetch categories');
+      });
+  }, []);
+
+  useEffect(() => {
+    if (nearestStocks.data) {
+      setLoading(false);
+      setTotal(nearestStocks.data.total);
+    }
+  }, [nearestStocks.data]);
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -71,6 +132,13 @@ const ProductList = () => {
   const handleTitleClick = (slug: string) => {
     router.push(`/products/detail/${slug}`);
   };
+
+  if (!nearestStocks.data?.stocks?.length)
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <h1>Sorry, we are out of stock! :(</h1>
+      </div>
+    );
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -98,7 +166,7 @@ const ProductList = () => {
         </div>
       </div>
       <div className="text-gray-700 mb-4">
-        Showing {products.length} of {total} products
+        Showing {nearestStocks.data.stocks.length} of {total} products
       </div>
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
@@ -107,8 +175,8 @@ const ProductList = () => {
       ) : (
         <>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {products.map(product => (
-              <ProductCard key={product.id} product={product} onTitleClick={handleTitleClick} />
+            {nearestStocks.data.stocks.map((stock: NearestStock, index: number) => (
+              <ProductCard key={index} product={stock.product} amount={stock.amount} onTitleClick={handleTitleClick} />
             ))}
           </div>
           <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
@@ -118,4 +186,4 @@ const ProductList = () => {
   );
 };
 
-export default ProductList;
+export default ProductPage;

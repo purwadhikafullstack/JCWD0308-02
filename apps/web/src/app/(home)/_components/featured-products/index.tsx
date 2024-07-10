@@ -77,11 +77,17 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
         </div>
       </div>
       <div className="mt-4">
-        <Link href={`/product/detail/${product.slug}`}>
-          <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">
-            Buy
+        {stock.amount > 0 ? (
+          <Link href={`/products/detail/${product.slug}`}>
+            <div className="bg-primary text-white text-center py-2 w-full rounded-lg cursor-pointer hover:bg-primary-dark transition-colors hover:shadow-lg">
+              Buy
+            </div>
+          </Link>
+        ) : (
+          <div className="bg-gray-500 text-white text-center py-2 w-full rounded-lg cursor-not-allowed text-base">
+            Product Out of Stock 
           </div>
-        </Link>
+        )}
       </div>
     </div>
   );
@@ -89,9 +95,13 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
 
 export default function FeaturedProducts() {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks'],
-    queryFn: getNearestStocks,
+    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryFn: async ({ queryKey }) => {
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    }
   });
+
   const selectedAddress = useSuspenseQuery({
     queryKey: ['selected-address'],
     queryFn: getSelectedAddress,
@@ -114,7 +124,7 @@ export default function FeaturedProducts() {
             Featured Products
           </h2>
           <Link
-            href="/product"
+            href="/products"
             className="text-sm font-medium text-primary hover:underline underline-offset-4"
             prefetch={false}
           >
