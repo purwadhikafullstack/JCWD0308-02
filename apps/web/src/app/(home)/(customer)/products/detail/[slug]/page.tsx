@@ -1,16 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
-import { addCartItem, addToCart } from '@/lib/features/cart/cartSlice';
-import { selectSelectedAddressId } from '@/lib/features/address/addressSlice';
-import { fetchProductBySlug } from '@/lib/fetch-api/product';
-import { Product } from '@/lib/types/product';
-import { formatCurrency } from '@/lib/currency';
-import { Button } from '@/components/ui/button';
-import { ShoppingCart, Plus, Minus, CheckCircle, Gift, Box, Info } from 'lucide-react';
-import Image from 'next/image';
+import React, { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { addCartItem, addToCart } from "@/lib/features/cart/cartSlice";
+import { selectSelectedAddressId } from "@/lib/features/address/addressSlice";
+import { fetchProductBySlug } from "@/lib/fetch-api/product";
+import { Product } from "@/lib/types/product";
+import { formatCurrency } from "@/lib/currency";
+import { Button } from "@/components/ui/button";
+import { ShoppingCart, Plus, Minus, CheckCircle, Gift, Box, Info } from "lucide-react";
+import Image from "next/image";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { getSelectedAddress } from "@/lib/fetch-api/address/client";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/sonner";
 
 const ProductDetail: React.FC = () => {
   const { slug } = useParams();
@@ -22,7 +27,13 @@ const ProductDetail: React.FC = () => {
   const [isPack, setIsPack] = useState<boolean>(false);
   const [quantity, setQuantity] = useState<number>(1);
   const dispatch = useAppDispatch();
-  const selectAddressId = useAppSelector(selectSelectedAddressId);
+
+  const selectedAddress = useSuspenseQuery({
+    queryKey: ["selected-address"],
+    queryFn: getSelectedAddress,
+  });
+  const addressId = selectedAddress.data?.address?.id;
+
   const router = useRouter();
 
   useEffect(() => {
@@ -31,8 +42,8 @@ const ProductDetail: React.FC = () => {
         const fetchedProduct = await fetchProductBySlug(productSlug);
         setProduct(fetchedProduct);
       } catch (error) {
-        console.error('Error fetching product:', error);
-        setError('Failed to fetch product');
+        console.error("Error fetching product:", error);
+        setError("Failed to fetch product");
       } finally {
         setLoading(false);
       }
@@ -53,8 +64,8 @@ const ProductDetail: React.FC = () => {
         productId: product.id,
         quantity,
         isPack,
-        addressId: selectAddressId ?? '',
-        stockId: product.stock?.[0]?.id ?? '', // Ensure to access the first stock item
+        addressId,
+        stockId: product.stock?.[0]?.id ?? "",
         isChecked: false,
       };
 
@@ -62,20 +73,20 @@ const ProductDetail: React.FC = () => {
         .unwrap()
         .then((response) => {
           dispatch(addToCart(response));
-          alert('Product added to cart!');
+          toast.success("Product added to cart!");
         })
         .catch((error) => {
-          console.error('Error adding product to cart:', error);
+          console.error("Error adding product to cart:", error);
+          toast.error("Failed to add product to cart.");
         });
     } catch (error) {
-      console.error('Error adding product to cart:', error);
+      console.error("Error adding product to cart:", error);
+      toast.error("An unexpected error occurred.");
     }
   };
 
-  const handleQuantityChange = (type: 'increment' | 'decrement') => {
-    setQuantity((prevQuantity) =>
-      type === 'increment' ? prevQuantity + 1 : Math.max(1, prevQuantity - 1)
-    );
+  const handleQuantityChange = (type: "increment" | "decrement") => {
+    setQuantity((prevQuantity) => (type === "increment" ? prevQuantity + 1 : Math.max(1, prevQuantity - 1)));
   };
 
   if (loading) return <p>Loading...</p>;
@@ -85,7 +96,9 @@ const ProductDetail: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <Button onClick={() => router.back()} className="mb-4">Back</Button>
+      <Button onClick={() => router.back()} className="mb-4">
+        Back
+      </Button>
       {product && (
         <div className="flex flex-col md:flex-row items-start md:items-center bg-white shadow-md rounded-lg overflow-hidden">
           <div className="w-full md:w-1/2 relative p-4 flex">
@@ -93,29 +106,17 @@ const ProductDetail: React.FC = () => {
               {product.images.map((image, index) => (
                 <div
                   key={index}
-                  className={`cursor-pointer p-1 border-2 ${currentImageIndex === index ? 'border-blue-600' : 'border-transparent'} rounded-lg`}
+                  className={`cursor-pointer p-1 border-2 ${currentImageIndex === index ? "border-blue-600" : "border-transparent"} rounded-lg`}
                   onClick={() => handleThumbnailClick(index)}
                 >
-                  <Image
-                    src={image.imageUrl}
-                    alt={product.title}
-                    width={80}
-                    height={80}
-                    className="object-cover rounded-lg hover:border-blue-600 transition"
-                  />
+                  <Image src={image.imageUrl} alt={product.title} width={80} height={80} className="object-cover rounded-lg hover:border-blue-600 transition" />
                 </div>
               ))}
             </div>
             <div className="w-full flex justify-center items-center">
               {product.images[currentImageIndex] && (
                 <div className="relative w-full h-96">
-                  <Image
-                    src={product.images[currentImageIndex].imageUrl}
-                    alt={product.title}
-                    layout="fill"
-                    objectFit="contain"
-                    className="rounded-lg border-2 border-gray-200 shadow-sm"
-                  />
+                  <Image src={product.images[currentImageIndex].imageUrl} alt={product.title} layout="fill" objectFit="contain" className="rounded-lg border-2 border-gray-200 shadow-sm" />
                 </div>
               )}
             </div>
@@ -124,58 +125,34 @@ const ProductDetail: React.FC = () => {
             <h1 className="text-4xl font-bold mb-2 text-primary">{product.title}</h1>
             <p className="text-lg mb-4 text-gray-600">{product.description}</p>
             <div className="flex space-x-4 mb-4">
-              <Button
-                variant={!isPack ? "default" : "outline"}
-                onClick={() => setIsPack(false)}
-                className={`flex-1 ${!isPack ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-              >
+              <Button variant={!isPack ? "default" : "outline"} onClick={() => setIsPack(false)} className={`flex-1 ${!isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
                 Unit Price
               </Button>
-              <Button
-                variant={isPack ? "default" : "outline"}
-                onClick={() => setIsPack(true)}
-                className={`flex-1 ${isPack ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
-              >
+              <Button variant={isPack ? "default" : "outline"} onClick={() => setIsPack(true)} className={`flex-1 ${isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
                 Pack Price
               </Button>
             </div>
             {isPack ? (
               <p className="text-2xl font-bold mb-4 text-primary">
-                <del className="text-xs font-semibold text-gray-500 line-through">{formatCurrency(product.packPrice || 0)}</del> {' '}
-                {formatCurrency(product.discountPackPrice || product.packPrice || 0)}
+                <del className="text-xs font-semibold text-gray-500 line-through">{formatCurrency(product.packPrice || 0)}</del> {formatCurrency(product.discountPackPrice || product.packPrice || 0)}
               </p>
             ) : (
               <p className="text-2xl font-bold mb-4 text-primary">
-                <del className="text-xs font-semibold text-gray-500 line-through">{formatCurrency(product.price || 0)}</del> {' '}
-                {formatCurrency(product.discountPrice || product.price || 0)}
+                <del className="text-xs font-semibold text-gray-500 line-through">{formatCurrency(product.price || 0)}</del> {formatCurrency(product.discountPrice || product.price || 0)}
               </p>
             )}
-            <p className="text-sm mb-4 text-gray-600">
-              Available Stock: {availableStock}
-            </p>
+            <p className="text-sm mb-4 text-gray-600">Available Stock: {availableStock}</p>
             <div className="flex items-center space-x-4 mb-4">
-              <Button
-                variant="outline"
-                onClick={() => handleQuantityChange('decrement')}
-                disabled={quantity <= 1}
-              >
+              <Button variant="outline" onClick={() => handleQuantityChange("decrement")} disabled={quantity <= 1}>
                 <Minus size={16} />
               </Button>
               <p className="text-lg">{quantity}</p>
-              <Button
-                variant="outline"
-                onClick={() => handleQuantityChange('increment')}
-              >
+              <Button variant="outline" onClick={() => handleQuantityChange("increment")}>
                 <Plus size={16} />
               </Button>
             </div>
             <div className="flex space-x-4">
-              <Button
-                variant="default"
-                onClick={handleAddToCart}
-                disabled={availableStock === 0}
-                className="bg-blue-600 text-white hover:bg-blue-700"
-              >
+              <Button variant="default" onClick={handleAddToCart} disabled={availableStock === 0} className="bg-blue-600 text-white hover:bg-blue-700">
                 <ShoppingCart size={20} className="mr-2" />
                 Add to Cart
               </Button>
@@ -212,7 +189,7 @@ const ProductDetail: React.FC = () => {
                     <div key={stock.id} className=" text-gray-600">
                       <div className="flex items-center text-bold text-primary">
                         <Box size={16} className="mr-2" />
-                        <span > {stock.store.name}</span>
+                        <span> {stock.store.name}</span>
                       </div>
                       <div className="flex items-center ml-6 mt-1 text-sm">
                         <CheckCircle size={16} className="mr-2" />
@@ -226,6 +203,7 @@ const ProductDetail: React.FC = () => {
           </div>
         </div>
       )}
+      <Toaster />
     </div>
   );
 };
