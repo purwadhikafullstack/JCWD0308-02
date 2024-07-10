@@ -9,7 +9,9 @@ export class ProductService {
   static getProducts = async (page: number, limit?: number, filters: any = {}) => {
     const where: any = {};
     if (filters.search) {
-      where.title = { contains: filters.search };
+      where.title = {
+        contains: filters.search.toLowerCase(),
+      };
       delete filters.search;
     }
     for (const [key, value] of Object.entries(filters)) {
@@ -129,5 +131,31 @@ export class ProductService {
     if (findProduct) {
       throw new ResponseError(400, "Product with this title already exists!");
     }
+  };
+  static getProductBySlug = async (slug: string) => {
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      select: {
+        ...ProductFields,
+        images: true,
+        stock: {
+          select: {
+            id: true,
+            amount: true,
+            store: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    return product;
   };
 }
