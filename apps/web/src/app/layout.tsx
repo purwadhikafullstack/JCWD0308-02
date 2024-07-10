@@ -75,7 +75,6 @@ export default async function RootLayout({
   await queryClient.prefetchQuery({
     queryKey: ['nearest-stocks', 1, 15, ''],
     queryFn: async ({ queryKey }) => {
-      // const [_, page, limit, queryString] = queryKey;
       const filters = Object.fromEntries(new URLSearchParams(String("")));
       return getNearestStocks(Number(1), Number(15), filters);
     },

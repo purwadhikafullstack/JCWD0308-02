@@ -14,6 +14,8 @@ import { Button } from '@/components/ui/button';
 import { handleApiError } from '@/components/toast/toastutils';
 import { showSuccess } from '@/components/toast/toastutils';
 import DeleteVoucherDialog from './_components/dialogs/DeleteVoucherDialog';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 import fixedDiscountProduct from '../../../../../public/fixeddiscountproduct.png';
 import discountProduct from '../../../../../public/discountproduct.png';
@@ -35,6 +37,13 @@ const VoucherManagement = () => {
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile
+  });
+
+  const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
 
   useEffect(() => {
     const fetchData = async () => {
@@ -118,14 +127,20 @@ const VoucherManagement = () => {
       <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">Vouchers</h2>
       <p className="text-lg mb-8 text-center text-gray-700">Manage your vouchers here.</p>
       <SearchBar onSearch={handleSearch} />
-      <VoucherFilters handleCreate={() => setCreatingVoucher(true)} />
+      {!isStoreAdmin && <VoucherFilters handleCreate={() => setCreatingVoucher(true)} />}
       {loading ? (
         <p className="text-center text-gray-500">Loading...</p>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {vouchers.map((voucher) => (
-              <VoucherCard key={voucher.id} voucher={voucher} handleDelete={() => setDeletingVoucher(voucher)} getVoucherIcon={getVoucherIcon} />
+              <VoucherCard 
+                key={voucher.id} 
+                voucher={voucher} 
+                handleDelete={() => setDeletingVoucher(voucher)} 
+                getVoucherIcon={getVoucherIcon} 
+                isStoreAdmin={isStoreAdmin}
+              />
             ))}
           </div>
           <Dialog open={creatingVoucher} onOpenChange={setCreatingVoucher}>

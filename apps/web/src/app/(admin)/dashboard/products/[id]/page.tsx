@@ -10,6 +10,8 @@ import EditProductForm from '../_components/forms/EditProductForm';
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
 import { handleApiError, showSuccess, showError } from '@/components/toast/toastutils';
 import DeleteProductDialog from '../_components/dialogs/DeleteProductDialog';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 const ProductDetail = () => {
   const router = useRouter();
@@ -78,6 +80,14 @@ const ProductDetail = () => {
     router.push('/dashboard/products');
   };
 
+  // Fetch user profile to determine role
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
+
+  const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -142,10 +152,12 @@ const ProductDetail = () => {
             <p className="text-sm text-gray-600"><strong>Updated At:</strong> {new Date(product.updatedAt).toLocaleDateString()}</p>
             <p className="text-sm text-gray-600"><strong>Created At:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
           </div>
-          <div className="flex justify-end space-x-2 mt-4">
-            <Button onClick={() => handleEdit(product)} className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"><FaEdit /></Button>
-            <Button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all"><FaTrashAlt /></Button>
-          </div>
+          {!isStoreAdmin && (
+            <div className="flex justify-end space-x-2 mt-4">
+              <Button onClick={() => handleEdit(product)} className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"><FaEdit /></Button>
+              <Button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all"><FaTrashAlt /></Button>
+            </div>
+          )}
         </div>
       </div>
       {editingProduct && (

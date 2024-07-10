@@ -25,8 +25,11 @@ export default function Cart() {
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState<boolean>(true);
   const router = useRouter();
   const nearestStocks = useSuspenseQuery({
-    queryKey: ["nearest-stocks"],
-    queryFn: getNearestStocks,
+    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryFn: async ({ queryKey }) => {
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    },
   });
 
   const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
