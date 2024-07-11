@@ -16,8 +16,6 @@ import {
 } from "@/components/ui/chart";
 import { StockMutation } from "@/lib/types/reports";
 
-export const description = "An interactive bar chart";
-
 const chartConfig = {
   stockIn: {
     label: "Stock In",
