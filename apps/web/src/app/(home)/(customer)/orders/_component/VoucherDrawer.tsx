@@ -16,7 +16,7 @@ import shippingCash from "../../../../../../public/shippingcash.png";
 import shippingDiscount from "../../../../../../public/shippingdiscount.png";
 
 interface VoucherDrawerProps {
-  onSelectVoucher: (voucherId: string, voucherName: string, voucherDiscount: number) => void;
+  onSelectVoucher: (voucherId: string, voucherName: string, voucherDiscount: number, voucherType: string, discountType: string) => void;
 }
 
 const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
@@ -40,12 +40,12 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
       return response.vouchers;
     },
   });
-
+  console.log("vouchers:", vouchers);
   const { data: userVouchers, error: userVouchersError } = useSuspenseQuery({
     queryKey: ["user-vouchers"],
     queryFn: getUserVouchers,
   });
-
+  console.log("userVouchers:", userVouchers);
   useEffect(() => {
     if (userVouchersError) {
       handleApiError(userVouchersError, "Failed to fetch user vouchers");
@@ -88,9 +88,15 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
     },
   });
 
-  const handleUseVoucher = (voucherId: string, voucherName: string, voucherDiscount: number) => {
-    setSelectedVoucher(voucherId);
-    onSelectVoucher(voucherId, voucherName, voucherDiscount);
+  const handleUseVoucher = (voucher: any) => {
+    setSelectedVoucher(voucher.id);
+    let discountAmount = 0;
+    if (voucher.discountType === "FIXED_DISCOUNT") {
+      discountAmount = voucher.fixedDiscount;
+    } else if (voucher.discountType === "DISCOUNT") {
+      discountAmount = voucher.discount * (1 / 100) * voucher.fixedDiscount;
+    }
+    onSelectVoucher(voucher.id, voucher.name, discountAmount, voucher.voucherType, voucher.discountType);
     document.getElementById("voucher-drawer-close")?.click();
   };
 
@@ -116,7 +122,7 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
                 <Button variant={claimedVouchers.includes(voucher.id) ? "secondary" : "default"} disabled={claimedVouchers.includes(voucher.id)} onClick={() => handleClaimVoucher.mutate(voucher.id)}>
                   {claimedVouchers.includes(voucher.id) ? "Claimed" : "Claim"}
                 </Button>
-                <Button variant="default" onClick={() => handleUseVoucher(voucher.id, voucher.name, voucher.fixedDiscount)}>
+                <Button variant="default" onClick={() => handleUseVoucher(voucher)}>
                   Use
                 </Button>
               </div>

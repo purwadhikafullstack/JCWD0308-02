@@ -15,16 +15,30 @@ interface ShippingAndDiscountProps {
   setShippingCourier: (method: string) => void;
   shippingMethod: string;
   setShippingMethod: (method: string) => void;
-  discount: string;
-  setDiscount: (method: string) => void;
+  discount: any;
+  setDiscount: (method: any) => void;
   cityId: any;
   totalWeight: number;
   shippingCost: number | null;
   setShippingCost: (cost: number | null) => void;
   setServiceDescription: (description: string) => void;
+  onVoucherSelect: (voucherId: string, voucherName: string, voucherDiscount: number) => void;
 }
 
-const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({ shippingCourier, setShippingCourier, shippingMethod, setShippingMethod, discount, setDiscount, cityId, totalWeight, shippingCost, setShippingCost, setServiceDescription }) => {
+const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
+  shippingCourier,
+  setShippingCourier,
+  shippingMethod,
+  setShippingMethod,
+  discount,
+  setDiscount,
+  cityId,
+  totalWeight,
+  shippingCost,
+  setShippingCost,
+  setServiceDescription,
+  onVoucherSelect,
+}) => {
   const nearestStocks = useSuspenseQuery({
     queryKey: ["nearest-stocks", 1, 15, ""],
     queryFn: async ({ queryKey }) => {
@@ -71,9 +85,10 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({ shippingCouri
     setServiceDescription(selectedService?.description || "");
   };
 
-  const handleSelectVoucher = (voucherId: string, voucherName: string) => {
+  const handleSelectVoucher = (voucherId: string, voucherName: string, voucherDiscount: number) => {
     setDiscount(voucherId);
     setSelectedVoucherName(voucherName);
+    onVoucherSelect(voucherId, voucherName, voucherDiscount);
   };
 
   const [selectedVoucherName, setSelectedVoucherName] = useState<string | null>(null);
