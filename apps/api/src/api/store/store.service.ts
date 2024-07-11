@@ -45,16 +45,44 @@ export class StoreService {
     return stores;
   };
 
-  static getStores = async () => {
+  static getStores = async (page: number, limit: number, filters: any, res: Response) => {
+    const { search, storeId, status, ...filterOptions } = filters;
+    const where: any = {};
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search } },
+        { slug: { contains: search } },
+        { City: { name: { contains: search } } },
+      ];
+    }
+
+    if (status) where.status = status
+
+    for (const [key, value] of Object.entries(filterOptions)) {
+      if (value) {
+        where[key] = value;
+      }
+    }
+
+    const total = await prisma.store.count({
+      where: {
+        ...where
+      }
+    });
+
     const stores = await prisma.store.findMany({
+      where,
       include: {
         City: true
       },
       orderBy: {
         createdAt: 'asc'
-      }
+      },
+      skip: (page - 1) * limit,
+      take: limit,
     });
-    return stores;
+    return { total, page, limit, stores, totalPage: Math.ceil(total / limit) };
   };
 
   static getSeletedStore = async (adminId: string) => {
@@ -100,7 +128,7 @@ export class StoreService {
     req.body.id = req.params.storeId
 
     const storeData = Validation.validate(StoreValidation.UPDATE, req.body as UpdateStoreRequest)
-    
+
     const existingStore = await prisma.store.findUnique({
       where: {
         id: storeData.id

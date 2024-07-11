@@ -6,8 +6,9 @@ export interface CartRequest {
   productId: string;
 }
 export interface UpdateCartRequest {
-  productId: any;
-  addressId: any;
+  // productId: any;
+  // addressId: any;
+  cartItemId: string | null;
   stockId: string | null;
   quantity?: number | null;
 }

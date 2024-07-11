@@ -25,9 +25,9 @@ export const deleteCartItem = createAsyncThunk("cart/deleteCartItem", async (car
   }
 });
 
-export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ addressId, productId, quantity }: { addressId: any; productId: string; quantity: number }, { rejectWithValue }) => {
+export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ cartItemId, stockId, quantity }: { cartItemId: string; stockId: string; quantity: number }, { rejectWithValue }) => {
   try {
-    const res = await updateCart({ addressId, productId, quantity });
+    const res = await updateCart(cartItemId, stockId, quantity);
     console.log("res from updatedCartItem: ", res);
     return res;
   } catch (error: any) {

@@ -61,8 +61,8 @@ export default async function RootLayout({
   });
 
   queryClient.prefetchQuery({
-    queryKey: ['stores'],
-    queryFn: getStores,
+    queryKey: ['stores', 1, "", ""],
+    queryFn: () => getStores(1, "", ""),
   });
 
   queryClient.prefetchQuery({

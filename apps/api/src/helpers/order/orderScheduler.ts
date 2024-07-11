@@ -1,6 +1,5 @@
 import cron from "node-cron";
 import { prisma } from "@/db.js";
-import { OrderStatus, PaymentMethod } from "@prisma/client";
 
 export const orderScheduler = () => {
   //set up confirmed by user
@@ -23,7 +22,7 @@ export const orderScheduler = () => {
     await prisma.$transaction(orderUpdates);
   });
 
-  //cancel otomatis
+  //auto cancel order
   cron.schedule("0 * * * *", async () => {
     try {
       console.log("Cron job triggered");

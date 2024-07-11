@@ -3,7 +3,6 @@ import { CartController } from "./cart.controller.js";
 import { AuthMiddleware } from "@/middlewares/auth.middleware.js";
 import multer from "multer";
 
-
 export class CartRouter {
   private router: Router;
   private cartController: CartController;
@@ -21,6 +20,7 @@ export class CartRouter {
     this.router.patch("/update-cart", AuthMiddleware.authed, this.cartController.updateCart);
     this.router.get("/item-count", AuthMiddleware.authed, this.cartController.getCartItemCount);
     this.router.patch("/checked", AuthMiddleware.authed, this.cartController.updateCartIsCheckedStatus);
+    this.router.patch("/checked-all", AuthMiddleware.authed, this.cartController.updateCheckedAll);
     this.router.delete("/:cartId", AuthMiddleware.authed, this.cartController.deleteCart);
   }
 

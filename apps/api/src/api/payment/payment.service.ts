@@ -1,5 +1,5 @@
-import { prisma } from '@/db.js';
-import { OrderStatus } from '@prisma/client';
+import { prisma } from "@/db.js";
+import { OrderStatus } from "@prisma/client";
 
 export class PaymentService {
   static updateOrderStatus = async (orderId: string, status: OrderStatus) => {
@@ -10,8 +10,7 @@ export class PaymentService {
       });
       return updatedOrder;
     } catch (error) {
-      console.error('Error updating order status:', error);
-      throw error;
+      console.error("Error updating order status:", error);
     }
   };
 }

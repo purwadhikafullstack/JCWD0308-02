@@ -30,7 +30,7 @@ export default function OrderCustomer() {
   const [selectedItems, setSelectedItems] = useState<CartItemType[]>([]);
   const [shippingCourier, setShippingCourier] = useState<string>("");
   const [shippingMethod, setShippingMethod] = useState<string>("");
-  const [discount, setDiscount] = useState<any>("");
+  const [discount, setDiscount] = useState<number>(0);
   const [note, setNote] = useState<string>("");
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingCost, setShippingCost] = useState<number | null>(null);
@@ -62,7 +62,8 @@ export default function OrderCustomer() {
         serviceDescription,
         paymentMethod,
         addressId,
-        note: note,
+        note,
+        discountId: selectedVoucherId,
       };
       const response = await addOrder(orderData);
       if (response && response.data) {
@@ -135,6 +136,8 @@ export default function OrderCustomer() {
               shippingCost={shippingCost}
               setShippingCost={setShippingCost}
               setServiceDescription={setServiceDescription}
+              onVoucherSelect={handleSelectVoucher}
+              selectedItems={selectedItems}
             />
           </div>
           {/* Additional Info */}

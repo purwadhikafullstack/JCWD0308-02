@@ -1,6 +1,6 @@
-import { Router } from 'express';
-import { AuthMiddleware } from '@/middlewares/auth.middleware.js';
-import { OrderStoreController } from './admin-store.controller.js';
+import { Router } from "express";
+import { AuthMiddleware } from "@/middlewares/auth.middleware.js";
+import { OrderStoreController } from "./admin-store.controller.js";
 
 export class OrderStoreRouter {
   private router: Router;
@@ -15,17 +15,8 @@ export class OrderStoreRouter {
   private initializeRoutes(): void {
     const storeAdmin = AuthMiddleware.storeAdmin;
 
-    this.router.post(
-      '/:orderId/send',
-      storeAdmin,
-      this.orderStoreController.sendUserOrders,
-    );
-
-    this.router.post(
-      '/:orderId/cancel-by-admin',
-      storeAdmin,
-      this.orderStoreController.cancelOrderByAdmin,
-    );
+    this.router.post("/:orderId/send", storeAdmin, this.orderStoreController.sendUserOrders);
+    this.router.post("/:orderId/cancel-by-admin", storeAdmin, this.orderStoreController.cancelOrderByAdmin);
   }
   public getRouter(): Router {
     return this.router;
