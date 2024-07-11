@@ -2,6 +2,7 @@ import { ResponseError } from "@/utils/error.response.js";
 import { CourierType } from "@prisma/client";
 
 export interface OrderRequest {
+  serviceDescription?: any;
   addressId?: any;
   paymentMethod: string;
   courier: string;

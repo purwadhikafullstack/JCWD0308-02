@@ -1,5 +1,4 @@
 "use client";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
@@ -11,13 +10,14 @@ import ShippingAndDiscount from "./_component/ShippingAndDiscount";
 import Summary from "./_component/Summary";
 import { CartItemType } from "@/lib/types/cart";
 import { fetchAddresses } from "@/lib/features/address/addressSlice";
-import { getUserProfile } from "@/lib/fetch-api/user/client";
 import AdditionalInfo from "./_component/AdditionalInfo";
 import { mapCourierToUpperCase } from "@/lib/courierServices";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getSelectedAddress } from "@/lib/fetch-api/address/client";
 import { addOrder } from "@/lib/fetch-api/order";
 import { Separator } from "@/components/ui/separator";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/sonner";
 
 export default function OrderCustomer() {
   const dispatch = useAppDispatch();
@@ -35,11 +35,13 @@ export default function OrderCustomer() {
   const [paymentMethod, setPaymentMethod] = useState<string>("");
   const [shippingCost, setShippingCost] = useState<number | null>(null);
   const [serviceDescription, setServiceDescription] = useState<string>("");
+  const [selectedVoucherId, setSelectedVoucherId] = useState<string | null>(null);
+  const [selectedVoucherName, setSelectedVoucherName] = useState<string | null>(null);
 
   const router = useRouter();
   const searchParams = useSearchParams();
-  const addressId = selectedAddress.data?.address.id;
-  const cityId = selectedAddress.data?.address.cityId;
+  const addressId = selectedAddress.data?.address?.id;
+  const cityId = selectedAddress.data?.address?.cityId;
 
   useEffect(() => {
     dispatch(fetchAddresses());
@@ -63,11 +65,8 @@ export default function OrderCustomer() {
         note: note,
       };
       const response = await addOrder(orderData);
-      console.log("Response:", response);
-
       if (response && response.data) {
         const newOrder = response.data;
-        const paymentLink = newOrder.paymentLink;
         if (paymentMethod === "GATEWAY" && newOrder) {
           router.push(`/orders/order-details/${newOrder.id}`);
         } else if (paymentMethod === "MANUAL" && newOrder) {
@@ -77,17 +76,26 @@ export default function OrderCustomer() {
         }
         const selectedIds = selectedItems.map((item) => `${item.id}-${item.isPack}`);
         dispatch(removeSelectedItems(selectedIds));
+        toast.success("Order success!");
       } else {
         console.error("Unexpected response structure:", response);
+        toast.error("Unexpected response structure");
       }
     } catch (error) {
       console.error("Failed to create order: ", error);
+      toast.error("Failed to create order");
     }
   };
 
   const totalWeight = carts.reduce((acc: any, item) => {
     return acc + item.quantity * (item.isPack ? item.stock.product.weightPack : item.stock.product.weight);
   }, 0);
+
+  const handleSelectVoucher = (voucherId: string, voucherName: string, voucherDiscount: number) => {
+    setSelectedVoucherId(voucherId);
+    setSelectedVoucherName(voucherName);
+    setDiscount(voucherDiscount);
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-5">
@@ -143,6 +151,7 @@ export default function OrderCustomer() {
           Place Order
         </Button>
       </div>
+      <Toaster />
     </div>
   );
 }

@@ -14,4 +14,8 @@ export interface Voucher {
   minOrderItem: number;
   expiresAt: Date;
   imageUrl: string | null;
+  store: {
+    id: string;
+    name: string;
+  } | null; // Add this line to include the store information
 }

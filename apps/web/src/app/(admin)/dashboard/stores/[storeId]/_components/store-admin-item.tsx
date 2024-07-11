@@ -1,9 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { TableCell, TableRow } from '@/components/ui/table';
-import { Store } from '@/lib/types/store';
 import { User } from '@/lib/types/user';
 import Image from 'next/image';
-import Link from 'next/link';
 
 export default function StoreAdminItem({ user }: { user: User }) {
   return (

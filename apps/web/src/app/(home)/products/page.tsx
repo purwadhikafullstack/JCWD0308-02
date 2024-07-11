@@ -13,6 +13,7 @@ import { getSelectedAddress } from '@/lib/fetch-api/address/client';
 import { fetchCategories } from '@/lib/fetch-api/category/client';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Metadata } from 'next';
 
 const ProductCard: React.FC<{ product: NearestStock['product'], amount: number, onTitleClick: (slug: string) => void }> = ({ product, amount, onTitleClick }) => {
   return (

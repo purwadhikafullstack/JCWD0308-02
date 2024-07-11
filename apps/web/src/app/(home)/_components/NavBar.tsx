@@ -3,7 +3,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { cn, shuffleArray } from '@/lib/utils';
+import { cn } from '@/lib/utils';
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,7 +12,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu';
-import { CarTaxiFront, LayoutGrid, Menu, Search, ShoppingBag } from 'lucide-react';
+import { LayoutGrid, Search } from 'lucide-react';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,11 +22,9 @@ import RightMenu from './right-menu';
 import SecondNavbar from './second-navbar';
 import Image from 'next/image';
 
-
 export const NavbBar = ({ category }: { category: Category[] }) => {
   const router = useRouter();
   const [query, setQuery] = useState('');
-
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,9 +37,17 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
     <div className="flex flex-col z-10 bg-background">
       <header className="container flex items-center justify-between gap-4 h-16 bg-background px-4 md:px-6">
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center gap-2 text-lg font-semibold md:text-sm">
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-lg font-semibold md:text-sm"
+          >
             <figure>
-              <Image src="/logogram-new.png" width={200} height={200} alt="logo grosirun" />
+              <Image
+                src="/logogram-new.png"
+                width={200}
+                height={200}
+                alt="logo grosirun"
+              />
             </figure>
           </Link>
           <nav className="flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
@@ -75,7 +81,10 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
             </NavigationMenu>
           </nav>
         </div>
-        <form className="relative hidden md:block w-full max-w-4xl" onSubmit={handleSearch}>
+        <form
+          className="relative hidden md:block w-full max-w-4xl"
+          onSubmit={handleSearch}
+        >
           <Input
             type="text"
             className="max-w-4xl"
@@ -84,10 +93,14 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button size="icon" variant="ghost" type="submit" className="absolute inset-y-0 right-0 rounded-r-md px-3 text-muted-foreground">
+          <Button
+            size="icon"
+            variant="ghost"
+            type="submit"
+            className="absolute inset-y-0 right-0 rounded-r-md px-3 text-muted-foreground"
+          >
             <Search className="h-5 w-5" />
           </Button>
-        
         </form>
         <div className="flex items-center gap-3">
           <Sheet>
@@ -100,21 +113,27 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
             <SheetContent className="w-[300px]" side="right">
               <div className="flex flex-col items-start gap-4 p-4">
                 <nav className="flex flex-col items-start gap-2">
-                  <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
-                    Home
-                  </Link>
-                  <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
-                    List Orders
-                  </Link>
-                  <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
-                    Products
-                  </Link>
-                  <Link href="#" className="text-muted-foreground transition-colors hover:text-foreground">
-                    Customers
-                  </Link>
-                  <Link href="#" className="text-foreground transition-colors hover:text-foreground">
-                    Settings
-                  </Link>
+                  <form
+                    className="relative w-full max-w-4xl"
+                    onSubmit={handleSearch}
+                  >
+                    <Input
+                      type="text"
+                      className="max-w-4xl"
+                      name="query"
+                      placeholder="Search products...."
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                    />
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      type="submit"
+                      className="absolute inset-y-0 right-0 rounded-r-md px-3 text-muted-foreground"
+                    >
+                      <Search className="h-5 w-5" />
+                    </Button>
+                  </form>
                 </nav>
               </div>
             </SheetContent>
@@ -131,11 +150,12 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
 const ListItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'>
->(({ className, title, children, ...props }, ref) => {
+>(({ className, title, children, href, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
-        <a
+        <Link
+          href={href!}
           ref={ref}
           className={cn(
             'block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground',
@@ -143,10 +163,8 @@ const ListItem = React.forwardRef<
           )}
           {...props}
         >
-          <div className="leading-none">
-            {title}
-          </div>
-        </a>
+          <div className="leading-none">{title}</div>
+        </Link>
       </NavigationMenuLink>
     </li>
   );

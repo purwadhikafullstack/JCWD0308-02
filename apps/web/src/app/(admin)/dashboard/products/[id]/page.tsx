@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useCallback, useEffect, useState, useRef } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from '@/components/ui/button';
@@ -7,8 +7,18 @@ import Image from 'next/image';
 import { Product } from '@/lib/types/product';
 import { fetchProductById, updateProduct } from '@/lib/fetch-api/product';
 import EditProductForm from '../_components/forms/EditProductForm';
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from '@/components/ui/carousel';
-import { handleApiError, showSuccess, showError } from '@/components/toast/toastutils';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/components/ui/carousel';
+import {
+  handleApiError,
+  showSuccess,
+  showError,
+} from '@/components/toast/toastutils';
 import DeleteProductDialog from '../_components/dialogs/DeleteProductDialog';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
@@ -46,7 +56,9 @@ const ProductDetail = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       if (carouselRef.current) {
-        const nextButton = carouselRef.current.querySelector('.carousel-next') as HTMLButtonElement;
+        const nextButton = carouselRef.current.querySelector(
+          '.carousel-next',
+        ) as HTMLButtonElement;
         if (nextButton) {
           nextButton.click();
         }
@@ -80,7 +92,6 @@ const ProductDetail = () => {
     router.push('/dashboard/products');
   };
 
-  // Fetch user profile to determine role
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,
@@ -88,9 +99,12 @@ const ProductDetail = () => {
 
   const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
 
-  if (loading) {
-    return <p>Loading...</p>;
-  }
+  if (loading)
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
 
   if (error) {
     return <p>{error}</p>;
@@ -102,7 +116,9 @@ const ProductDetail = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 flex flex-col items-center">
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">{product.title}</h2>
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">
+        {product.title}
+      </h2>
       <div className="bg-white shadow-lg rounded-lg overflow-hidden">
         <Carousel ref={carouselRef} className="max-w-xs mx-auto">
           <CarouselContent className="flex">
@@ -133,29 +149,65 @@ const ProductDetail = () => {
           <CarouselNext className="carousel-next absolute right-0 top-1/2 transform -translate-y-1/2 bg-primary text-white p-2 rounded-full hover:bg-primary-100 cursor-pointer" />
         </Carousel>
         <div className="p-6">
-          <p className="text-md text-gray-600 mb-2"><strong>Description:</strong> {product.description}</p>
+          <p className="text-md text-gray-600 mb-2">
+            <strong>Description:</strong> {product.description}
+          </p>
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <p className="text-lg font-semibold text-red-500 line-through">Rp {product.price?.toLocaleString() ?? 'N/A'}</p>
-              <p className="text-lg font-semibold text-green-500">Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}</p>
+              <p className="text-lg font-semibold text-red-500 line-through">
+                Rp {product.price?.toLocaleString() ?? 'N/A'}
+              </p>
+              <p className="text-lg font-semibold text-green-500">
+                Rp {product.discountPrice?.toLocaleString() ?? 'N/A'}
+              </p>
             </div>
             <div>
-              <p className="text-lg font-semibold text-red-500 line-through">Rp {product.packPrice?.toLocaleString() ?? 'N/A'}</p>
-              <p className="text-lg font-semibold text-green-500">Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}</p>
+              <p className="text-lg font-semibold text-red-500 line-through">
+                Rp {product.packPrice?.toLocaleString() ?? 'N/A'}
+              </p>
+              <p className="text-lg font-semibold text-green-500">
+                Rp {product.discountPackPrice?.toLocaleString() ?? 'N/A'}
+              </p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 mb-4">
-            <p className="text-sm text-gray-600"><strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'} units</p>
-            <p className="text-sm text-gray-600"><strong>Bonus:</strong> {product.bonus ?? 'No bonus'}</p>
-            <p className="text-sm text-gray-600"><strong>Min Order:</strong> {product.minOrderItem ?? 'No min order'}</p>
-            <p className="text-sm text-gray-600"><strong>Status:</strong> {product.status}</p>
-            <p className="text-sm text-gray-600"><strong>Updated At:</strong> {new Date(product.updatedAt).toLocaleDateString()}</p>
-            <p className="text-sm text-gray-600"><strong>Created At:</strong> {new Date(product.createdAt).toLocaleDateString()}</p>
+            <p className="text-sm text-gray-600">
+              <strong>Pack Quantity:</strong> {product.packQuantity ?? 'N/A'}{' '}
+              units
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Bonus:</strong> {product.bonus ?? 'No bonus'}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Min Order:</strong>{' '}
+              {product.minOrderItem ?? 'No min order'}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Status:</strong> {product.status}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Updated At:</strong>{' '}
+              {new Date(product.updatedAt).toLocaleDateString()}
+            </p>
+            <p className="text-sm text-gray-600">
+              <strong>Created At:</strong>{' '}
+              {new Date(product.createdAt).toLocaleDateString()}
+            </p>
           </div>
           {!isStoreAdmin && (
             <div className="flex justify-end space-x-2 mt-4">
-              <Button onClick={() => handleEdit(product)} className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"><FaEdit /></Button>
-              <Button onClick={handleDelete} className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all"><FaTrashAlt /></Button>
+              <Button
+                onClick={() => handleEdit(product)}
+                className="bg-blue-500 text-white p-2 rounded-lg shadow-md hover:bg-blue-600 transition-all"
+              >
+                <FaEdit />
+              </Button>
+              <Button
+                onClick={handleDelete}
+                className="bg-red-500 text-white p-2 rounded-lg shadow-md hover:bg-red-600 transition-all"
+              >
+                <FaTrashAlt />
+              </Button>
             </div>
           )}
         </div>

@@ -16,6 +16,9 @@ import { Separator } from "@/components/ui/separator";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
 import { Alert } from "@/components/ui/alert";
+import { Toaster } from "@/components/ui/toaster";
+import { toast } from "@/components/ui/sonner";
+import { getUserProfile } from "@/lib/fetch-api/user/client";
 
 export default function Cart() {
   const dispatch = useAppDispatch();
@@ -25,12 +28,21 @@ export default function Cart() {
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState<boolean>(true);
   const router = useRouter();
   const nearestStocks = useSuspenseQuery({
-    queryKey: ['nearest-stocks', 1, 15, ''],
+    queryKey: ["nearest-stocks", 1, 15, ""],
     queryFn: async ({ queryKey }) => {
       const filters = Object.fromEntries(new URLSearchParams(String("")));
       return getNearestStocks(Number(1), Number(15), filters);
     },
   });
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+  });
+
+  if (!userProfile?.data?.user) {
+    router.push('/auth/signin')
+  }
 
   const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
 
@@ -43,8 +55,10 @@ export default function Cart() {
           isChecked: false,
         }));
         dispatch(setCart(updatedCartData));
+        toast.success("Cart Updated!");
       } catch (error) {
         console.error("Error fetching cart data:", error);
+        toast.error("Error fetching cart data.");
       }
     };
     fetchCartData();
@@ -104,7 +118,6 @@ export default function Cart() {
   const handleCheckout = () => {
     const selectedCarts = Object.keys(selectedItem).filter((key) => selectedItem[key]);
     const selectedItems = carts.filter((cart: any) => selectedCarts.includes(`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`));
-
     if (selectedItems.length > 0) {
       const queryString = selectedItems.map((item: any) => `items=${item.id}-${item.isPack}`).join("&");
       router.push(`/orders?${queryString}`);
@@ -138,7 +151,6 @@ export default function Cart() {
               <p className="text-gray-700">Subtotal</p>
               <p className="text-gray-700">{formatCurrency(subtotal)}</p>
             </div>
-
             <Separator className="mb-4" />
             <div className="flex justify-center">
               <Button variant="default" className="w-full" onClick={isCheckoutDisabled || !isServiceAvailable ? undefined : handleCheckout} disabled={isCheckoutDisabled || !isServiceAvailable}>
@@ -156,6 +168,7 @@ export default function Cart() {
           <div className="flex max-md:hidden max-md:overflow-y-hidden"></div>
         </div>
       </div>
+      <Toaster />
     </div>
   );
 }

@@ -16,9 +16,9 @@ export class VoucherRouter {
   private initializeRoutes(): void {
     this.router.get(
       '/',
-     
       this.voucherController.getVouchers,
     );
+    this.router.get('/voucher-user',AuthMiddleware.authed, this.voucherController.getUserVouchers);
     this.router.get(
       '/:id',
       AuthMiddleware.authed,
@@ -43,10 +43,10 @@ export class VoucherRouter {
     );
     this.router.post(
       '/assign',
-      AuthMiddleware.storeAdmin,
+      AuthMiddleware.authed,
       this.voucherController.assignVoucherToUser,
     );
-    this.router.get('/voucher-user', this.voucherController.getUserVouchers);
+   
   }
 
   getRouter(): Router {

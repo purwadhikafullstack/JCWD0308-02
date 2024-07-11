@@ -21,6 +21,11 @@ export class AddressService {
         ...addressRequest
       },
     });
+
+    if (address.isMainAddress) {
+      await prisma.userAddress.updateMany({ where: { NOT: { id: address.id } }, data: { isMainAddress: false } })
+    }
+
     return address;
   };
 
@@ -68,6 +73,11 @@ export class AddressService {
         ...addressRequest
       },
     });
+
+    if (address.isMainAddress) {
+      await prisma.userAddress.updateMany({ where: { NOT: { id: address.id } }, data: { isMainAddress: false } })
+    }
+
     return address;
   };
 

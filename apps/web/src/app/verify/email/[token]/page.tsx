@@ -1,13 +1,12 @@
-'use client';
-import Link from 'next/link';
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import fetchAPI from '@/lib/fetchAPI';
 import { env } from '@/app/env';
-import { Button } from '@/components/ui/button';
-import { Send } from 'lucide-react';
-import { toast } from 'sonner';
-import { useParams } from 'next/navigation';
 import { VerifyForm } from './_components/verify-form';
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Change Email Verification',
+}
 
 export default function VerifyPage({ params }: { params: { token: string } }) {
   const checkToken = useSuspenseQuery({

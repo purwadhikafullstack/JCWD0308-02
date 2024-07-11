@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { fetchStocks, createStock, deleteStock } from '@/lib/fetch-api/stock';
@@ -37,13 +37,13 @@ const StockList = () => {
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
 
   const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
-    queryFn: getUserProfile
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
   });
 
   const selectedStore = useSuspenseQuery({
-    queryKey: ["selected-store"],
-    queryFn: getSelectedStore
+    queryKey: ['selected-store'],
+    queryFn: getSelectedStore,
   });
 
   const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
@@ -52,7 +52,10 @@ const StockList = () => {
   useEffect(() => {
     if (isStoreAdmin && selectedStoreId) {
       setStoreFilter(selectedStoreId);
-      setFilters((prevFilters: any) => ({ ...prevFilters, storeId: selectedStoreId }));
+      setFilters((prevFilters: any) => ({
+        ...prevFilters,
+        storeId: selectedStoreId,
+      }));
     }
   }, [isStoreAdmin, selectedStoreId]);
 
@@ -98,10 +101,16 @@ const StockList = () => {
     }
   };
 
-  const handleDelete = async (id: string, productName: string, storeName: string) => {
+  const handleDelete = async (
+    id: string,
+    productName: string,
+    storeName: string,
+  ) => {
     try {
       await deleteStock(id);
-      showSuccess(`Stock for ${productName} in ${storeName} deleted successfully`);
+      showSuccess(
+        `Stock for ${productName} in ${storeName} deleted successfully`,
+      );
       setUpdateFlag(!updateFlag);
     } catch (error) {
       handleApiError(error, 'Failed to delete stock');
@@ -152,8 +161,12 @@ const StockList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">Stocks</h2>
-      <p className="text-lg mb-8 text-center text-gray-700">Manage your stocks here.</p>
+      <h2 className="text-3xl font-extrabold mb-6 text-center text-primary">
+        Stocks
+      </h2>
+      <p className="text-lg mb-8 text-center text-gray-700">
+        Manage your stocks here.
+      </p>
       <SearchBar onSearch={handleSearch} />
       <StockFilters
         stores={stores}
@@ -163,7 +176,9 @@ const StockList = () => {
         isStoreAdmin={isStoreAdmin}
       />
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="h-screen flex justify-center items-center">
+          <span className="loader"></span>
+        </div>
       ) : error ? (
         <p className="text-center text-red-500">{error}</p>
       ) : (
@@ -172,7 +187,7 @@ const StockList = () => {
             stocks={stocks}
             handleTitleClick={handleTitleClick}
             handleDelete={(id: string) => {
-              const stock = stocks.find(s => s.id === id);
+              const stock = stocks.find((s) => s.id === id);
               if (stock) {
                 setDeletingStock(stock);
               }
@@ -182,7 +197,12 @@ const StockList = () => {
           {!isStoreAdmin && (
             <>
               {creatingStock && (
-                <CreateStockForm onCreate={handleCreate} onCancel={() => setCreatingStock(false)} products={products} stores={stores} />
+                <CreateStockForm
+                  onCreate={handleCreate}
+                  onCancel={() => setCreatingStock(false)}
+                  products={products}
+                  stores={stores}
+                />
               )}
               {deletingStock && (
                 <DeleteStockDialog

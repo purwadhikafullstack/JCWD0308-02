@@ -1,16 +1,7 @@
-'use client';
-import React, { useEffect, useState } from 'react';
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { formatCurrency } from '@/lib/currency';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { getSelectedAddress } from '@/lib/fetch-api/address/client';
+"use client";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { formatCurrency } from "@/lib/currency";
 
 interface SummaryProps {
   selectedItems: any[];
@@ -18,64 +9,50 @@ interface SummaryProps {
   selectedAddress: any;
   shippingCost: number | null;
 }
-const Summary: React.FC<SummaryProps> = ({
-  selectedItems,
-  discount,
-  selectedAddress,
-  shippingCost,
-}) => {
-  const selectAddress = useSuspenseQuery({
-    queryKey: ['selected-address'],
-    queryFn: getSelectedAddress,
-  });
+
+const Summary: React.FC<SummaryProps> = ({ selectedItems, discount, selectedAddress, shippingCost }) => {
   const calculateSubtotal = () => {
     let subtotal = 0;
     selectedItems.forEach((item) => {
-      let itemPrice = item.isPack
-        ? item.stock.product.packPrice
-        : item.stock.product.price;
+      let itemPrice = item.isPack ? item.stock.product.packPrice : item.stock.product.price;
 
-      if (item.quantity && typeof itemPrice === 'number' && !isNaN(itemPrice)) {
+      if (item.quantity && typeof itemPrice === "number" && !isNaN(itemPrice)) {
         subtotal += item.quantity * itemPrice;
-      } else {
-        console.warn(`Invalid item found: ${JSON.stringify(item)}`);
       }
     });
     return subtotal;
   };
 
   const subtotal = calculateSubtotal();
-  const discountedSubtotal = subtotal - (discount || 0);
+  const validDiscount = typeof discount === "number" && !isNaN(discount) ? discount : 0;
+  const discountedSubtotal = subtotal - validDiscount;
   const total = (shippingCost || 0) + discountedSubtotal;
+  const totalDiscount = discount;
 
-  console.log(subtotal);
   return (
     <Card className="bg-card text-card-foreground shadow-lg flex flex-col h-full rounded-lg">
       <CardHeader className="bg-primary text-primary-foreground p-4 rounded-t-lg">
         <CardTitle className="text-3xl font-bold">Order Summary</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow p-6">
-        <h1 className="text-2xl font-bold mb-4">Order Details</h1>
-        <div className="flex justify-between mb-2">
-          <span>Subtotal</span>
+      <CardContent className="p-4">
+        <div className="flex justify-between">
+          <span>Subtotal:</span>
           <span>{formatCurrency(subtotal)}</span>
         </div>
-        <div className="flex justify-between mb-2">
-          <span>Shipping</span>
-          <span>
-            {shippingCost !== null
-              ? formatCurrency(shippingCost)
-              : 'Not yet calculated'}
-          </span>
-        </div>
-        {discount > 0 && (
-          <div className="flex justify-between mb-2">
-            <span>Discount</span>
-            <span>-{formatCurrency(discount)}</span>
+        {shippingCost !== null && (
+          <div className="flex justify-between mt-2">
+            <span>Shipping Cost:</span>
+            <span>{formatCurrency(shippingCost)}</span>
           </div>
         )}
-        <div className="flex justify-between font-bold text-lg">
-          <span>Total</span>
+        {totalDiscount > 0 && (
+          <div className="flex justify-between mt-2">
+            <span>Discount:</span>
+            <span>-{formatCurrency(totalDiscount)}</span>
+          </div>
+        )}
+        <div className="flex justify-between mt-2 font-bold">
+          <span>Total:</span>
           <span>{formatCurrency(total)}</span>
         </div>
         <hr className="my-4 border-primary" />

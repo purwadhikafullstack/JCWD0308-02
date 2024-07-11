@@ -1,17 +1,45 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { getStores, getSelectedStore } from '@/lib/fetch-api/store/client';
 
 const FormFields: React.FC = () => {
-  const { control, register } = useFormContext();
+  const { control, register, setValue, watch } = useFormContext();
+  const storeId = watch('storeId'); 
+
+  const { data: userProfile } = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
+  const { data: stores } = useSuspenseQuery({
+    queryKey: ['stores'],
+    queryFn: getStores,
+  });
+  const { data: selectedStore } = useSuspenseQuery({
+    queryKey: ['store'],
+    queryFn: getSelectedStore,
+  });
+
+  const isStoreAdmin = userProfile?.user?.role === 'STORE_ADMIN';
+  const storeAdminStoreId = selectedStore?.store?.id;
+
+  useEffect(() => {
+    if (isStoreAdmin && storeAdminStoreId) {
+      setValue('storeId', storeAdminStoreId);
+    } else if (!storeId) {
+      setValue('storeId', ''); 
+    }
+  }, [isStoreAdmin, storeAdminStoreId, storeId, setValue]);
 
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 col-span-full">
-      <div className='col-span-2'>
+      <div className="col-span-2">
         <Label htmlFor="name">Name</Label>
         <Controller
           name="name"
@@ -120,12 +148,34 @@ const FormFields: React.FC = () => {
         />
       </div>
       <div className="col-span-full">
-        <Label htmlFor="image">Image</Label>
-        <input
-          type="file"
-          {...register('image')}
-          className="mt-1 block w-full"
+        <Label htmlFor="storeId">Store</Label>
+        <Controller
+          name="storeId"
+          control={control}
+          render={({ field }) => (
+            <Select onValueChange={(value) => field.onChange(value !== 'all' ? value : '')} value={field.value ?? ''} disabled={isStoreAdmin}>
+              <SelectTrigger className="text-black">
+                <SelectValue placeholder="Select store" />
+              </SelectTrigger>
+              <SelectContent>
+                {!isStoreAdmin && (
+                  <SelectItem value="all">
+                    Applicable to all stores
+                  </SelectItem>
+                )}
+                {stores?.stores?.map((store) => (
+                  <SelectItem key={store.id} value={store.id}>
+                    {store.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         />
+      </div>
+      <div className="col-span-full">
+        <Label htmlFor="image">Image</Label>
+        <input type="file" {...register('image')} className="mt-1 block w-full" />
       </div>
       <div className="flex items-center">
         <Controller

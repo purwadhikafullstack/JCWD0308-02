@@ -34,8 +34,8 @@ export default function CreateAddressForm({
   const form = useAddressForm({
     address: address?.address || "",
     coordinate: address?.coordinate || "",
-    cityId: String(address?.cityId) || "",
-    provinceId: String(address?.city?.provinceId) || "",
+    cityId: address?.cityId?.toString() || "",
+    provinceId: address?.city?.provinceId?.toString() || "",
     isMainAddress: address?.isMainAddress || false,
     labelAddress: address?.labelAddress || "",
     latitude: address?.latitude || "",

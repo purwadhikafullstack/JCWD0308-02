@@ -5,7 +5,7 @@ import { confirmOrder } from "@/lib/fetch-api/order";
 import { OrderItemProps } from "@/lib/types/order";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 
 const DeliveredOrderItem: React.FC<OrderItemProps> = ({ order }) => {
   const [confirmed, setConfirmed] = useState(false);
@@ -52,9 +52,6 @@ const DeliveredOrderItem: React.FC<OrderItemProps> = ({ order }) => {
               Quantity: {item.quantity}
               {item.isPack && ` (Pack of ${item.stock.product.packQuantity})`}
             </p>
-            <div className="flex gap-2 mt-2">
-              <Button className="hover:underline">View Product</Button>
-            </div>
           </div>
         </div>
       ))}

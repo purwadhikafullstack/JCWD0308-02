@@ -6,7 +6,13 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { NearestStock } from "@/lib/types/stock";
 import Image from "next/image";
 import Link from "next/link";
-import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
 import { getUserProfile } from "@/lib/fetch-api/user/client";
 
 interface ProductItemProps {
@@ -38,7 +44,11 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
 
   return (
     <div className="bg-white shadow-lg rounded-lg overflow-hidden transition-transform transform hover:scale-105">
-      <Carousel ref={carouselRef} className="relative w-full h-64" opts={{ loop: true }}>
+      <Carousel
+        ref={carouselRef}
+        className="relative w-full h-64"
+        opts={{ loop: true }}
+      >
         <CarouselContent className="flex">
           {product.images && product.images.length > 0 ? (
             product.images.map((image, index) => (
@@ -61,11 +71,14 @@ const ProductItem: React.FC<ProductItemProps> = ({ stock, addressId }) => {
       </Carousel>
       <div className="relative z-20 mt-2">
         <div className="h-20 flex items-center justify-center text-center">
-          <h3 className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3">{product.title}</h3>
+          <Link
+            href={`/products/detail/${product.slug}`}
+            className="font-semibold text-base text-primary overflow-hidden overflow-ellipsis whitespace-normal line-clamp-3 cursor-pointer"
+          >{product.title}</Link>
         </div>
-        <div className="h-12 mt-2 flex flex-col justify-center">
-          <p className="text-xs font-semibold text-gray-500 line-through">Rp {product.price?.toLocaleString() ?? "N/A"}</p>
-          <p className="text-xl font-semibold text-primary">Rp {product.discountPrice?.toLocaleString() ?? "N/A"}</p>
+        <div className="h-12 mt-2 flex flex-col justify-center ml-4">
+          <p className="text-xs font-semibold text-gray-500 line-through" suppressHydrationWarning>Rp {product.price?.toLocaleString() ?? "N/A"}</p>
+          <p className="text-xl font-semibold text-primary" suppressHydrationWarning>Rp {product.discountPrice?.toLocaleString() ?? "N/A"}</p>
         </div>
       </div>
       <div className="mt-4">
@@ -127,9 +140,11 @@ export default function FeaturedProducts() {
           </Link>
         </div>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 mt-6">
-          {nearestStocks.data.stocks.map((stock: NearestStock, index: number) => (
-            <ProductItem key={index} stock={stock} addressId={addressId} />
-          ))}
+          {nearestStocks.data.stocks.map(
+            (stock: NearestStock, index: number) => (
+              <ProductItem key={index} stock={stock} addressId={addressId} />
+            ),
+          )}
         </div>
       </div>
     </section>

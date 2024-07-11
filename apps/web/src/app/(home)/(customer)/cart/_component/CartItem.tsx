@@ -1,13 +1,11 @@
 "use client";
 import Image from "next/image";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Trash2, Minus, Plus, Trash } from "lucide-react";
+import { Minus, Plus, Trash } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { useAppDispatch } from "@/lib/features/hooks";
 import { deleteCartItem, fetchCartItemCount, updateCartItem, updateQuantity } from "@/lib/features/cart/cartSlice";
-import { RootState } from "@/lib/features/store";
 import { formatCurrency } from "@/lib/currency";
 import { CartItemType } from "@/lib/types/cart";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -16,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/sonner";
+import { getUserProfile } from "@/lib/fetch-api/user/client";
 
 interface CartItemProps {
   cart: CartItemType;
@@ -28,6 +27,15 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
     queryKey: ["selected-address"],
     queryFn: getSelectedAddress,
   });
+  const userProfile = useSuspenseQuery({
+    queryKey: ["user-profile"],
+    queryFn: getUserProfile,
+  });
+
+  if (!userProfile?.data?.user) {
+    router.push('/auth/signin')
+  }
+
   const [quantity, setQuantity] = useState(cart.quantity);
   const dispatch = useAppDispatch();
 
@@ -114,6 +122,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
         </Button>
       </div>
       <Separator className="my-4" />
+      <Toaster />
     </div>
   );
 };
