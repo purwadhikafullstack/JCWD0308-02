@@ -14,7 +14,6 @@ export class ReportRouter {
 
   private initializeRoutes(): void {
     this.router.get('/stock-mutations', AuthMiddleware.authed, this.reportController.getStockMutation);
-    this.router.get('/stock-mutations/:id', AuthMiddleware.authed, this.reportController.getStockMutationById);
   }
 
   public getRouter(): Router {
