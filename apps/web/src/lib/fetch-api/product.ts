@@ -4,7 +4,7 @@ import { API_URL } from "./lib";
 
 export const fetchProducts = async (
   page: number = 1,
-  limit?: number, // Optional limit parameter
+  limit?: number,
   filters: any = {},
 ): Promise<{ products: Product[]; total: number; page: number }> => {
   const params: any = { page: page.toString(), ...filters };

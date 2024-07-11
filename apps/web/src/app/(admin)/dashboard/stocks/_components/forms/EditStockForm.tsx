@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import { useForm, FormProvider, Controller } from 'react-hook-form';
 import { updateStockAmount, fetchStockById } from '@/lib/fetch-api/stock';
-
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
