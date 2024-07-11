@@ -6,12 +6,20 @@ export const fetchStockMutations = async (
   yearMonth: string, 
   page: number = 1,
   perPage: number = 10,
-  storeId?: string,  
-  filters: any = {}
+  storeId?: string,
+  productSlug?: string,
+  storeSlug?: string
 ): Promise<{ data: StockMutation[]; totalCount: number }> => {
-  const params: any = { yearMonth, page: page.toString(), perPage: perPage.toString(), ...filters };
+  const params: any = { yearMonth, page: page.toString(), perPage: perPage.toString() };
+
   if (storeId) {
     params.storeId = storeId;
+  }
+  if (productSlug) {
+    params.productSlug = productSlug;
+  }
+  if (storeSlug) {
+    params.storeSlug = storeSlug;
   }
 
   const query = new URLSearchParams(params).toString();
