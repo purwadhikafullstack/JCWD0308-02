@@ -6,11 +6,13 @@ export type IUserProfile = {
   avatarUrl: string;
   role: "SUPER_ADMIN" | "STORE_ADMIN" | "USER";
   status: "ACTIVE" | "INACTIVE" | "SUSPENDED";
+  accountType: "EMAIL" | "GITHUB" | "GOOGLE";
   referralCode: string;
   registerCode: string | null;
   updatedAt: Date;
   createdAt: Date;
-}
+  data?: { error?: any };
+};
 
 export interface User {
   id: string;
@@ -18,7 +20,7 @@ export interface User {
   email: string;
   accountType: string;
   contactEmail: string;
-  role: string;
+  role: "SUPER_ADMIN" | "STORE_ADMIN" | "USER";
   status: string;
   referralCode: string;
   avatarUrl?: string;
@@ -26,10 +28,10 @@ export interface User {
   createdAt: string;
   updatedAt: string;
   StoreAdmin?: {
-    id: string,
-    storeId: string,
-    storeAdminId: string,
-    updatedAt: Date,
-    createdAt: Date,
-  } | null
+    id: string;
+    storeId: string;
+    storeAdminId: string;
+    updatedAt: Date;
+    createdAt: Date;
+  } | null;
 }

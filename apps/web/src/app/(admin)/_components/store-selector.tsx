@@ -1,7 +1,5 @@
 'use client';
 
-import * as React from 'react';
-
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -21,11 +19,18 @@ import { Check, ChevronsUpDown, Store } from 'lucide-react';
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query';
 import { getSelectedStore, getStores } from '@/lib/fetch-api/store/client';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
-import { useRouter } from 'next/navigation';
 import { changeStore } from './action';
+import { useMemo, useState } from 'react';
 
-export const StoreSelector = ({ storeId, className, disable }: { storeId?: string, className?: string, disable?: boolean }) => {
-  const router = useRouter();
+export const StoreSelector = ({
+  storeId,
+  className,
+  disable,
+}: {
+  storeId?: string;
+  className?: string;
+  disable?: boolean;
+}) => {
   const stores = useSuspenseQuery({
     queryKey: ['stores'],
     queryFn: getStores,
@@ -41,7 +46,7 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
     queryFn: getUserProfile,
   });
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const superAdminOnly = userProfile.data?.user?.role === 'SUPER_ADMIN';
 
@@ -51,13 +56,11 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
     },
   });
 
-  // if(!selectedStore.data.store) {
-  //   // router.refresh()
-  //   router.push('/auth/signin')
-  // }
-  
-  const [selectedStoreId, setSelectedStoreId] = React.useState(storeId || selectedStore?.data?.store?.id)
-  
+  const selectedStoreId = useMemo(() => {
+    return storeId !== undefined && storeId !== selectedStore?.data?.store?.id
+      ? storeId
+      : selectedStore?.data?.store?.id;
+  }, [selectedStore?.data?.store?.id, storeId]);
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,11 +70,11 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className={cn("w-full justify-between", className)}
+          className={cn('w-full justify-between', className)}
         >
           <div className="flex items-center gap-2">
             <Store className="h-4 w-4" />
-            <span className='max-w-28 truncate'>
+            <span className="max-w-28 truncate">
               {selectedStoreId
                 ? stores.data.stores.find(
                     (store) => store.id === selectedStoreId,
@@ -93,17 +96,13 @@ export const StoreSelector = ({ storeId, className, disable }: { storeId?: strin
                   key={store.id}
                   value={store.id}
                   onSelect={async (currentValue) => {
-                    console.log('hi');
-
-                    // setValue(currentValue === value ? (selectedStore.data.store.id || '') : currentValue);
                     await handleChangeStore.mutateAsync(
                       currentValue === selectedStoreId
                         ? selectedStoreId || ''
                         : currentValue,
                     );
-                    console.log('hi');
-                    setOpen(() =>false);
-                    setSelectedStoreId(() => selectedStore?.data?.store?.id);
+
+                    setOpen(() => false);
                   }}
                 >
                   <Check

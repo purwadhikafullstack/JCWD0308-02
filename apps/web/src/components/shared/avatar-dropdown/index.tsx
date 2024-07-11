@@ -1,6 +1,6 @@
 'use client';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button, buttonVariants } from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,13 +8,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { Signout } from './signout';
-import { ReceiptText, ShoppingCart } from 'lucide-react';
-import { cn } from '@/lib/utils';
-const UserDropdown = dynamic(() => import('./user-dropdown'));
-const AdminDropdown = dynamic(() => import('./admin-dropdown'));
+import AdminDropdown from './admin-dropdown';
+import UserDropdown from './user-dropdown';
+import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 
 export const AvatarDropdown = () => {
   const userProfile = useSuspenseQuery({
@@ -22,35 +21,44 @@ export const AvatarDropdown = () => {
     queryFn: getUserProfile,
   });
 
-  console.log(userProfile.data);
+  const pathname = usePathname();
 
   if (!userProfile.data?.user) {
+    const searchParams = new URLSearchParams();
+
+    if (pathname !== '/') searchParams.set('redirect', pathname);
+
     return (
       <>
-        <Button size={'sm'}>
-          <Link href={'auth/signin'}>Signin</Link>
+        <Button asChild size={'sm'}>
+          <Link href={`/auth/signin?${searchParams.toString()}`}>Signin</Link>
         </Button>
       </>
     );
   }
-
-  console.log(userProfile.data.user.avatarUrl);
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="ml-auto rounded-full text-primary w-10 h-10 cursor-pointer">
           <AvatarImage
+            asChild
             src={`${userProfile.data.user.avatarUrl}`}
             alt={userProfile.data.user.displayName.toUpperCase()}
             referrerPolicy="no-referrer"
-          />
+          >
+            <Image
+              src={userProfile.data.user.avatarUrl}
+              width={40}
+              height={40}
+              alt={userProfile.data.user.displayName.toUpperCase()}
+              referrerPolicy="no-referrer"
+            />
+          </AvatarImage>
           <AvatarFallback>
             {userProfile.data.user.displayName[0].toUpperCase()}
           </AvatarFallback>
         </Avatar>
-        {/* <Button variant="ghost" size="icon" className="rounded-full">
-          </Button> */}
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         {userProfile.data.user.role !== 'USER' ? (

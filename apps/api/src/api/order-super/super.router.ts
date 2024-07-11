@@ -14,11 +14,8 @@ export class OrderSuperRouter {
 
   private initializeRoutes(): void {
     const superAdmin = AuthMiddleware.superAdmin;
-    this.router.get(
-      '/all-orders',
-      superAdmin,
-      this.orderSuperController.getAllOrders,
-    );
+    // const storeAdmin = AuthMiddleware.storeAdmin;
+    this.router.get('/all-orders', this.orderSuperController.getAllOrders);
     this.router.post(
       '/:orderId/confirm-payment',
       superAdmin,

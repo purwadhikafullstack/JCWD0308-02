@@ -15,33 +15,26 @@ export class OrderRouter {
 
   private initializeRoutes(): void {
     const authed = AuthMiddleware.authed;
-    const upload = uploader('payment-proof', 'orders').single('proof');
-    // Endpoint for adding an order
+    const upload = uploader('payment-proof', '/').single('proof');
+
     this.router.post('/', authed, this.orderController.addOrder);
-
     this.router.get('/:orderId', authed, this.orderController.getOrder);
-
     this.router.patch(
       '/:orderId/payment-proof',
       authed,
       upload,
       this.orderController.uploadProof,
     );
-
-    // Endpoint for canceling an order
     this.router.post(
       '/:orderId/cancel',
       authed,
       this.orderController.cancelOrder,
     );
-
-    // Endpoint for confirming an order
     this.router.post(
       '/:orderId/confirm',
       authed,
       this.orderController.confirmOrder,
     );
-
     this.router.get(
       '/status/:status',
       authed,

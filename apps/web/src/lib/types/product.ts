@@ -1,11 +1,14 @@
+import { Stock } from "./stock";
+
 export interface Product {
+  isPack: any;
   id: string;
   title: string;
   slug: string;
   description: string;
   price: number;
   packPrice: number;
-  images: { imageUrl: string }[];
+  images: ProductImage[]; 
   discountPrice?: number;
   discountPackPrice?: number;
   packQuantity?: number;
@@ -16,6 +19,7 @@ export interface Product {
   superAdminId: string;
   status: 'DRAFT' | 'PUBLISHED' | 'INACTIVE' | 'SUSPENDED';
   categoryId: string;
+  stock: Stock[]
   resetDiscountCode?: string;
   resetDiscountAt?: Date;
   createdAt: string;

@@ -12,11 +12,11 @@ export const getAllOrders = async (page: number, perPage: number) => {
 
 export const confirmPaymentByAdmin = async (
   orderId: string,
-  isAccepted: boolean,
+  newStatus: string,
 ) => {
   const response = await axios.post(
-    `${API_URL}/${orderId}/order-super/confirm-payment`,
-    { orderId, isAccepted },
+    `${API_URL}/order-super/${orderId}/confirm-payment`,
+    { orderId, newStatus },
     {
       withCredentials: true,
     },
@@ -25,9 +25,10 @@ export const confirmPaymentByAdmin = async (
 };
 
 //store admin
-export const getOrdersByStoreAdmin = async (storeAdminId: string) => {
-  const response = await axios.get(
-    `${API_URL}/order-store/store/${storeAdminId}`,
+export const cancelOrderByAdmin = async (orderId: any) => {
+  const response = await axios.post(
+    `${API_URL}/order-store/${orderId}/cancel-by-admin`,
+    { orderId },
     {
       withCredentials: true,
     },
@@ -35,17 +36,14 @@ export const getOrdersByStoreAdmin = async (storeAdminId: string) => {
   return response.data;
 };
 
-export const cancelOrderByAdmin = async (data: any, orderId: any) => {
-  const response = await axios.post(`${API_URL}/order-store/${orderId}`, data, {
-    withCredentials: true,
-  });
-  return response.data;
-};
-
-export const sendOrder = async (data: any) => {
-  const response = await axios.post(`${API_URL}/order-store/send`, data, {
-    withCredentials: true,
-  });
+export const sendOrder = async (orderId: any, newStatus: string) => {
+  const response = await axios.post(
+    `${API_URL}/order-store/${orderId}/send`,
+    { orderId, newStatus },
+    {
+      withCredentials: true,
+    },
+  );
   return response.data;
 };
 
@@ -79,10 +77,14 @@ export const addOrder = async (data: any) => {
   return response.data;
 };
 
-export const cancelOrder = async (data: any) => {
-  const response = await axios.post(`${API_URL}/order/cancel`, data, {
-    withCredentials: true,
-  });
+export const cancelOrder = async (orderId: any) => {
+  const response = await axios.post(
+    `${API_URL}/order/${orderId}/cancel`,
+    orderId,
+    {
+      withCredentials: true,
+    },
+  );
   return response.data;
 };
 

@@ -3,12 +3,15 @@ import { Validation } from "@/utils/validation.js";
 import { prisma } from "@/db.js";
 import { ProductFields, ProductRequest, ProductUpdateRequest } from "@/types/product.type.js";
 import { ProductValidation } from "./product.validation.js";
+import { API_URL } from "@/config.js";
 
 export class ProductService {
-  static getProducts = async (page: number, limit: number, filters: any) => {
+  static getProducts = async (page: number, limit?: number, filters: any = {}) => {
     const where: any = {};
     if (filters.search) {
-      where.title = { contains: filters.search };
+      where.title = {
+        contains: filters.search.toLowerCase(),
+      };
       delete filters.search;
     }
     for (const [key, value] of Object.entries(filters)) {
@@ -16,11 +19,15 @@ export class ProductService {
         where[key] = value;
       }
     }
+
     const total = await prisma.product.count({ where });
     const products = await prisma.product.findMany({
       where,
-      skip: (page - 1) * limit,
-      take: limit,
+      orderBy: {
+        createdAt: 'desc',
+      },
+      skip: page && limit ? (page - 1) * limit : undefined,
+      take: limit ?? undefined,
       select: {
         ...ProductFields,
         images: true,
@@ -30,7 +37,7 @@ export class ProductService {
     return {
       total,
       page,
-      limit,
+      limit: limit || total,
       products,
     };
   };
@@ -49,7 +56,7 @@ export class ProductService {
         await prisma.productImage.create({
           data: {
             productId: product.id,
-            imageUrl: `http://localhost:8000${imageUrl}`,
+            imageUrl: `${API_URL}${imageUrl}`,
           },
         });
       }
@@ -91,7 +98,7 @@ export class ProductService {
         await prisma.productImage.create({
           data: {
             productId: product.id,
-            imageUrl: `http://localhost:8000${imageUrl}`,
+            imageUrl: `${API_URL}${imageUrl}`,
           },
         });
       }
@@ -99,9 +106,14 @@ export class ProductService {
 
     if (imagesToDelete.length > 0) {
       for (const imageId of imagesToDelete) {
-        await prisma.productImage.delete({
+        const imageExists = await prisma.productImage.findUnique({
           where: { id: imageId },
         });
+        if (imageExists) {
+          await prisma.productImage.delete({
+            where: { id: imageId },
+          });
+        }
       }
     }
 
@@ -119,5 +131,31 @@ export class ProductService {
     if (findProduct) {
       throw new ResponseError(400, "Product with this title already exists!");
     }
+  };
+  static getProductBySlug = async (slug: string) => {
+    const product = await prisma.product.findUnique({
+      where: { slug },
+      select: {
+        ...ProductFields,
+        images: true,
+        stock: {
+          select: {
+            id: true,
+            amount: true,
+            store: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!product) {
+      throw new Error('Product not found');
+    }
+
+    return product;
   };
 }

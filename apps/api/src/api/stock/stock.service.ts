@@ -2,7 +2,8 @@ import { prisma } from '@/db.js';
 import { Validation } from '@/utils/validation.js';
 import { StockValidation } from './stock.validation.js';
 import { ResponseError } from '@/utils/error.response.js';
-import { findStoresInRange } from '../distance/distance.service.js';
+import { findNearestStore, findStoresInRange } from '../distance/distance.service.js';
+import { Response } from 'express';
 
 export class StockService {
   static async getStocks(page: number, limit: number, filters: any) {
@@ -19,25 +20,104 @@ export class StockService {
       where.storeId = storeId;
     }
 
-    const total = await prisma.stock.count({ where });
+    const skip = (page - 1) * limit;
     const stocks = await prisma.stock.findMany({
-      where,
-      skip: (page - 1) * limit,
+      skip,
       take: limit,
+      where,
       include: {
-        product: { select: { title: true } },
-        store: { select: { name: true } },
+        product: true,
+        store: true,
       },
     });
+    const total = await prisma.stock.count({ where });
+
     return { total, page, limit, stocks };
   }
 
+  static async getNearestStocks(page: number, limit: number, filters: any, res: Response) {
+    const { search, storeId, categoryId, sortcol, ...filterOptions } = filters;
+    const where: any = {};
+  
+    if (search) {
+      where.OR = [
+        { product: { title: { contains: search } } },
+        { store: { name: { contains: search } } },
+      ];
+    }
+  
+    if (categoryId) {
+      where.product = {
+        categoryId: categoryId
+      };
+    }
+  
+    for (const [key, value] of Object.entries(filterOptions)) {
+      if (value) {
+        where[key] = value;
+      }
+    }
+  
+    let store = null;
+    let isServiceAvailable = false;
+    if (!res.locals.address?.id) {
+      store = await prisma.store.findFirst({
+        orderBy: {
+          createdAt: 'asc'
+        }
+      });
+      where.storeId = store?.id;
+    } else {
+      const data = await findNearestStore(res.locals.address.id);
+      where.storeId = data?.nearestStore?.id;
+      store = data?.nearestStore;
+      isServiceAvailable = data?.isServiceAvailable;
+    }
+  
+
+    let orderBy: any = {};
+    if (sortcol === 'popular') {
+      orderBy = {
+        OrderItem: {
+          _count: 'desc'
+        }
+      };
+    }
+  
+    delete where.skip   
+    const total = await prisma.stock.count({
+      where: {
+        ...where
+      }
+    });
+  
+    const stocks = await prisma.stock.findMany({
+      where: {
+        ...where
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: orderBy,
+      include: {
+        product: {
+          include: {
+            images: true
+          }
+        }
+      }
+    });
+  
+    return { total, page, limit, stocks, store, isServiceAvailable };
+  }
+  
+  
+  
   static async getStockById(id: string) {
     const stock = await prisma.stock.findUnique({
       where: { id },
       include: {
         product: { select: { title: true } },
-        store: { select: { name: true } }, 
+        store: { select: { name: true } },
         mutations: {
           orderBy: { createdAt: 'desc' },
         },
@@ -108,7 +188,7 @@ export class StockService {
   private static buildWhereClause(filters: any) {
     const where: any = {};
     for (const [key, value] of Object.entries(filters)) {
-      if (value && key !== 'page' && key !== 'limit') { // memastikan page dan limit tidak masuk dalam where
+      if (value && key !== 'page' && key !== 'limit') { 
         where[key] = value;
       }
     }
@@ -181,5 +261,32 @@ export class StockService {
 
     return stock.id;
   };
+
+  static async getStockByIdWithMutationsGroupedByMonth(id: string) {
+    const stock = await prisma.stock.findUnique({
+      where: { id },
+      include: {
+        product: { select: { title: true } },
+        store: { select: { name: true } },
+        mutations: {
+          orderBy: { createdAt: 'desc' },
+        },
+      },
+    });
+
+    if (!stock) throw new ResponseError(404, "Stock item not found");
+
+    const mutationsByMonth: Record<string, any[]> = stock.mutations.reduce((acc: Record<string, any[]>, mutation) => {
+      const date = new Date(mutation.createdAt);
+      const monthYear = `${date.getMonth() + 1}-${date.getFullYear()}`;
+      if (!acc[monthYear]) {
+        acc[monthYear] = [];
+      }
+      acc[monthYear].push(mutation);
+      return acc;
+    }, {});
+
+    return { stock, mutationsByMonth };
+  }
 
 }

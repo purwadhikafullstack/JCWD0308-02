@@ -22,5 +22,5 @@ export default function StorePreviewWrapper({
       ).json(),
   });
 
-  return <StorePreview store={store?.data?.store!} />;
+  return <StorePreview />;
 }

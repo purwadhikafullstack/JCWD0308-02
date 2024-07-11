@@ -1,7 +1,8 @@
-import { z } from 'zod';
+import { z } from "zod";
 
-export const OrderIdValidation = {
-  ORDER_ID: z.object({
+export const ChangeStatusValidation = {
+  CHANGE: z.object({
     orderId: z.string().uuid(),
+    newStatus: z.string(),
   }),
 };

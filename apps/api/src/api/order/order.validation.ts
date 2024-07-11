@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const OrderValidation = {
   ORDER: z.object({
@@ -8,6 +8,7 @@ export const OrderValidation = {
     service: z.string(),
     note: z.string(),
     voucherId: z.string().uuid().optional(),
+    serviceDescription: z.string().optional(),
   }),
 };
 

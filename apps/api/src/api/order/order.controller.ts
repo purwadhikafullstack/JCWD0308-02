@@ -3,7 +3,6 @@ import { ICallback } from '@/types/index.js';
 import { ResponseError } from '@/utils/error.response.js';
 import { OrderService } from './order.service.js';
 import { OrderStatus } from '@prisma/client';
-import { ConfirmPaymentRequest } from '@/types/order.type.js';
 
 export class OrderController {
   addOrder: ICallback = async (req, res, next) => {

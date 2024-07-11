@@ -1,5 +1,5 @@
 'use client';
-import { ChevronDown, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import React, { useState } from 'react';
 import { Input } from '../ui/input';
 import { Button } from '../ui/button';

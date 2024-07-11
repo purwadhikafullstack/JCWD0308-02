@@ -1,10 +1,9 @@
 import axios from 'axios';
-import fetchSSR from '../../fetchSSR';
 import { env } from '@/app/env';
 import { Category } from '@/lib/types/category';
 
 export const fetchCategories = async (): Promise<Category[]> => {
-  const res = await axios.get('http://localhost:8000/api/category', {
+  const res = await axios.get(`${env.NEXT_PUBLIC_BASE_API_URL}/category`, {
     withCredentials: true,
   });
   if (res.status !== 200) {
@@ -14,7 +13,7 @@ export const fetchCategories = async (): Promise<Category[]> => {
 };
 
 export const fetchCategoryById = async (id: string): Promise<Category> => {
-  const res = await axios.get(`http://localhost:8000/api/category/${id}`, {
+  const res = await axios.get(`${env.NEXT_PUBLIC_BASE_API_URL}/category/${id}`, {
     withCredentials: true,
   });
   if (res.status !== 200) {
@@ -23,8 +22,8 @@ export const fetchCategoryById = async (id: string): Promise<Category> => {
   return res.data.category;
 };
 
-export const createCategory = async (categoryData: Category): Promise<Category> => {
-  const res = await axios.post('http://localhost:8000/api/category', categoryData, {
+export const createCategory = async (formData: FormData): Promise<Category> => {
+  const res = await axios.post(`${env.NEXT_PUBLIC_BASE_API_URL}/category`, formData, {
     withCredentials: true,
   });
   if (res.status !== 201) {
@@ -33,8 +32,8 @@ export const createCategory = async (categoryData: Category): Promise<Category> 
   return res.data.category;
 };
 
-export const updateCategory = async (id: string, categoryData: Category): Promise<Category> => {
-  const res = await axios.put(`http://localhost:8000/api/category/${id}`, categoryData, {
+export const updateCategory = async (id: string, formData: FormData): Promise<Category> => {
+  const res = await axios.put(`${env.NEXT_PUBLIC_BASE_API_URL}/category/${id}`, formData, {
     withCredentials: true,
   });
   if (res.status !== 200) {
@@ -44,7 +43,7 @@ export const updateCategory = async (id: string, categoryData: Category): Promis
 };
 
 export const deleteCategory = async (id: string): Promise<void> => {
-  const res = await axios.delete(`http://localhost:8000/api/category/${id}`, {
+  const res = await axios.delete(`${env.NEXT_PUBLIC_BASE_API_URL}/category/${id}`, {
     withCredentials: true,
   });
   if (res.status !== 200) {

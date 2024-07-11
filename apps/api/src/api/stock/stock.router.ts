@@ -15,6 +15,10 @@ export class StockRouter {
   private initializeRoutes(): void {
     this.router.get('/', AuthMiddleware.authed, this.stockController.getStocks);
     this.router.get(
+      '/nearest',
+      this.stockController.getNearestStocks,
+    );
+    this.router.get(
       '/:id',
       AuthMiddleware.authed,
       this.stockController.getStockById,

@@ -30,7 +30,10 @@ import { CityRouter } from './api/city/city.router.js';
 import { OrderSuperRouter } from './api/order-super/super.router.js';
 import { OrderStoreRouter } from './api/order-store/admin-store.router.js';
 import { initializeSchedulers } from './helpers/order/scheduler.js';
+import { ReportRouter } from './api/report/report.router.js';
 
+
+initializeSchedulers();
 const __filename = fileURLToPath(import.meta.url);
 
 const __dirname = path.dirname(__filename);
@@ -82,6 +85,7 @@ export default class App {
     const cityRouter = new CityRouter();
     const orderSuperRouter = new OrderSuperRouter();
     const orderStoreRouter = new OrderStoreRouter();
+    const reportRouter = new ReportRouter();
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student !`);
@@ -102,11 +106,12 @@ export default class App {
     this.app.use('/api/city', cityRouter.getRouter());
     this.app.use('/api/order-super', orderSuperRouter.getRouter());
     this.app.use('/api/order-store', orderStoreRouter.getRouter());
+    this.app.use('/api/report', reportRouter.getRouter());
   }
 
   private handleError(): void {
     this.app.use(errorMiddleware);
-    // not found
+
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       if (req.path.includes('/api/')) {
         res.status(404).send('Not found !');
@@ -115,7 +120,6 @@ export default class App {
       }
     });
 
-    // error
     this.app.use(
       (err: Error, req: Request, res: Response, next: NextFunction) => {
         if (req.path.includes('/api/')) {

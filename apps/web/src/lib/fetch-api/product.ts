@@ -1,29 +1,39 @@
+import axios from "axios";
+import { Product } from "../types/product";
+import { API_URL } from "./lib";
 
-import axios from 'axios';
-import { Product } from '../types/product';
+export const fetchProducts = async (
+  page: number = 1,
+  limit?: number, // Optional limit parameter
+  filters: any = {},
+): Promise<{ products: Product[]; total: number; page: number }> => {
+  const params: any = { page: page.toString(), ...filters };
+  if (limit !== undefined) {
+    params.limit = limit.toString();
+  }
 
-export const fetchProducts = async (page: number = 1, limit: number = 8, filters: any = {}): Promise<{ products: Product[], total: number, page: number, limit: number }> => {
-  const query = new URLSearchParams({ page: page.toString(), limit: limit.toString(), ...filters }).toString();
-  const res = await axios.get(`http://localhost:8000/api/product?${query}`, {
+  const query = new URLSearchParams(params).toString();
+  const res = await axios.get(`${API_URL}/product?${query}`, {
     withCredentials: true,
   });
+
   if (res.status !== 200) {
-    throw new Error('Failed to fetch products');
+    throw new Error("Failed to fetch products");
   }
   return res.data;
 };
 
 export const fetchProductById = async (id: string) => {
-  const response = await axios.get(`http://localhost:8000/api/product/${id}`, {
+  const response = await axios.get(`${API_URL}/product/${id}`, {
     withCredentials: true,
   });
   return response.data;
 };
 
 export const createProduct = async (productData: FormData) => {
-  const response = await axios.post(`http://localhost:8000/api/product`, productData, {
+  const response = await axios.post(`${API_URL}/product`, productData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
     withCredentials: true,
   });
@@ -31,9 +41,9 @@ export const createProduct = async (productData: FormData) => {
 };
 
 export const updateProduct = async (id: string, productData: FormData) => {
-  const response = await axios.put(`http://localhost:8000/api/product/${id}`, productData, {
+  const response = await axios.put(`${API_URL}/product/${id}`, productData, {
     headers: {
-      'Content-Type': 'multipart/form-data',
+      "Content-Type": "multipart/form-data",
     },
     withCredentials: true,
   });
@@ -41,7 +51,14 @@ export const updateProduct = async (id: string, productData: FormData) => {
 };
 
 export const deleteProduct = async (id: string) => {
-  const response = await axios.delete(`http://localhost:8000/api/product/${id}`, {
+  const response = await axios.delete(`${API_URL}/product/${id}`, {
+    withCredentials: true,
+  });
+  return response.data;
+};
+
+export const fetchProductBySlug = async (slug: string) => {
+  const response = await axios.get(`${API_URL}/product/detail/${slug}`, {
     withCredentials: true,
   });
   return response.data;

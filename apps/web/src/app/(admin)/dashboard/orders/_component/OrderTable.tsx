@@ -1,24 +1,14 @@
-import { Order } from '@/lib/types/order';
-import { OrderTableRow } from './OrderTableRow';
-import React from 'react';
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableCaption,
-} from '@/components/ui/table';
+import { Order } from "@/lib/types/order";
+import { OrderTableRow } from "./OrderTableRow";
+import React from "react";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCaption } from "@/components/ui/table";
 
 interface OrderTableProps {
   orders: Order[];
-  handleStatusChange: (orderId: any, newStatus: string) => void;
+
+  handleStatusChange: (orderId: string, newStatus: string) => void;
 }
-export const OrderTable: React.FC<OrderTableProps> = ({
-  orders,
-  handleStatusChange,
-}) => (
+export const OrderTable: React.FC<OrderTableProps> = ({ orders, handleStatusChange }) => (
   <div className="overflow-x-auto">
     <Table className="min-w-full">
       <TableCaption>A list of orders of all users</TableCaption>
@@ -50,12 +40,7 @@ export const OrderTable: React.FC<OrderTableProps> = ({
       </TableHeader>
       <TableBody>
         {orders.map((order, index) => (
-          <OrderTableRow
-            key={order.id}
-            order={order}
-            handleStatusChange={handleStatusChange}
-            index={index}
-          />
+          <OrderTableRow key={order.id} order={order} handleStatusChange={handleStatusChange} index={index} />
         ))}
       </TableBody>
     </Table>

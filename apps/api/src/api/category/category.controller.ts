@@ -28,7 +28,7 @@ export class CategoryController {
   createCategory: ICallback = async (req, res, next) => {
     try {
       const user = res.locals.user as User;
-      const category = await CategoryService.createCategory(req.body, user.id);
+      const category = await CategoryService.createCategory(req, res, user.id);
       return res.status(201).json({ status: "OK", message: "Category created successfully!", category });
     } catch (error) {
       next(error);
@@ -38,7 +38,7 @@ export class CategoryController {
   updateCategory: ICallback = async (req, res, next) => {
     try {
       const { id } = req.params;
-      const category = await CategoryService.updateCategory(id, req.body);
+      const category = await CategoryService.updateCategory(req, res, id);
       return res.status(200).json({ status: "OK", message: "Category updated successfully!", category });
     } catch (error) {
       next(error);
@@ -48,6 +48,10 @@ export class CategoryController {
   deleteCategory: ICallback = async (req, res, next) => {
     try {
       const { id } = req.params;
+      const category = await CategoryService.getCategoryById(id);
+      if (!category) {
+        return res.status(404).json({ error: "Category not found" });
+      }
       await CategoryService.deleteCategory(id);
       return res.status(200).json({ status: "OK", message: "Category deleted successfully" });
     } catch (error) {

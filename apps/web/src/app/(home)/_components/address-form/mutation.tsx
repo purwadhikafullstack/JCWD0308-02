@@ -1,4 +1,3 @@
-import { Store } from '@/lib/types/store';
 import { useMutation } from '@tanstack/react-query';
 import { z } from 'zod';
 import { FormSchema } from './validation';
@@ -7,9 +6,13 @@ import { env } from '@/app/env';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { Address } from '@/lib/types/address';
+import { useAppDispatch } from '@/lib/features/hooks';
+import { fetchCart, fetchCartItemCount } from '@/lib/features/cart/cartSlice';
 
 export const useCreateUserAddress = (handleClose: () => void) => {
   const router = useRouter();
+  const dispatch = useAppDispatch();
+
 
   return useMutation<
     { address: Address },
@@ -30,7 +33,6 @@ export const useCreateUserAddress = (handleClose: () => void) => {
 
         return await res.json();
       } catch (error) {
-        // ✅ here, a failed Promise is returned
         throw error;
       }
     },
@@ -40,16 +42,14 @@ export const useCreateUserAddress = (handleClose: () => void) => {
         duration: 4000,
       });
       handleClose();
-      // router.push(`/dashboard/stores/${data.address.id}`);
+      dispatch(fetchCart());
+      dispatch(fetchCartItemCount());
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to create new address!', {
         description: data.error,
         duration: 4000,
       });
-      // handleClose();
     },
   });
 };
@@ -82,7 +82,6 @@ export const useUpdateUserAddress = (
 
         return await res.json();
       } catch (error) {
-        // ✅ here, a failed Promise is returned
         throw error;
       }
     },
@@ -92,16 +91,12 @@ export const useUpdateUserAddress = (
         duration: 4000,
       });
       handleClose();
-      // router.push(`/dashboard/stores/${data.address.id}`);
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to create new address!', {
         description: data.error,
         duration: 4000,
       });
-      // handleClose();
     },
   });
 };
@@ -134,16 +129,12 @@ export const useDeleteUserAddress = () => {
     onSuccess: (data) => {
       router.refresh();
       toast(`${data.message}`, { duration: 4000 });
-      // router.push(`/dashboard/stores/${data.address.id}`);
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to delete address!', {
         description: data.error,
         duration: 4000,
       });
-      // handleClose();
     },
   });
 };

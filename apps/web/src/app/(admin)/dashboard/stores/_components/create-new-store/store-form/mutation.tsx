@@ -37,8 +37,6 @@ export const useCreateNewStore = (handleClose: () => void) => {
       router.push(`/dashboard/stores/${data.store.id}`)
     },
     onError: (data) => {
-      console.log('onError', data);
-
       toast.error('Failed to create new store!', {
         description: data.error,
         duration: 4000,

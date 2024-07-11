@@ -14,7 +14,6 @@ import FieldCity from './field/city';
 import FieldStatus from './field/status';
 import FieldLatitude from './field/latitude';
 import FieldLongitude from './field/longitude';
-import { Button } from '@/components/ui/button';
 
 export function CreateStoreForm({
   className,
@@ -84,8 +83,8 @@ export function CreateStoreForm({
           form={form}
           errorMessage={createNewStore?.error?.errors?.fieldErrors?.status}
         />
-        <Button type="submit">Submit</Button>
-        {/* <Submit type="submit">Submit</Submit> */}
+        {/* <Button type="submit">Submit</Button> */}
+        <Submit type="submit">Submit</Submit>
       </form>
     </Form>
   );

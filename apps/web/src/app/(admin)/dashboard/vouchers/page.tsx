@@ -1,25 +1,39 @@
-"use client";
+'use client';
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { getVouchers, createVoucher, deleteVoucher } from '@/lib/fetch-api/voucher';
+import {
+  getVouchers,
+  createVoucher,
+  deleteVoucher,
+} from '@/lib/fetch-api/voucher';
 import { Toaster } from '@/components/ui/sonner';
-
-import { Voucher } from './_components/types';
-import VoucherCard from './_components/vouchercard';
-import VoucherFilters from './_components/voucherfilters';
-import CreateForm from './_components/createform';
+import { Voucher } from '../../../../lib/types/voucher';
+import VoucherCard from './_components/cards/VoucherCard';
+import VoucherFilters from './_components/filters/VoucherFilters';
+import CreateForm from './_components/forms/CreateVoucherForm';
 import Pagination from '@/components/partial/pagination';
 import SearchBar from '@/components/partial/SearchBar';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { handleApiError } from '@/components/toast/errorapi';
+import { handleApiError } from '@/components/toast/toastutils';
 import { showSuccess } from '@/components/toast/toastutils';
+import DeleteVoucherDialog from './_components/dialogs/DeleteVoucherDialog';
+import { useSuspenseQuery } from '@tanstack/react-query';
+
 
 import fixedDiscountProduct from '../../../../../public/fixeddiscountproduct.png';
 import discountProduct from '../../../../../public/discountproduct.png';
 import shippingCash from '../../../../../public/shippingcash.png';
 import shippingDiscount from '../../../../../public/shippingdiscount.png';
 import { StaticImageData } from 'next/image';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { getSelectedStore } from '@/lib/fetch-api/store/client';
 
 const VoucherManagement = () => {
   const router = useRouter();
@@ -28,18 +42,33 @@ const VoucherManagement = () => {
   const [vouchers, setVouchers] = useState<Voucher[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [creatingVoucher, setCreatingVoucher] = useState<boolean>(false);
+  const [deletingVoucher, setDeletingVoucher] = useState<Voucher | null>(null);
   const [page, setPage] = useState<number>(1);
   const [total, setTotal] = useState<number>(0);
-  const [limit, setLimit] = useState<number>(8); // Adjust limit to fit 4 cards per row
+  const [limit, setLimit] = useState<number>(8); 
   const [filters, setFilters] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [updateFlag, setUpdateFlag] = useState<boolean>(false);
+
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
+
+  const selectedStore = useSuspenseQuery({
+    queryKey: ['store'],
+    queryFn: getSelectedStore
+  });
+
+  const isStoreAdmin = userProfile.data?.user?.role === 'STORE_ADMIN';
+  const storeAdminStoreId = selectedStore.data?.store?.id;
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const voucherData = await getVouchers(page, limit, filters);
+        const filterData = isStoreAdmin && storeAdminStoreId ? { ...filters, storeId: storeAdminStoreId } : filters;
+        const voucherData = await getVouchers(page, limit, filterData);
         setVouchers(voucherData.vouchers || []);
         setTotal(voucherData.total || 0);
       } catch (error) {
@@ -49,7 +78,7 @@ const VoucherManagement = () => {
       }
     };
     fetchData();
-  }, [page, limit, filters, updateFlag]);
+  }, [page, limit, filters, updateFlag, isStoreAdmin, storeAdminStoreId]);
 
   useEffect(() => {
     const query = searchParams.get('search');
@@ -59,7 +88,7 @@ const VoucherManagement = () => {
     }
   }, [searchParams]);
 
-  const handleCreate = async (newVoucher: any) => {
+  const handleCreate = async (newVoucher: FormData) => {
     try {
       await createVoucher(newVoucher);
       showSuccess('Voucher created successfully');
@@ -82,7 +111,7 @@ const VoucherManagement = () => {
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('page', newPage.toString());
     const url = `${pathname}?${params.toString()}`;
     router.replace(url);
@@ -91,7 +120,7 @@ const VoucherManagement = () => {
   const handleSearch = (query: string) => {
     setSearchQuery(query);
     setFilters({ ...filters, search: query });
-    const params = new URLSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams.toString());
     params.set('search', query);
     params.set('page', '1');
     const url = `${pathname}?${params.toString()}`;
@@ -99,53 +128,86 @@ const VoucherManagement = () => {
   };
 
   const getVoucherIcon = (voucher: Voucher): StaticImageData => {
-    if (voucher.voucherType === 'PRODUCT' && voucher.discountType === 'FIXED_DISCOUNT') {
+    if (
+      voucher.voucherType === 'PRODUCT' &&
+      voucher.discountType === 'FIXED_DISCOUNT'
+    ) {
       return fixedDiscountProduct;
-    } else if (voucher.voucherType === 'PRODUCT' && voucher.discountType === 'DISCOUNT') {
+    } else if (
+      voucher.voucherType === 'PRODUCT' &&
+      voucher.discountType === 'DISCOUNT'
+    ) {
       return discountProduct;
-    } else if (voucher.voucherType === 'SHIPPING_COST' && voucher.discountType === 'FIXED_DISCOUNT') {
+    } else if (
+      voucher.voucherType === 'SHIPPING_COST' &&
+      voucher.discountType === 'FIXED_DISCOUNT'
+    ) {
       return shippingCash;
-    } else if (voucher.voucherType === 'SHIPPING_COST' && voucher.discountType === 'DISCOUNT') {
+    } else if (
+      voucher.voucherType === 'SHIPPING_COST' &&
+      voucher.discountType === 'DISCOUNT'
+    ) {
       return shippingDiscount;
     }
-    return fixedDiscountProduct; // Default icon, adjust as necessary
+    return fixedDiscountProduct;
   };
 
   return (
     <div className="container mx-auto px-4 py-8">
       <Toaster />
-      <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">Vouchers</h2>
-      <p className="text-lg mb-8 text-center text-gray-700">Manage your vouchers here.</p>
+      <h2 className="text-4xl font-extrabold mb-8 text-center text-indigo-600">
+        Vouchers
+      </h2>
+      <p className="text-lg mb-8 text-center text-gray-700">
+        Manage your vouchers here.
+      </p>
       <SearchBar onSearch={handleSearch} />
+
       <VoucherFilters handleCreate={() => setCreatingVoucher(true)} />
+
       {loading ? (
-        <p className="text-center text-gray-500">Loading...</p>
+        <div className="h-screen flex justify-center items-center">
+          <span className="loader"></span>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {vouchers.map((voucher) => (
-              <VoucherCard key={voucher.id} voucher={voucher} handleDelete={handleDelete} getVoucherIcon={getVoucherIcon} />
+              <VoucherCard
+                key={voucher.id}
+                voucher={voucher}
+                handleDelete={() => setDeletingVoucher(voucher)}
+                getVoucherIcon={getVoucherIcon}
+                isStoreAdmin={isStoreAdmin}
+              />
             ))}
           </div>
-          {creatingVoucher && (
-            <Dialog open={creatingVoucher} onOpenChange={setCreatingVoucher}>
-              <DialogTrigger asChild>
-                <Button className="hidden">Open Modal</Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Create New Voucher</DialogTitle>
-                  <DialogDescription>
-                    <CreateForm onCreate={handleCreate} onCancel={() => setCreatingVoucher(false)} />
-                  </DialogDescription>
-                </DialogHeader>
-                <DialogFooter>
-                  <Button variant="secondary" onClick={() => setCreatingVoucher(false)}>Close</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
+          <Dialog open={creatingVoucher} onOpenChange={setCreatingVoucher}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Voucher</DialogTitle>
+                <DialogDescription>
+                  <CreateForm
+                    onCreate={handleCreate}
+                    onCancel={() => setCreatingVoucher(false)}
+                  />
+                </DialogDescription>
+              </DialogHeader>
+            </DialogContent>
+          </Dialog>
+          {deletingVoucher && (
+            <DeleteVoucherDialog
+              voucher={deletingVoucher}
+              onClose={() => setDeletingVoucher(null)}
+              onDeleteSuccess={() => setUpdateFlag(!updateFlag)}
+            />
           )}
-          <Pagination total={total} page={page} limit={limit} onPageChange={handlePageChange} />
+          <Pagination
+            total={total}
+            page={page}
+            limit={limit}
+            onPageChange={handlePageChange}
+          />
         </>
       )}
     </div>

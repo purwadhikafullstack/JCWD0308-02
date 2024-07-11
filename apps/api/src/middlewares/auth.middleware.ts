@@ -21,13 +21,10 @@ export class AuthMiddleware {
       const { session, user } = await lucia.validateSession(sessionId)
 
       if (session && session.fresh) {
-        console.log('hit fresh');
-
         res.appendHeader("Set-Cookie", lucia.createSessionCookie(session.id).serialize())
       }
 
       if (!session) {
-        console.log('hit false');
         res.appendHeader("Set-Cookie", lucia.createBlankSessionCookie().serialize())
       }
 
@@ -62,7 +59,7 @@ export class AuthMiddleware {
     if (res.locals.user?.role === "USER") {
 
       if (!req.cookies.addressId) {
-        const mainAddress = await prisma.userAddress.findFirst({ where: { userId: res.locals.user.id, isMainAddress: true } })
+        const mainAddress = await prisma.userAddress.findFirst({ where: { userId: res.locals.user.id } })
         res.appendHeader("Set-Cookie", serializeCookie('addressId', mainAddress?.id!, {
           path: '/',
           secure: NODE_ENV === 'production',
@@ -124,11 +121,6 @@ export class AuthMiddleware {
 
   static storeAdmin: ICallback = async (req, res, next) => {
     try {
-
-      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
-      console.log('&&&&&&&&&&&&&', req.query, '&&&&&&&&&&&&&');
-      console.log('&&&&&PPPP&&&&&&&', res.locals.user, '&&&&&&&&&&&&&');
-      console.log('&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&');
       if (res.locals.user?.role === "USER" || res.locals.user?.status !== 'ACTIVE') throw new ResponseError(401, "Unauthorized")
       next()
     } catch (error) {

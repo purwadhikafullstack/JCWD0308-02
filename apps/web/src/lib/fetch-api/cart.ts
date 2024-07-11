@@ -1,9 +1,9 @@
-import { API_URL } from './lib';
-import axios from 'axios';
+import { API_URL } from "./lib";
+import axios from "axios";
 const URL = `${API_URL}/cart`;
 export const addCart = async (cartData: any) => {
   const res = await axios.post(`${URL}/add-to-cart`, cartData, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: { "Content-Type": "application/json" },
     withCredentials: true,
   });
 
@@ -25,16 +25,17 @@ export const getCartItemCount = async () => {
   return res.data;
 };
 
+export const checkCart = async (cartId: any, isChecked: boolean) => {
+  const res = await axios.patch(`${URL}/checked`, { cartId, isChecked }, { withCredentials: true });
+  return res.data;
+};
+
 export const deleteCart = async (cartId: any) => {
   const res = await axios.delete(`${URL}/${cartId}`, { withCredentials: true });
   return res.data;
 };
 
-export const updateCart = async (cartData: {
-  addressId: string;
-  productId: string;
-  quantity: number;
-}) => {
+export const updateCart = async (cartData: { addressId: string; productId: string; quantity: number }) => {
   const { addressId, productId, quantity } = cartData;
 
   try {
@@ -42,7 +43,7 @@ export const updateCart = async (cartData: {
       `${URL}/update-cart`,
       { addressId, productId, quantity },
       {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { "Content-Type": "application/json" },
         withCredentials: true,
       },
     );
