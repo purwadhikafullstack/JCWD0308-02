@@ -28,6 +28,16 @@ export class CartController {
       next(error);
     }
   };
+  updateCheckedAll: ICallback = async (req, res, next) => {
+    const userId = res.locals?.user?.id;
+    const { isChecked } = req.body;
+    try {
+      await CartService.updateCheckedAll(userId!, isChecked);
+      res.json({ status: "OK", message: "cart item checked" });
+    } catch (error) {
+      next(error);
+    }
+  };
   deleteCart: ICallback = async (req, res, next) => {
     try {
       const cartId = req.params.cartId;

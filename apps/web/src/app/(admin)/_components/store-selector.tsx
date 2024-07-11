@@ -32,8 +32,8 @@ export const StoreSelector = ({
   disable?: boolean;
 }) => {
   const stores = useSuspenseQuery({
-    queryKey: ['stores'],
-    queryFn: getStores,
+    queryKey: ['stores', 1, "", ""],
+    queryFn: () =>  getStores(1, "", ""),
   });
 
   const selectedStore = useSuspenseQuery({

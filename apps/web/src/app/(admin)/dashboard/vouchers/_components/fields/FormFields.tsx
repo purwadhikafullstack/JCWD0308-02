@@ -4,22 +4,28 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from '@/components/ui/select';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { getStores, getSelectedStore } from '@/lib/fetch-api/store/client';
 
 const FormFields: React.FC = () => {
   const { control, register, setValue, watch } = useFormContext();
-  const storeId = watch('storeId'); 
+  const storeId = watch('storeId');
 
   const { data: userProfile } = useSuspenseQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,
   });
   const { data: stores } = useSuspenseQuery({
-    queryKey: ['stores'],
-    queryFn: getStores,
+    queryKey: ['stores', 1, '', ""],
+    queryFn: () => getStores(1, '', ""),
   });
   const { data: selectedStore } = useSuspenseQuery({
     queryKey: ['store'],
@@ -33,7 +39,7 @@ const FormFields: React.FC = () => {
     if (isStoreAdmin && storeAdminStoreId) {
       setValue('storeId', storeAdminStoreId);
     } else if (!storeId) {
-      setValue('storeId', ''); 
+      setValue('storeId', '');
     }
   }, [isStoreAdmin, storeAdminStoreId, storeId, setValue]);
 
@@ -104,7 +110,9 @@ const FormFields: React.FC = () => {
         <Controller
           name="fixedDiscount"
           control={control}
-          render={({ field }) => <Input type="number" {...field} className="text-black" />}
+          render={({ field }) => (
+            <Input type="number" {...field} className="text-black" />
+          )}
         />
       </div>
       <div>
@@ -112,7 +120,9 @@ const FormFields: React.FC = () => {
         <Controller
           name="discount"
           control={control}
-          render={({ field }) => <Input type="number" {...field} className="text-black" />}
+          render={({ field }) => (
+            <Input type="number" {...field} className="text-black" />
+          )}
         />
       </div>
       <div>
@@ -120,7 +130,9 @@ const FormFields: React.FC = () => {
         <Controller
           name="stock"
           control={control}
-          render={({ field }) => <Input type="number" {...field} className="text-black" />}
+          render={({ field }) => (
+            <Input type="number" {...field} className="text-black" />
+          )}
         />
       </div>
       <div>
@@ -128,7 +140,9 @@ const FormFields: React.FC = () => {
         <Controller
           name="minOrderPrice"
           control={control}
-          render={({ field }) => <Input type="number" {...field} className="text-black" />}
+          render={({ field }) => (
+            <Input type="number" {...field} className="text-black" />
+          )}
         />
       </div>
       <div>
@@ -136,7 +150,9 @@ const FormFields: React.FC = () => {
         <Controller
           name="minOrderItem"
           control={control}
-          render={({ field }) => <Input type="number" {...field} className="text-black" />}
+          render={({ field }) => (
+            <Input type="number" {...field} className="text-black" />
+          )}
         />
       </div>
       <div>
@@ -144,7 +160,9 @@ const FormFields: React.FC = () => {
         <Controller
           name="expiresAt"
           control={control}
-          render={({ field }) => <Input type="date" {...field} className="text-black" />}
+          render={({ field }) => (
+            <Input type="date" {...field} className="text-black" />
+          )}
         />
       </div>
       <div className="col-span-full">
@@ -153,15 +171,19 @@ const FormFields: React.FC = () => {
           name="storeId"
           control={control}
           render={({ field }) => (
-            <Select onValueChange={(value) => field.onChange(value !== 'all' ? value : '')} value={field.value ?? ''} disabled={isStoreAdmin}>
+            <Select
+              onValueChange={(value) =>
+                field.onChange(value !== 'all' ? value : '')
+              }
+              value={field.value ?? ''}
+              disabled={isStoreAdmin}
+            >
               <SelectTrigger className="text-black">
                 <SelectValue placeholder="Select store" />
               </SelectTrigger>
               <SelectContent>
                 {!isStoreAdmin && (
-                  <SelectItem value="all">
-                    Applicable to all stores
-                  </SelectItem>
+                  <SelectItem value="all">Applicable to all stores</SelectItem>
                 )}
                 {stores?.stores?.map((store) => (
                   <SelectItem key={store.id} value={store.id}>
@@ -175,23 +197,35 @@ const FormFields: React.FC = () => {
       </div>
       <div className="col-span-full">
         <Label htmlFor="image">Image</Label>
-        <input type="file" {...register('image')} className="mt-1 block w-full" />
+        <input
+          type="file"
+          {...register('image')}
+          className="mt-1 block w-full"
+        />
       </div>
       <div className="flex items-center">
         <Controller
           name="isClaimable"
           control={control}
-          render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
+          render={({ field }) => (
+            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+          )}
         />
-        <Label htmlFor="isClaimable" className="ml-2">Is Claimable</Label>
+        <Label htmlFor="isClaimable" className="ml-2">
+          Is Claimable
+        </Label>
       </div>
       <div className="flex items-center">
         <Controller
           name="isPrivate"
           control={control}
-          render={({ field }) => <Checkbox checked={field.value} onCheckedChange={field.onChange} />}
+          render={({ field }) => (
+            <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+          )}
         />
-        <Label htmlFor="isPrivate" className="ml-2">Is Private</Label>
+        <Label htmlFor="isPrivate" className="ml-2">
+          Is Private
+        </Label>
       </div>
     </div>
   );

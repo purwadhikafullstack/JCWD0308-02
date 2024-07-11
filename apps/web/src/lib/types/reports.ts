@@ -9,8 +9,8 @@ export interface StockMutation {
   updatedAt: Date;
   createdAt: Date;
   stock: {
-    product:{
+    product: {
       title: string
-    } 
+    }
   }
 }

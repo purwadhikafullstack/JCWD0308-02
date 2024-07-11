@@ -4,7 +4,6 @@ import handlebars from "handlebars";
 import path from "path";
 import fs from "fs";
 import { OrderStatus } from "@prisma/client";
-import { MAIL_USER, WEB_URL } from "@/config.js";
 import { fileURLToPath } from "url";
 
 type ISendEmailVerifyProps = { id?: number; isActive?: boolean; displayName?: string; email: string; token: String };

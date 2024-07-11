@@ -21,7 +21,6 @@ export const getCartItemCount = async () => {
   const res = await axios.get(`${URL}/item-count`, {
     withCredentials: true,
   });
-  console.log(res.data);
   return res.data;
 };
 
@@ -30,18 +29,21 @@ export const checkCart = async (cartId: any, isChecked: boolean) => {
   return res.data;
 };
 
+export const checkCartAll = async (isChecked: boolean) => {
+  const res = await axios.patch(`${URL}/checked-all`, { isChecked }, { withCredentials: true });
+  return res.data;
+};
+
 export const deleteCart = async (cartId: any) => {
   const res = await axios.delete(`${URL}/${cartId}`, { withCredentials: true });
   return res.data;
 };
 
-export const updateCart = async (cartData: { addressId: string; productId: string; quantity: number }) => {
-  const { addressId, productId, quantity } = cartData;
-
+export const updateCart = async (cartItemId: string, stockId: string, quantity: number) => {
   try {
     const res = await axios.patch(
       `${URL}/update-cart`,
-      { addressId, productId, quantity },
+      { cartItemId, stockId, quantity },
       {
         headers: { "Content-Type": "application/json" },
         withCredentials: true,

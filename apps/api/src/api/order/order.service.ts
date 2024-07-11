@@ -4,15 +4,13 @@ import { ResponseError } from "@/utils/error.response.js";
 import { Validation } from "@/utils/validation.js";
 import { Request, Response } from "express";
 import { OrderIdValidation, OrderValidation } from "./order.validation.js";
-import { applyDiscounts, applyVoucherDiscount, calculateShipping, calculateTotalPriceAndWeight, getAddress, updateOrderItemsAndStock } from "@/helpers/order/addOrderHelper.js";
+import { applyDiscounts, calculateShipping, calculateTotalPriceAndWeight, getAddress, updateOrderItemsAndStock } from "@/helpers/order/addOrderHelper.js";
 import { createOrder, prepareOrderData } from "@/helpers/order/addOrderToPayment.js";
 import { handleCartItems } from "@/helpers/order/handleCartItems.js";
 import path from "path";
-import { parseEstimation } from "@/helpers/order/parseEstimation.js";
 import { mapStatusToEnum } from "@/helpers/order/mapStatusToEnum.js";
-import { calculateFinalPrices, handlePaymentLinkCreation } from "@/helpers/order/addOrderToPayment.js";
+import { handlePaymentLinkCreation } from "@/helpers/order/addOrderToPayment.js";
 import { cancelOrderTransaction, checkPaymentDeadline } from "@/helpers/order/cancelOrderHelper.js";
-import { OrderItemType } from "@prisma/client";
 
 export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
@@ -23,18 +21,14 @@ export class OrderService {
     const { updatedCartItem, nearestStore } = await handleCartItems(userId, address);
     const { totalPrice, weight } = calculateTotalPriceAndWeight(updatedCartItem);
     const { cost, estimation } = await calculateShipping(nearestStore, cityId, weight, orderRequest.courier);
-
     const discounts = await applyDiscounts(orderRequest, totalPrice, cost, updatedCartItem.length);
     const { finalTotalPrice, finalShippingCost, orderStatus, discountProducts, discountShippingCost, totalPayment } = await prepareOrderData(orderRequest, userId, nearestStore, updatedCartItem, totalPrice, cost, estimation, discounts);
-
     const newOrder = await createOrder(orderRequest, userId, nearestStore, updatedCartItem, finalTotalPrice, finalShippingCost, estimation, orderStatus, discountProducts, discountShippingCost, totalPayment);
-
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
     const paymentLink = await handlePaymentLinkCreation(orderRequest, newOrder, totalPayment);
-
-    return { ...newOrder, paymentLink };
     return { ...newOrder, paymentLink };
   };
+
   static getOrder = async (orderId: string) => {
     const orders = await prisma.order.findUnique({
       where: { id: orderId },
@@ -49,20 +43,11 @@ export class OrderService {
     if (!orderStatus) throw new ResponseError(401, `Invalid order status: ${status}`);
     if (date) {
       const parsedDate = new Date(date);
-      filters.updatedAt = {
-        gte: parsedDate.setHours(0, 0, 0, 0),
-        lt: parsedDate.setHours(23, 59, 59, 999),
-      };
+      filters.updatedAt = { gte: parsedDate.setHours(0, 0, 0, 0), lt: parsedDate.setHours(23, 59, 59, 999) };
     }
     const orders = await prisma.order.findMany({
       where: filters,
-      include: {
-        orderItems: {
-          include: {
-            stock: { include: { product: { include: { images: true } } } },
-          },
-        },
-      },
+      include: { orderItems: { include: { stock: { include: { product: { include: { images: true } } } } } } },
     });
     return orders;
   };

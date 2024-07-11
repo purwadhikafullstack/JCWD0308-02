@@ -2,11 +2,11 @@ import { prisma } from '@/db.js';
 import { ResponseError } from '@/utils/error.response.js';
 
 export class ReportService {
-  static async getStockMutation(storeId: string, page: number, perPage: number, yearMonth: string) {
-    const whereClause = this.buildWhereClause(storeId, yearMonth);
+  static async getStockMutation(storeId: string, page: number, perPage: number, yearMonth: string, productSlug: string, storeSlug: string) {
+    const whereClause = this.buildWhereClause(storeId, yearMonth, productSlug, storeSlug);
     const mutations = await prisma.stockMutation.findMany({
       where: whereClause,
-      include: { stock: { include: { product: true } } },
+      include: { stock: { include: { product: true, store: true } } },
       orderBy: { createdAt: 'desc' },
       skip: perPage * (page - 1),
       take: perPage,
@@ -15,11 +15,7 @@ export class ReportService {
     return { mutations, totalCount };
   }
 
-  static async getStockMutationById(storeAdminId: string, page: number, perPage: number, yearMonth: string) {
-    if (!storeAdminId) {
-      return this.getStockMutation('', page, perPage, yearMonth);
-    }
-
+  static async getStockMutationById(storeAdminId: string, page: number, perPage: number, yearMonth: string, productSlug: string, storeSlug: string) {
     const storeAdmin = await prisma.storeAdmin.findUnique({
       where: { storeAdminId: storeAdminId },
       select: { storeId: true },
@@ -30,22 +26,10 @@ export class ReportService {
     }
 
     const storeId = storeAdmin.storeId;
-    return this.getStockMutation(storeId, page, perPage, yearMonth);
+    return this.getStockMutation(storeId, page, perPage, yearMonth, productSlug, storeSlug);
   }
 
-  static async getStoreAdminIdByStoreId(storeId: string) {
-    const store = await prisma.store.findUnique({
-      where: { id: storeId },
-      select: { storeAdmins: { select: { storeAdminId: true } } },
-    });
-
-    if (!store) {
-      throw new ResponseError(404, `Store with id ${storeId} not found`);
-    }
-    return store.storeAdmins[0].storeAdminId;
-  }
-
-  private static buildWhereClause(storeId: string, yearMonth: string) {
+  private static buildWhereClause(storeId: string, yearMonth: string, productSlug: string, storeSlug: string) {
     const where: any = {};
     if (storeId) {
       where.stock = { storeId: storeId };
@@ -60,6 +44,12 @@ export class ReportService {
       } else {
         throw new ResponseError(400, `Invalid yearMonth format: ${yearMonth}`);
       }
+    }
+    if (productSlug) {
+      where.stock = { ...where.stock, product: { slug: productSlug } };
+    }
+    if (storeSlug) {
+      where.stock = { ...where.stock, store: { slug: storeSlug } };
     }
     return where;
   }
