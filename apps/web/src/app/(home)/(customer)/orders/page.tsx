@@ -137,6 +137,7 @@ export default function OrderCustomer() {
               setShippingCost={setShippingCost}
               setServiceDescription={setServiceDescription}
               onVoucherSelect={handleSelectVoucher}
+              selectedItems={selectedItems}
             />
           </div>
           {/* Additional Info */}

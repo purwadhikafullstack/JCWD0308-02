@@ -26,6 +26,7 @@ export default function Cart() {
   const [selectedItem, setSelectedItems] = useState<{ [key: string]: boolean }>({});
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const isSelectedAll = useMemo(() => {
     return carts.every((item) => item.isChecked);
@@ -62,6 +63,8 @@ export default function Cart() {
       } catch (error) {
         console.error("Error fetching cart data:", error);
         toast.error("Error fetching cart data.");
+      } finally {
+        setLoading(false);
       }
     };
     fetchCartData();
@@ -116,47 +119,61 @@ export default function Cart() {
       router.push(`/orders?${queryString}`);
     }
   };
-
-  return (
-    <div className="max-w-7xl mx-auto p-5">
-      <div className="grid lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white rounded-xl border-2 border-[#a1a3b5] p-6 shadow-lg">
-          <div className="flex items-center mb-4">
-            <Checkbox id="select-all" onChange={handleSelectAll} onCheckedChange={handleSelectAll} checked={selectAll} />
-
-            <label className="text-xl font-semibold ml-3">Select All</label>
-          </div>
-          <Separator className="mb-4" />
-          {carts.map((cart, index: any) => (
-            <CartItem key={`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}-${index + 1}`} cart={cart} isSelected={cart.isChecked} onSelect={() => handleSelectedItem(cart.id, cart.isChecked)} />
-          ))}
-        </div>
-        <div className="grid grid-rows-2 max-md:grid-rows-1">
-          <div className="bg-white rounded-xl border-2 border-[#a1a3b5] p-6 shadow-lg flex flex-col justify-between">
-            <h1 className="text-xl font-semibold mb-4">Shopping Summary</h1>
-            <Separator className="mb-4" />
-            <div className="flex justify-between mb-2">
-              <p className="text-gray-700">Subtotal</p>
-              <p className="text-gray-700">{formatCurrency(subtotal)}</p>
-            </div>
-            <Separator className="mb-4" />
-            <div className="flex justify-center">
-              <Button variant="default" className="w-full" onClick={isCheckoutDisabled || !isServiceAvailable ? undefined : handleCheckout} disabled={isCheckoutDisabled || !isServiceAvailable}>
-                Checkout
-              </Button>
-            </div>
-            {(isCheckoutDisabled || !isServiceAvailable) && (
-              <div className="mt-4 ">
-                <Alert variant="default" className="text-destructive">
-                  {!isServiceAvailable ? "Service is not available in your area." : "Please select at least one item to checkout."}
-                </Alert>
-              </div>
-            )}
-          </div>
-          <div className="flex max-md:hidden max-md:overflow-y-hidden"></div>
-        </div>
+  if (loading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
       </div>
-      <Toaster />
+    );
+  }
+  return (
+    <div className="flex justify-center items-center">
+      <div className="max-w-7xl p-5">
+        {carts.length === 0 ? (
+          <div className="text-center py-10">
+            <h2 className="text-xl font-semibold mb-2">Cart is empty. Start Shopping!</h2>
+            <Button onClick={() => router.push("/products")}>Shop Now</Button>
+          </div>
+        ) : (
+          <div className="grid lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 bg-white rounded-xl border-2 border-[#a1a3b5] p-6 shadow-lg">
+              <div className="flex items-center mb-4">
+                <Checkbox id="select-all" onChange={handleSelectAll} onCheckedChange={handleSelectAll} checked={selectAll} />
+                <label className="text-xl font-semibold ml-3">Select All</label>
+              </div>
+              <Separator className="mb-4" />
+              {carts.map((cart, index: any) => (
+                <CartItem key={`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}-${index + 1}`} cart={cart} isSelected={cart.isChecked} onSelect={() => handleSelectedItem(cart.id, cart.isChecked)} />
+              ))}
+            </div>
+            <div className="grid grid-rows-2 max-md:grid-rows-1">
+              <div className="bg-white rounded-xl border-2 border-[#a1a3b5] p-6 shadow-lg flex flex-col justify-between">
+                <h1 className="text-xl font-semibold mb-4">Shopping Summary</h1>
+                <Separator className="mb-4" />
+                <div className="flex justify-between mb-2">
+                  <p className="text-gray-700">Subtotal</p>
+                  <p className="text-gray-700">{formatCurrency(subtotal)}</p>
+                </div>
+                <Separator className="mb-4" />
+                <div className="flex justify-center">
+                  <Button variant="default" className="w-full" onClick={isCheckoutDisabled || !isServiceAvailable ? undefined : handleCheckout} disabled={isCheckoutDisabled || !isServiceAvailable}>
+                    Checkout
+                  </Button>
+                </div>
+                {(isCheckoutDisabled || !isServiceAvailable) && (
+                  <div className="mt-4">
+                    <Alert variant="default" className="text-destructive">
+                      {!isServiceAvailable ? "Service is not available in your area." : "Please select at least one item to checkout."}
+                    </Alert>
+                  </div>
+                )}
+              </div>
+              <div className="flex max-md:hidden max-md:overflow-y-hidden"></div>
+            </div>
+          </div>
+        )}
+        <Toaster />
+      </div>
     </div>
   );
 }

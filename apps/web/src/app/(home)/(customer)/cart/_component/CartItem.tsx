@@ -87,7 +87,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 mb-4 sm:mb-0 w-full sm:w-auto">
+        <div className="flex items-center gap-3 mb-4 sm:mb-0 sm:w-auto">
           <Checkbox id={cart.id} checked={isSelected} onCheckedChange={() => onSelect(cart.id, !isSelected)} onChange={() => onSelect(cart.id, !isSelected)} />
 
           <figure className="max-w-[70%] sm:max-w-none sm:w-[90px] w-[60%]">
