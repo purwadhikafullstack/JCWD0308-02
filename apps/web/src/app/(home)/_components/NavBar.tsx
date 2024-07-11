@@ -63,7 +63,7 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
                     <ul className="grid w-[600px] gap-3 p-4 md:grid-cols-4">
-                      {category.length > 0 ? (
+                      {category?.length > 0 ? (
                         category.map((item: Category) => (
                           <ListItem
                             key={item.id}

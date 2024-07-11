@@ -47,9 +47,10 @@ export class StoreController {
 
   getStores: ICallback = async (req, res, next) => {
     try {
-      const stores = await StoreService.getStores()
+      const { page, limit, filters } = this.getPaginationAndFilters(req.query);
+      const data = await StoreService.getStores(page, limit, filters, res)
 
-      return res.status(200).json({ status: 'OK', stores })
+      return res.status(200).json({ status: 'OK', ...data })
     } catch (error) {
       next(error)
     }
@@ -106,5 +107,14 @@ export class StoreController {
     } catch (error) {
       next(error)
     }
+  }
+
+  private getPaginationAndFilters(query: any) {
+    const page = parseInt(query.page || '1', 10);
+    const limit = parseInt(query.limit || '10', 10);
+    const filters = { ...query };
+    delete filters.page;
+    delete filters.limit;
+    return { page, limit, filters };
   }
 }
