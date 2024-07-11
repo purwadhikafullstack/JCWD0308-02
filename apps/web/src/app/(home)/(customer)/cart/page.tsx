@@ -2,12 +2,12 @@
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import { checkCart, getCart } from "@/lib/fetch-api/cart";
+import { checkCart, checkCartAll, getCart } from "@/lib/fetch-api/cart";
 import CartItem from "./_component/CartItem";
 import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
-import { setCart } from "@/lib/features/cart/cartSlice";
+import { fetchCart, setCart } from "@/lib/features/cart/cartSlice";
 import { RootState } from "@/lib/features/store";
 import { formatCurrency } from "@/lib/currency";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,10 @@ export default function Cart() {
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState<boolean>(true);
   const router = useRouter();
+  const isSelectedAll = useMemo(() => {
+    return carts.every((item) => item.isChecked);
+  }, [carts]);
+
   const nearestStocks = useSuspenseQuery({
     queryKey: ["nearest-stocks", 1, 15, ""],
     queryFn: async ({ queryKey }) => {
@@ -41,7 +45,7 @@ export default function Cart() {
   });
 
   if (!userProfile?.data?.user) {
-    router.push('/auth/signin')
+    router.push("/auth/signin");
   }
 
   const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
@@ -52,7 +56,6 @@ export default function Cart() {
         const cartData = await getCart();
         const updatedCartData = cartData.data.map((item: CartItemType) => ({
           ...item,
-          isChecked: false,
         }));
         dispatch(setCart(updatedCartData));
         toast.success("Cart Updated!");
@@ -77,19 +80,6 @@ export default function Cart() {
 
   const subtotal = useAppSelector((state: RootState) => calculateSubtotal(state.cart.items));
 
-  const handleSelectAll = () => {
-    const newSelectedItems: { [key: string]: boolean } = {};
-    if (!selectAll) {
-      carts.forEach((cart: CartItemType) => {
-        const key = `${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`;
-        newSelectedItems[key] = true;
-      });
-    }
-    setSelectedItems(newSelectedItems);
-    setSelectAll(!selectAll);
-    setIsCheckoutDisabled(!Object.values(newSelectedItems).some((isSelected) => isSelected));
-  };
-
   useEffect(() => {
     const initialSelectedItems: { [key: string]: boolean } = {};
     carts.forEach((cart: CartItemType) => {
@@ -97,22 +87,25 @@ export default function Cart() {
     });
     setSelectedItems(initialSelectedItems);
     setIsCheckoutDisabled(!Object.values(initialSelectedItems).some((isSelected) => isSelected));
+    setSelectAll(Object.values(initialSelectedItems).every((isSelected) => isSelected));
   }, [carts]);
 
-  const handleSelectedItem = async (itemId: string, isPack: boolean) => {
-    const key = `${itemId}-${isPack !== undefined ? isPack.toString() : "missing"}`;
-    const newSelectedItems = { ...selectedItem, [key]: !selectedItem[key] };
-    setSelectedItems(newSelectedItems);
-    setIsCheckoutDisabled(!Object.values(newSelectedItems).some((isSelected) => isSelected));
+  const handleSelectedItem = async (itemId: string, isChecked: boolean) => {
     try {
-      await checkCart(itemId, newSelectedItems[key]);
-      console.log(`Item ${itemId} isChecked updated to ${newSelectedItems[key]}`);
+      await checkCart(itemId, !isChecked);
     } catch (error) {
       console.error("Error updating isChecked:", error);
     }
+    dispatch(fetchCart());
+  };
 
-    const allSelectedManually = carts.every((cart: CartItemType) => newSelectedItems[`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`]);
-    setSelectAll(allSelectedManually);
+  const handleSelectAll = async () => {
+    try {
+      await checkCartAll(!isSelectedAll);
+    } catch (error) {
+      console.error(error);
+    }
+    dispatch(fetchCart());
   };
 
   const handleCheckout = () => {
@@ -134,13 +127,8 @@ export default function Cart() {
             <label className="text-xl font-semibold ml-3">Select All</label>
           </div>
           <Separator className="mb-4" />
-          {carts.map((cart: any, index: any) => (
-            <CartItem
-              key={`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}-${index + 1}`}
-              cart={cart}
-              isSelected={selectedItem[`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`] || false}
-              onSelect={() => handleSelectedItem(cart.id, cart.isPack)}
-            />
+          {carts.map((cart, index: any) => (
+            <CartItem key={`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}-${index + 1}`} cart={cart} isSelected={cart.isChecked} onSelect={() => handleSelectedItem(cart.id, cart.isChecked)} />
           ))}
         </div>
         <div className="grid grid-rows-2 max-md:grid-rows-1">

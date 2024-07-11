@@ -40,12 +40,10 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
       return response.vouchers;
     },
   });
-  console.log("vouchers:", vouchers);
   const { data: userVouchers, error: userVouchersError } = useSuspenseQuery({
     queryKey: ["user-vouchers"],
     queryFn: getUserVouchers,
   });
-  console.log("userVouchers:", userVouchers);
   useEffect(() => {
     if (userVouchersError) {
       handleApiError(userVouchersError, "Failed to fetch user vouchers");
