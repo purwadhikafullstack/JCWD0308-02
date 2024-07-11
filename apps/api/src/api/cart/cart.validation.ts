@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 export const CartValidation = {
   CART: z.object({
@@ -12,8 +12,10 @@ export const CartValidation = {
 
 export const patchCartValidation = {
   CART: z.object({
-    addressId: z.string().uuid(),
-    productId: z.string().uuid(),
+    // addressId: z.string().uuid(),
+    // productId: z.string().uuid(),
+    cartItemId: z.string().uuid(),
+    stockId: z.string().uuid(),
     quantity: z.number(),
   }),
 };

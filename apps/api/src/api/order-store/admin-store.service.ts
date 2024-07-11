@@ -25,15 +25,9 @@ export class OrderStoreService {
 
   static sendUserOrders = async (req: ChangeStatusRequest, res: Response) => {
     const { orderId, newStatus } = Validation.validate(ChangeStatusValidation.CHANGE, req);
-    if (!Object.values(OrderStatus).includes(newStatus as OrderStatus)) {
-      throw new ResponseError(400, `Invalid status: ${newStatus}`);
-    }
-    const order = await prisma.order.findUnique({
-      where: { id: orderId },
-      include: { user: true },
-    });
+    if (!Object.values(OrderStatus).includes(newStatus as OrderStatus)) throw new ResponseError(400, `Invalid status: ${newStatus}`);
+    const order = await prisma.order.findUnique({ where: { id: orderId }, include: { user: true } });
     if (!order) throw new ResponseError(404, "Order not found");
-
     const allowedTransitions: { [key in OrderStatus]: OrderStatus[] } = {
       [OrderStatus.AWAITING_PAYMENT]: [],
       [OrderStatus.AWAITING_CONFIRMATION]: [],
@@ -43,60 +37,26 @@ export class OrderStoreService {
       [OrderStatus.CONFIRMED]: [],
       [OrderStatus.CANCELLED]: [],
     };
-
     const currentStatus = order.orderStatus;
     const targetStatus = newStatus as OrderStatus;
-
-    if (!allowedTransitions[currentStatus].includes(targetStatus)) {
-      throw new ResponseError(400, `Unsupported new status: ${newStatus}`);
-    }
-
-    const updatedOrder = await prisma.order.update({
-      where: { id: orderId },
-      data: { orderStatus: targetStatus },
-    });
-
+    if (!allowedTransitions[currentStatus].includes(targetStatus)) throw new ResponseError(400, `Unsupported new status: ${newStatus}`);
+    const updatedOrder = await prisma.order.update({ where: { id: orderId }, data: { orderStatus: targetStatus } });
     return updatedOrder;
   };
 
   static cancelOrderByAdmin = async (req: OrderId, res: Response) => {
-    console.log("pingpongpong");
     const { orderId } = Validation.validate(OrderIdValidation.ORDER_ID, req);
     const order = await prisma.order.findUnique({
       where: { id: orderId },
       include: { orderItems: true },
     });
-    if (!order) {
-      console.error("Order not found:", orderId);
-      throw new ResponseError(404, "Order not found");
-    }
-    console.log("current order status:", order.orderStatus);
-    if (order.orderStatus === OrderStatus.SHIPPING || order.orderStatus === OrderStatus.DELIVERED || order.orderStatus === OrderStatus.CONFIRMED) {
-      console.error("Order cannot be canceled, current status:", order.orderStatus);
-      throw new ResponseError(400, "Order cannot be canceled");
-    }
+    if (!order) throw new ResponseError(404, "Order not found");
+    if (order.orderStatus === OrderStatus.SHIPPING || order.orderStatus === OrderStatus.DELIVERED || order.orderStatus === OrderStatus.CONFIRMED) throw new ResponseError(400, "Order cannot be canceled");
 
     const updatedOrder = await prisma.$transaction([
-      prisma.order.update({
-        where: { id: orderId },
-        data: { orderStatus: OrderStatus.CANCELLED },
-      }),
-      ...order.orderItems.map((item: any) =>
-        prisma.stock.update({
-          where: { id: item.stockId },
-          data: { amount: { increment: item.quantity } },
-        }),
-      ),
-      ...order.orderItems.map((item: any) =>
-        prisma.stockMutation.create({
-          data: {
-            stockId: item.stockId,
-            mutationType: "REFUND",
-            amount: item.quantity,
-            orderId: order.id,
-          },
-        }),
-      ),
+      prisma.order.update({ where: { id: orderId }, data: { orderStatus: OrderStatus.CANCELLED } }),
+      ...order.orderItems.map((item: any) => prisma.stock.update({ where: { id: item.stockId }, data: { amount: { increment: item.quantity } } })),
+      ...order.orderItems.map((item: any) => prisma.stockMutation.create({ data: { stockId: item.stockId, mutationType: "REFUND", amount: item.quantity, orderId: order.id } })),
     ]);
     return updatedOrder;
   };
