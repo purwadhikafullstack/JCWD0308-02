@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAppDispatch } from "@/lib/features/hooks";
-import { deleteCartItem, fetchCartItemCount, updateCartItem, updateQuantity } from "@/lib/features/cart/cartSlice";
+import { deleteCartItem, fetchCart, fetchCartItemCount, updateCartItem, updateQuantity } from "@/lib/features/cart/cartSlice";
 import { formatCurrency } from "@/lib/currency";
 import { CartItemType } from "@/lib/types/cart";
 import { useSuspenseQuery } from "@tanstack/react-query";
@@ -19,7 +19,7 @@ import { getUserProfile } from "@/lib/fetch-api/user/client";
 interface CartItemProps {
   cart: CartItemType;
   isSelected: boolean;
-  onSelect: (itemId: string) => void;
+  onSelect: (itemId: string, isChecked: boolean) => void;
 }
 const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   const router = useRouter();
@@ -33,7 +33,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   });
 
   if (!userProfile?.data?.user) {
-    router.push('/auth/signin')
+    router.push("/auth/signin");
   }
 
   const [quantity, setQuantity] = useState(cart.quantity);
@@ -56,14 +56,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
       dispatch(deleteCartItem(cart.id));
     } else {
       try {
-        const resultAction = await dispatch(
-          updateCartItem({
-            addressId,
-            quantity: newQuantity,
-            productId: cart.stock.product.id,
-            isChecked: false,
-          } as any),
-        );
+        const resultAction = await dispatch(updateCartItem({ cartItemId: cart.id, stockId: cart.stock.id, quantity: newQuantity }));
 
         if (updateCartItem.fulfilled.match(resultAction)) {
           dispatch(updateQuantity({ id: cart.id, quantity: newQuantity }));
@@ -76,6 +69,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
       } catch (error) {
         console.error("Update Cart Error:", error);
       }
+      dispatch(fetchCart());
     }
   };
 
@@ -93,8 +87,8 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
   return (
     <div className="mb-6">
       <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 mb-4 sm:mb-0 w-full sm:w-auto">
-          <Checkbox id={cart.id} checked={isSelected} onCheckedChange={() => onSelect(cart.id)} onChange={() => onSelect(cart.id)} />
+        <div className="flex items-center gap-3 mb-4 sm:mb-0 sm:w-auto">
+          <Checkbox id={cart.id} checked={isSelected} onCheckedChange={() => onSelect(cart.id, !isSelected)} onChange={() => onSelect(cart.id, !isSelected)} />
 
           <figure className="max-w-[70%] sm:max-w-none sm:w-[90px] w-[60%]">
             <Image src={product.images[0]?.imageUrl || "/indomie.jpg"} width={50} height={50} alt="product image" />

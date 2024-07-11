@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Percent, Truck } from "lucide-react";
 import { calculateShippingCost } from "@/lib/fetch-api/shipping";
 import { courierServices, formattedCourierNames } from "@/lib/courierServices";
@@ -23,6 +22,7 @@ interface ShippingAndDiscountProps {
   setShippingCost: (cost: number | null) => void;
   setServiceDescription: (description: string) => void;
   onVoucherSelect: (voucherId: string, voucherName: string, voucherDiscount: number) => void;
+  selectedItems: any[];
 }
 
 const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
@@ -38,6 +38,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   setShippingCost,
   setServiceDescription,
   onVoucherSelect,
+  selectedItems,
 }) => {
   const nearestStocks = useSuspenseQuery({
     queryKey: ["nearest-stocks", 1, 15, ""],
@@ -158,7 +159,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
         </CardHeader>
         <CardContent className="p-4">
           <p>Use discount codes to save more.</p>
-          <VoucherDrawer onSelectVoucher={handleSelectVoucher} />
+          <VoucherDrawer onSelectVoucher={handleSelectVoucher} selectedItems={selectedItems} />
           {selectedVoucherName && (
             <div className="mt-4">
               <p>Selected Voucher: {selectedVoucherName}</p>

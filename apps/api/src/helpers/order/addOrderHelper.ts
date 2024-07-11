@@ -1,11 +1,9 @@
 import { calculateShippingCost } from "@/api/shipping/shipping.service.js";
 import { prisma } from "@/db.js";
-import { OrderRequest, getCourierType, mapCourierTypeToRajaOngkir } from "@/types/order.type.js";
+import { mapCourierTypeToRajaOngkir } from "@/types/order.type.js";
 import { ResponseError } from "@/utils/error.response.js";
-import { PaymentMethod } from "@prisma/client";
 import { calculateProductPriceAndWeight } from "./calculateWeight.js";
 import { Response } from "express";
-import { calculateFinalPrices } from "./addOrderToPayment.js";
 
 export const getAddress = async (res: Response) => {
   const addressId = res.locals.address?.id;
@@ -87,47 +85,15 @@ export const calculateTotalPriceAndWeight = (updatedCartItem: any[]) => {
 
 export const updateOrderItemsAndStock = async (updatedCartItem: any[], orderId: string) => {
   const updates = updatedCartItem.map(async (item) => {
-    const stock = await prisma.stock.findUnique({
-      where: { id: item.stockId },
-      include: { product: true },
-    });
-    if (!stock) {
-      throw new Error(`Stock with id ${item.stockId} not found`);
-    }
+    const stock = await prisma.stock.findUnique({ where: { id: item.stockId }, include: { product: true } });
+    if (!stock) throw new Error(`Stock with id ${item.stockId} not found`);
     const decrementValue = item.isPack ? item.quantity * stock.product.packQuantity : item.quantity;
     const amountValue = item.isPack ? item.quantity * stock.product.packQuantity : item.quantity;
-
-    console.log(`Updating Order Item ${item.id}: orderId=${orderId}, decrement=${decrementValue}, amount=${amountValue}`);
-
-    try {
-      await prisma.$transaction([
-        prisma.orderItem.update({
-          where: { id: item.id },
-          data: { orderId, orderItemType: "ORDER_ITEM", isChecked: true },
-        }),
-        prisma.stock.update({
-          where: { id: item.stockId },
-          data: {
-            amount: {
-              decrement: decrementValue,
-            },
-          },
-        }),
-        prisma.stockMutation.create({
-          data: {
-            stockId: item.stockId,
-            mutationType: "ORDER",
-            amount: amountValue,
-            orderId,
-          },
-        }),
-      ]);
-
-      console.log("Updates successfully applied.");
-    } catch (error) {
-      console.error("Error applying updates:", error);
-    }
+    await prisma.$transaction([
+      prisma.orderItem.update({ where: { id: item.id }, data: { orderId, orderItemType: "ORDER_ITEM", isChecked: true } }),
+      prisma.stock.update({ where: { id: item.stockId }, data: { amount: { decrement: decrementValue } } }),
+      prisma.stockMutation.create({ data: { stockId: item.stockId, mutationType: "ORDER", amount: amountValue, orderId } }),
+    ]);
   });
-
   await Promise.all(updates);
 };

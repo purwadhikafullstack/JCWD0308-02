@@ -17,9 +17,10 @@ import shippingDiscount from "../../../../../../public/shippingdiscount.png";
 
 interface VoucherDrawerProps {
   onSelectVoucher: (voucherId: string, voucherName: string, voucherDiscount: number, voucherType: string, discountType: string) => void;
+  selectedItems: any[];
 }
 
-const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
+const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher, selectedItems }) => {
   const nearestStocks = useSuspenseQuery({
     queryKey: ["nearest-stocks", 1, 15, ""],
     queryFn: async ({ queryKey }) => {
@@ -40,12 +41,10 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
       return response.vouchers;
     },
   });
-  console.log("vouchers:", vouchers);
   const { data: userVouchers, error: userVouchersError } = useSuspenseQuery({
     queryKey: ["user-vouchers"],
     queryFn: getUserVouchers,
   });
-  console.log("userVouchers:", userVouchers);
   useEffect(() => {
     if (userVouchersError) {
       handleApiError(userVouchersError, "Failed to fetch user vouchers");
@@ -90,11 +89,19 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher }) => {
 
   const handleUseVoucher = (voucher: any) => {
     setSelectedVoucher(voucher.id);
+    let subtotal = 0;
+    selectedItems.forEach((item) => {
+      let itemPrice = item.isPack ? item.stock.product.packPrice : item.stock.product.price;
+
+      if (item.quantity && typeof itemPrice === "number" && !isNaN(itemPrice)) {
+        subtotal += item.quantity * itemPrice;
+      }
+    });
     let discountAmount = 0;
     if (voucher.discountType === "FIXED_DISCOUNT") {
       discountAmount = voucher.fixedDiscount;
     } else if (voucher.discountType === "DISCOUNT") {
-      discountAmount = voucher.discount * (1 / 100) * voucher.fixedDiscount;
+      discountAmount = voucher.discount * (1 / 100) * subtotal;
     }
     onSelectVoucher(voucher.id, voucher.name, discountAmount, voucher.voucherType, voucher.discountType);
     document.getElementById("voucher-drawer-close")?.click();
