@@ -4,15 +4,13 @@ import { ResponseError } from "@/utils/error.response.js";
 import { Validation } from "@/utils/validation.js";
 import { Request, Response } from "express";
 import { OrderIdValidation, OrderValidation } from "./order.validation.js";
-import { applyDiscounts, applyVoucherDiscount, calculateShipping, calculateTotalPriceAndWeight, getAddress, updateOrderItemsAndStock } from "@/helpers/order/addOrderHelper.js";
+import { applyDiscounts, calculateShipping, calculateTotalPriceAndWeight, getAddress, updateOrderItemsAndStock } from "@/helpers/order/addOrderHelper.js";
 import { createOrder, prepareOrderData } from "@/helpers/order/addOrderToPayment.js";
 import { handleCartItems } from "@/helpers/order/handleCartItems.js";
 import path from "path";
-import { parseEstimation } from "@/helpers/order/parseEstimation.js";
 import { mapStatusToEnum } from "@/helpers/order/mapStatusToEnum.js";
-import { calculateFinalPrices, handlePaymentLinkCreation } from "@/helpers/order/addOrderToPayment.js";
+import { handlePaymentLinkCreation } from "@/helpers/order/addOrderToPayment.js";
 import { cancelOrderTransaction, checkPaymentDeadline } from "@/helpers/order/cancelOrderHelper.js";
-import { OrderItemType } from "@prisma/client";
 
 export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
@@ -32,7 +30,6 @@ export class OrderService {
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
     const paymentLink = await handlePaymentLinkCreation(orderRequest, newOrder, totalPayment);
 
-    return { ...newOrder, paymentLink };
     return { ...newOrder, paymentLink };
   };
   static getOrder = async (orderId: string) => {
