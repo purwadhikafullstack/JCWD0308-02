@@ -26,7 +26,7 @@ export class CategoryService {
     if (req.files && !Array.isArray(req.files)) {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       if (files.imageUrl) {
-        req.body.imageUrl = `${API_URL}/api/public/images/${files.imageUrl[0].filename}`;
+        req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
       }
     }
     const newCategory = Validation.validate(CategoryValidation.createCategory, req.body as CreateCategoryRequest);
@@ -44,7 +44,7 @@ export class CategoryService {
     if (req.files && !Array.isArray(req.files)) {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
       if (files.imageUrl) {
-        req.body.imageUrl = `${API_URL}/api/public/images/${files.imageUrl[0].filename}`;
+        req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
       }
     }
 
