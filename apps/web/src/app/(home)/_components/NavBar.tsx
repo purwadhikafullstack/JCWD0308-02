@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -21,14 +21,33 @@ import { AvatarDropdown } from '@/components/shared/avatar-dropdown';
 import RightMenu from './right-menu';
 import SecondNavbar from './second-navbar';
 import Image from 'next/image';
+import SearchBarDebounce from '@/components/partial/SearchBarDeBounce';
+import { Product } from '@/lib/types/product';
+import { fetchProducts } from '@/lib/fetch-api/product';
 
 export const NavbBar = ({ category }: { category: Category[] }) => {
   const router = useRouter();
   const [query, setQuery] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
 
-  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (query) {
+  useEffect(() => {
+    const fetchAllProducts = async () => {
+      try {
+        const response = await fetchProducts();
+        setProducts(response.products);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      }
+    };
+
+    fetchAllProducts();
+  }, []);
+
+  const handleSearch = (query: string) => {
+    const product = products.find(p => p.title.toLowerCase() === query.toLowerCase());
+    if (product) {
+      router.push(`/products/detail/${product.slug}`);
+    } else {
       router.push(`/products?search=${query}`);
     }
   };
@@ -83,23 +102,15 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
         </div>
         <form
           className="relative hidden md:block w-full max-w-4xl"
-          onSubmit={handleSearch}
+          onSubmit={(e) => { e.preventDefault(); handleSearch(query); }}
         >
-          <Input
-            type="text"
-            className="max-w-4xl"
-            name="query"
-            placeholder="Search products...."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+          <SearchBarDebounce onSearch={handleSearch} suggestions={products.map(p => p.title)} />
           <Button
             size="icon"
             variant="ghost"
             type="submit"
             className="absolute inset-y-0 right-0 rounded-r-md px-3 text-muted-foreground"
           >
-            <Search className="h-5 w-5" />
           </Button>
         </form>
         <div className="flex items-center gap-3">
@@ -113,27 +124,7 @@ export const NavbBar = ({ category }: { category: Category[] }) => {
             <SheetContent className="w-[300px]" side="right">
               <div className="flex flex-col items-start gap-4 p-4">
                 <nav className="flex flex-col items-start gap-2">
-                  <form
-                    className="relative w-full max-w-4xl"
-                    onSubmit={handleSearch}
-                  >
-                    <Input
-                      type="text"
-                      className="max-w-4xl"
-                      name="query"
-                      placeholder="Search products...."
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                    />
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      type="submit"
-                      className="absolute inset-y-0 right-0 rounded-r-md px-3 text-muted-foreground"
-                    >
-                      <Search className="h-5 w-5" />
-                    </Button>
-                  </form>
+                  <SearchBarDebounce onSearch={handleSearch} suggestions={products.map(p => p.title)} />
                 </nav>
               </div>
             </SheetContent>

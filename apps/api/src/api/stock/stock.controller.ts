@@ -34,21 +34,6 @@ export class StockController {
     }
   };
 
-  postStockId: ICallback = async (req, res, next) => {
-    try {
-      const { productId, addressId } = req.body;
-      const userId = res.locals.user?.id;
-      const stockId = await StockService.postStockId(
-        productId,
-        addressId,
-        userId,
-      );
-      res.status(200).json({ stockId });
-    } catch (error) {
-      next(error);
-    }
-  };
-
   createStock: ICallback = async (req, res, next) => {
     try {
       const user = this.getUserOrFail(res.locals.user);

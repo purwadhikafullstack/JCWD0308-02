@@ -12,6 +12,11 @@ export const addCart = async (cartData: any) => {
 
 export const getCart = async () => {
   const res = await axios.get(URL, {
+    headers: {
+      "Cache-Control": "no-cache",
+      Pragma: "no-cache",
+      Expires: "0",
+    },
     withCredentials: true,
   });
   return res.data;

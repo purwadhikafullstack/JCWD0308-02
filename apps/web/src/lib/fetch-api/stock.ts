@@ -49,15 +49,3 @@ export const deleteStock = async (id: string) => {
   });
   return response.data;
 };
-
-export const postStockId = async (productId: string, addressId: string) => {
-  const res = await axios.post(
-    `${API_URL}/stock/post-stock-id`,
-    { productId, addressId },
-    {
-      headers: { "Content-Type": "application/json" },
-      withCredentials: true,
-    },
-  );
-  return res.data;
-};
