@@ -1,24 +1,25 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { useAppDispatch } from "@/lib/features/hooks";
 import { addCartItem, addToCart, fetchCartItemCount } from "@/lib/features/cart/cartSlice";
 import { fetchProductBySlug } from "@/lib/fetch-api/product";
 import { Product } from "@/lib/types/product";
 import { formatCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus, Minus, CheckCircle, Gift, Box } from "lucide-react";
+import { ShoppingCart, Plus, Minus, Box } from "lucide-react";
 import Image from "next/image";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
 import { getSelectedAddress } from "@/lib/fetch-api/address/client";
 import { getUserProfile } from "@/lib/fetch-api/user/client";
 import { toast } from "@/components/ui/sonner";
+import ImageHover from "./components/ImageHover";
 
 const ProductDetail = () => {
-  const { slug } = useParams();
-  const productSlug = Array.isArray(slug) ? slug[0] : slug; // Ensure slug is a string
+  const params = useParams();
+  const productSlug = params.slug as string;
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -79,10 +80,10 @@ const ProductDetail = () => {
         quantity,
         isPack,
         addressId,
-        stockId: product.stock?.[0]?.id ?? "",
+        stockId: nearestStocks.data?.stocks?.find(stock => stock.productId === product.id)?.id ?? "",
         isChecked: false,
       };
-      const availableStock = product?.stock?.reduce((total, stock) => total + stock.amount, 0) || 0;
+      const availableStock = nearestStocks.data?.stocks?.find(stock => stock.productId === product.id)?.amount ?? 0;
       if (quantity > availableStock) {
         toast.error("Quantity exceeds available stock.");
         return;
@@ -108,10 +109,13 @@ const ProductDetail = () => {
     setQuantity((prevQuantity) => (type === "increment" ? prevQuantity + 1 : Math.max(1, prevQuantity - 1)));
   };
 
+  const nearestStore = useMemo(() => {
+    if (!product) return nearestStocks.data?.stocks?.[0];
+    return nearestStocks.data?.stocks?.find(stock => stock.productId === product.id) || nearestStocks.data?.stocks?.[0];
+  }, [product, nearestStocks.data?.stocks]);
+
   if (loading) return <p>Loading...</p>;
   if (error) return <p>{error}</p>;
-
-  const availableStock = product?.stock?.reduce((total, stock) => total + stock.amount, 0) || 0;
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -128,10 +132,10 @@ const ProductDetail = () => {
                 </div>
               ))}
             </div>
-            <div className="w-full flex justify-center items-center">
+            <div className="w-full flex justify-center items-center overflow-hidden">
               {product.images[currentImageIndex] && (
                 <div className="relative w-full h-96">
-                  <Image src={product.images[currentImageIndex].imageUrl} alt={product.title} layout="fill" objectFit="contain" className="rounded-lg border-2 border-gray-200 shadow-sm" />
+                  <ImageHover alt={product.slug} src={product.images[currentImageIndex].imageUrl} />
                 </div>
               )}
             </div>
@@ -156,7 +160,9 @@ const ProductDetail = () => {
                 <del className="text-xs font-semibold text-gray-500 line-through">{formatCurrency(product.price || 0)}</del> {formatCurrency(product.discountPrice || product.price || 0)}
               </p>
             )}
-            <p className="text-sm mb-4 text-gray-600">Available Stock: {availableStock}</p>
+            {nearestStore && (
+              <p className="text-sm mb-4 text-gray-600">Available Stock: {nearestStore.amount}</p>
+            )}
             <div className="flex items-center space-x-4 mb-4">
               <Button variant="outline" onClick={() => handleQuantityChange("decrement")} disabled={quantity <= 1}>
                 <Minus size={16} />
@@ -167,9 +173,9 @@ const ProductDetail = () => {
               </Button>
             </div>
             <div className="flex space-x-4">
-              <Button variant="default" onClick={handleAddToCart} disabled={availableStock === 0 || !isServiceAvailable} className="bg-blue-600 text-white hover:bg-blue-700">
+              <Button variant="default" onClick={handleAddToCart} disabled={nearestStore?.amount === 0 || !isServiceAvailable} className="bg-blue-600 text-white hover:bg-blue-700">
                 <ShoppingCart size={20} className="mr-2" />
-                {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
+                {nearestStore?.amount === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
             </div>
             {isError ? (
@@ -192,23 +198,6 @@ const ProductDetail = () => {
                 <div className="flex items-center text-gray-600">
                   <Box size={16} className="mr-2" />
                   <span>Weight Pack: {product.weightPack} g</span>
-                </div>
-              )}
-              {product.stock && product.stock.length > 0 && (
-                <div>
-                  <h2 className="text-lg font-semibold mt-4 mb-2 text-gray-700">Stock Information:</h2>
-                  {product.stock.map((stock) => (
-                    <div key={stock.id} className=" text-gray-600">
-                      <div className="flex items-center text-bold text-primary">
-                        <Box size={16} className="mr-2" />
-                        <span> {stock.store.name}</span>
-                      </div>
-                      <div className="flex items-center ml-6 mt-1 text-sm">
-                        <CheckCircle size={16} className="mr-2" />
-                        <span>Store Stock: {stock.amount}</span>
-                      </div>
-                    </div>
-                  ))}
                 </div>
               )}
             </div>
