@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import { generateId } from 'lucia';
 import { CookieAttributes, parseCookies, serializeCookie } from 'oslo/cookie';
 import { user } from './auth.validation.js';
+import { sendWelcomeOAuth } from '@/utils/email.js';
 
 export interface ICreateUserByEmail extends Prisma.UserCreateInput {
   email: string;
@@ -150,11 +151,15 @@ export class AuthHelper {
   };
 
   static createUserByGitHub = async (data: ICreateUserByGitHub) => {
-    return await prisma.user.create({ data });
+    const user = await prisma.user.create({ data });
+    await sendWelcomeOAuth({email: user.contactEmail!, displayName: user.displayName!})
+    return user
   };
 
   static createUserByGoogle = async (data: ICreateUserByGoogle) => {
-    return await prisma.user.create({ data });
+    const user = await prisma.user.create({ data });
+    await sendWelcomeOAuth({email: user.contactEmail!, displayName: user.displayName!})
+    return user
   };
 
   static getUserByOAuthId = async (data: ICreateUserByOAuth) => {

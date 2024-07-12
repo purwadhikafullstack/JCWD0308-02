@@ -35,16 +35,10 @@ const UserDropdown = () => {
             <span>Cart</span>
           </DropdownMenuItem>
         </Link>
-        <Link href={'/orders'}>
+        <Link href={'/list-orders'}>
           <DropdownMenuItem>
             <ReceiptText className="mr-2 h-4 w-4" />
             <span>Orders</span>
-          </DropdownMenuItem>
-        </Link>
-        <Link href={'/vouchers'}>
-          <DropdownMenuItem>
-            <Percent className="mr-2 h-4 w-4" />
-            <span>Vouchers</span>
           </DropdownMenuItem>
         </Link>
       </DropdownMenuGroup>
