@@ -10,10 +10,10 @@ import EditForm from './_components/forms/EditFormUser';
 import CreateForm from './_components/forms/CreateFormUser';
 import UserTable from './_components/tables/usertable';
 import { Button } from '@/components/ui/button';
-import SearchBar from '@/components/partial/SearchBar';
 import Pagination from '@/components/partial/pagination';
 import { handleApiError, showSuccess } from '@/components/toast/toastutils';
 import { User } from '@/lib/types/user';
+import SearchBarDebounce from '@/components/partial/SearchBarDeBounce';
 
 const Users = () => {
   const router = useRouter();
@@ -30,6 +30,7 @@ const Users = () => {
   const [page, setPage] = useState<number>(1);
   const [limit] = useState<number>(10);
   const [totalUsers, setTotalUsers] = useState<number>(0);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -45,6 +46,7 @@ const Users = () => {
           ),
         );
         setTotalUsers(data.total);
+        setSuggestions(data.users.map((user: User) => user.displayName).filter(Boolean)); // Filter non-string values
       } catch (error) {
         handleApiError(error, 'Failed to fetch users');
         setError('Failed to fetch users');
@@ -137,7 +139,9 @@ const Users = () => {
         <Button onClick={() => setCreatingUser(true)} className="mb-4 sm:mb-0">
           Create User Admin
         </Button>
-        <SearchBar onSearch={handleSearch} />
+        <div className="w-full sm:w-1/2 lg:w-1/3 ">
+          <SearchBarDebounce onSearch={handleSearch} suggestions={suggestions} />
+        </div>
       </div>
       {loading ? (
         <div className="h-screen flex justify-center items-center">
@@ -147,13 +151,15 @@ const Users = () => {
         <p className="text-center text-red-500">{error}</p>
       ) : (
         <>
-          <UserTable
-            users={users}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            deletingUser={deletingUser}
-            removeUserFromState={removeUserFromState}
-          />
+          <div className="overflow-x-auto">
+            <UserTable
+              users={users}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              deletingUser={deletingUser}
+              removeUserFromState={removeUserFromState}
+            />
+          </div>
           <Pagination
             total={totalUsers}
             page={page}

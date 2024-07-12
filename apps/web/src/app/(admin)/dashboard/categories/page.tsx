@@ -73,17 +73,6 @@ const CategoryList = () => {
     }
   };
 
-  const handleDelete = async (category: Category) => {
-    try {
-      await deleteCategory(category.id);
-      setCategories(categories.filter((cat) => cat.id !== category.id));
-      setDeletingCategory(null);
-      showSuccess("Category deleted successfully!");
-    } catch (error) {
-      handleApiError(error, "Failed to delete category");
-    }
-  };
-
   if (loading)
     return (
       <div className="h-screen flex justify-center items-center">
