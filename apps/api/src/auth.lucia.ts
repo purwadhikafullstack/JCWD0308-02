@@ -27,7 +27,7 @@ export const lucia = new Lucia(adapter, {
 
 export const github = new GitHub(GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET)
 
-export const google = new Google(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, `${API_URL}/api/auth/google/callback`)
+export const google = new Google(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, `${API_URL}/auth/google/callback`)
 
 declare module "lucia" {
   interface Register {
