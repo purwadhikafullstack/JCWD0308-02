@@ -1,11 +1,7 @@
 import { ICallback } from '@/types/index.js';
 import { PaymentService } from './payment.service.js';
 import { OrderStatus } from '@prisma/client';
-import {
-  getEmailTemplate,
-  getOrderWithUser,
-  sendConfirmationEmail,
-} from '@/helpers/order/confirmPaymentByAdmin.js';
+import { getEmailTemplate, getOrderWithUser, sendConfirmationEmail } from '@/helpers/order/orderNotificationService.js';
 
 export class PaymentController {
   updateOrderStatus: ICallback = async (req, res, next) => {

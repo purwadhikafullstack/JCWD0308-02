@@ -1,11 +1,15 @@
 import { API_URL } from "./lib";
 import axios from "axios";
 const URL = `${API_URL}/cart`;
-export const addCart = async (cartData: any) => {
-  const res = await axios.post(`${URL}/add-to-cart`, cartData, {
-    headers: { "Content-Type": "application/json" },
-    withCredentials: true,
-  });
+export const addCart = async (stockId: string, quantity: number, isPack: boolean) => {
+  const res = await axios.post(
+    `${URL}/add-to-cart`,
+    { stockId, quantity, isPack },
+    {
+      headers: { "Content-Type": "application/json" },
+      withCredentials: true,
+    },
+  );
 
   return res.data;
 };
