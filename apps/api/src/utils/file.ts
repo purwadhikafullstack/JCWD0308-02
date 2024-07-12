@@ -17,12 +17,12 @@ export function deleteFile(fileUrl: string) {
     }));
 }
 
-function getFilenameFromUrl(url: string): string {
+export function getFilenameFromUrl(url: string): string {
   const parts = url.split('/');
   return parts[parts.length - 1];
 }
 
-function getBaseUrl(url: string): string {
+export function getBaseUrl(url: string): string {
   const urlObj = new URL(url);
   return urlObj.origin;
 }

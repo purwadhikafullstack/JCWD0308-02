@@ -25,7 +25,6 @@ export function EditCategoryForm({
 }) {
   const form = useUpdateCategoryForm({
     name: category.name,
-    iconUrl: undefined,
     imageUrl: undefined,
   });
 
@@ -55,12 +54,6 @@ export function EditCategoryForm({
               <FormMessage>{updateCategory?.error?.errors?.fieldErrors?.name?.[0]}</FormMessage>
             </FormItem>
           )}
-        />
-        <FieldFile
-          label="Icon"
-          name="iconUrl"
-          form={form}
-          errorMessage={updateCategory?.error?.errors?.fieldErrors?.iconUrl?.[0]}
         />
         <FieldFile
           label="Image"

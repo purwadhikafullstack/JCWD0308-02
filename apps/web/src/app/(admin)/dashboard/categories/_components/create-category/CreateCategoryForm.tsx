@@ -47,12 +47,6 @@ export function CreateCategoryForm({
           )}
         />
         <FieldFile
-          label="Icon"
-          name="iconUrl"
-          form={form}
-          errorMessage={createNewCategory?.error?.errors?.fieldErrors?.iconUrl?.[0]}
-        />
-        <FieldFile
           label="Image"
           name="imageUrl"
           form={form}

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3082",
+    "dev": "next dev -p 3082 --turbo",
     "build": "next build",
     "serve": "next start -p 3082",
     "lint": "next lint",

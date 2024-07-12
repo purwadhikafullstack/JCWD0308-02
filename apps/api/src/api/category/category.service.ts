@@ -4,6 +4,7 @@ import { CategoryValidation } from './category.validation.js';
 import { CreateCategoryRequest, UpdateCategoryRequest } from '@/types/category.type.js';
 import { Request, Response } from 'express';
 import { API_URL } from '@/config.js';
+import { deleteFile, getBaseUrl } from '@/utils/file.js';
 
 export class CategoryService {
   static getCategories = async () => {
@@ -21,14 +22,11 @@ export class CategoryService {
       res.status(400).json({ error: "Category name already exists" });
       return;
     }
-    
+
     if (req.files && !Array.isArray(req.files)) {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      if (files.iconUrl) {
-        req.body.iconUrl = `${API_URL}/public/images/${files.iconUrl[0].filename}`;
-      }
       if (files.imageUrl) {
-        req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
+        req.body.imageUrl = `${API_URL}/api/public/images/${files.imageUrl[0].filename}`;
       }
     }
     const newCategory = Validation.validate(CategoryValidation.createCategory, req.body as CreateCategoryRequest);
@@ -42,17 +40,16 @@ export class CategoryService {
       res.status(400).json({ error: "Category name already exists" });
       return;
     }
-    
+
     if (req.files && !Array.isArray(req.files)) {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      if (files.iconUrl) {
-        req.body.iconUrl = `${API_URL}/public/images/${files.iconUrl[0].filename}`;
-      }
       if (files.imageUrl) {
-        req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
+        req.body.imageUrl = `${API_URL}/api/public/images/${files.imageUrl[0].filename}`;
       }
     }
+
     const updatedCategory = Validation.validate(CategoryValidation.updateCategory, req.body as UpdateCategoryRequest);
+
     return await prisma.category.update({
       where: { id },
       data: updatedCategory,

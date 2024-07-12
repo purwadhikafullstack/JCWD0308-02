@@ -59,7 +59,7 @@ export default function StorePreview({ store }: { store?: Store }) {
       </CardHeader>
       {userProfile.data?.user?.role === 'SUPER_ADMIN' ? (
         <CardContent className="text-3xl font-semibold ">
-          <UpdateStore store={data?.store!} />
+          <UpdateStore store={store || data?.store!} />
         </CardContent>
       ) : null}
     </Card>

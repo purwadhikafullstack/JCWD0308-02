@@ -5,6 +5,7 @@ import { CreateStoreRequest, StoreValidation, UpdateStoreRequest } from './store
 import { ResponseError } from '@/utils/error.response.js';
 import { API_URL } from '@/config.js';
 import { UserFields } from '@/types/user.type.js';
+import { deleteFile, getBaseUrl } from '@/utils/file.js';
 
 export class StoreService {
   static getStore = async (storeId: string) => {
@@ -101,7 +102,7 @@ export class StoreService {
 
   static createStore = async (req: Request, res: Response) => {
     if (req.file) {
-      req.body.imageUrl = `${API_URL}/public/images/${req.file.filename}`
+      req.body.imageUrl = `${API_URL}/api/public/images/${req.file.filename}`
     }
     const storeData = Validation.validate(StoreValidation.CREATE, req.body as CreateStoreRequest)
 
@@ -122,7 +123,7 @@ export class StoreService {
 
   static updateStore = async (req: Request, res: Response) => {
     if (req.file) {
-      req.body.imageUrl = `${API_URL}/public/images/${req.file.filename}`
+      req.body.imageUrl = `${API_URL}/api/public/images/${req.file.filename}`
     }
 
     req.body.id = req.params.storeId
@@ -136,6 +137,11 @@ export class StoreService {
     })
 
     if (!existingStore) throw new ResponseError(400, "Store is not found!")
+
+    
+      if (getBaseUrl(API_URL) === getBaseUrl(existingStore?.imageUrl!) && storeData.imageUrl !== existingStore?.imageUrl ) {
+        deleteFile(existingStore?.imageUrl!)
+      }
 
     const updatedStore = await prisma.store.update({
       where: {
