@@ -142,6 +142,6 @@ const StockMutationChart: React.FC = () => {
       </CardContent>
     </Card>
   );
-};
+}
 
 export default StockMutationChart;
