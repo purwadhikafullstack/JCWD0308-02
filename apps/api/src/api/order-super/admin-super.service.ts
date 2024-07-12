@@ -6,7 +6,7 @@ import { Response } from "express";
 import { ConfirmPaymentValidation } from "./admin-super.validation.js";
 import { OrderItem, OrderStatus, PaymentMethod } from "@prisma/client";
 
-import { getEmailTemplate, getOrderWithUser, sendConfirmationEmail, updateOrderStatus } from "@/helpers/order/confirmPaymentByAdmin.js";
+import { getEmailTemplate, getOrderWithUser, sendConfirmationEmail, updateOrderStatus } from "@/helpers/order/orderNotificationService.js";
 import { mapNewStatus } from "@/helpers/order/mapNewStatus.js";
 export class OrderSuperService {
   static getAllOrders = async (page: number, perPage: number, res: Response) => {

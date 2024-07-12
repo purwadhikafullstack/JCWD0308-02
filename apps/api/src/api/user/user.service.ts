@@ -148,7 +148,7 @@ export class UserService {
 
     const currentUser = await prisma.user.findUnique({ where: { id: res.locals?.user?.id }, select: { avatarUrl: true } })
 
-    if (getBaseUrl(API_URL) === getBaseUrl(currentUser?.avatarUrl!) && updatedUser.avatarUrl !== currentUser?.avatarUrl && currentUser?.avatarUrl !== `${API_URL}/api/public/images/avatar.png` ) {
+    if (getBaseUrl(API_URL) === getBaseUrl(currentUser?.avatarUrl!) && updatedUser.avatarUrl !== currentUser?.avatarUrl && currentUser?.avatarUrl !== `${API_URL}/public/images/avatar.png` ) {
       deleteFile(currentUser?.avatarUrl!)
     }
 

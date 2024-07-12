@@ -1,13 +1,11 @@
 "use client";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import React, { useEffect, useMemo, useState } from "react";
-import Image from "next/image";
-import { checkCart, checkCartAll, getCart } from "@/lib/fetch-api/cart";
+import { checkCart, checkCartAll } from "@/lib/fetch-api/cart";
 import CartItem from "./_component/CartItem";
 import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
-import { fetchCart, fetchCartItemCount, setCart } from "@/lib/features/cart/cartSlice";
+import { fetchCart, fetchCartItemCount } from "@/lib/features/cart/cartSlice";
 import { RootState } from "@/lib/features/store";
 import { formatCurrency } from "@/lib/currency";
 import { useRouter } from "next/navigation";
@@ -27,6 +25,7 @@ export default function Cart() {
   const [selectAll, setSelectAll] = useState<boolean>(false);
   const [isCheckoutDisabled, setIsCheckoutDisabled] = useState<boolean>(true);
   const [loading, setLoading] = useState(true);
+  const [isOutOfStock, setIsOutOfStock] = useState<boolean>(false);
   const router = useRouter();
   const isSelectedAll = useMemo(() => {
     return carts.every((item) => item.isChecked);
@@ -51,25 +50,6 @@ export default function Cart() {
 
   const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
 
-  // useEffect(() => {
-  //   const fetchCartData = async () => {
-  //     try {
-  //       const cartData = await getCart();
-  //       const updatedCartData = cartData.data.map((item: CartItemType) => ({
-  //         ...item,
-  //       }));
-  //       dispatch(setCart(updatedCartData));
-  //       toast.success("Cart Updated!");
-  //     } catch (error) {
-  //       console.error("Error fetching cart data:", error);
-  //       toast.error("Error fetching cart data.");
-  //     } finally {
-  //       setLoading(false);
-  //     }
-  //   };
-  //   fetchCartData();
-  // }, [dispatch]);
-
   useEffect(() => {
     try {
       dispatch(fetchCart());
@@ -87,7 +67,7 @@ export default function Cart() {
     return items.reduce((acc, item) => {
       const key = `${item.id}-${item.isPack !== undefined ? item.isPack.toString() : "missing"}`;
       if (selectedItem[key]) {
-        const price = item.isPack ? item.stock.product.packPrice : item.stock.product.price;
+        const price = item.isPack ? item.stock?.product?.packPrice : item.stock?.product?.price;
         return acc + item.quantity * price;
       }
       return acc;
@@ -97,7 +77,6 @@ export default function Cart() {
   const subtotal = useAppSelector((state: RootState) => calculateSubtotal(state.cart.items));
 
   useEffect(() => {
-    console.log("Carts state updated:", carts);
     const initialSelectedItems: { [key: string]: boolean } = {};
     carts.forEach((cart: CartItemType) => {
       initialSelectedItems[`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`] = cart.isChecked || false;
@@ -133,6 +112,7 @@ export default function Cart() {
       router.push(`/orders?${queryString}`);
     }
   };
+
   if (loading) {
     return (
       <div className="h-screen flex justify-center items-center">
@@ -157,7 +137,13 @@ export default function Cart() {
               </div>
               <Separator className="mb-4" />
               {carts.map((cart, index: any) => (
-                <CartItem key={`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}-${index + 1}`} cart={cart} isSelected={cart.isChecked} onSelect={() => handleSelectedItem(cart.id, cart.isChecked)} />
+                <CartItem
+                  key={`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}-${index + 1}`}
+                  cart={cart}
+                  isSelected={cart.isChecked}
+                  onSelect={() => handleSelectedItem(cart.id, cart.isChecked)}
+                  setIsCheckoutDisabled={setIsOutOfStock}
+                />
               ))}
             </div>
             <div className="grid grid-rows-2 max-md:grid-rows-1">
@@ -170,11 +156,11 @@ export default function Cart() {
                 </div>
                 <Separator className="mb-4" />
                 <div className="flex justify-center">
-                  <Button variant="default" className="w-full" onClick={isCheckoutDisabled || !isServiceAvailable ? undefined : handleCheckout} disabled={isCheckoutDisabled || !isServiceAvailable}>
+                  <Button variant="default" className="w-full" onClick={isOutOfStock || isCheckoutDisabled || !isServiceAvailable ? undefined : handleCheckout} disabled={isOutOfStock || isCheckoutDisabled || !isServiceAvailable}>
                     Checkout
                   </Button>
                 </div>
-                {(isCheckoutDisabled || !isServiceAvailable) && (
+                {(isOutOfStock || isCheckoutDisabled || !isServiceAvailable) && (
                   <div className="mt-4">
                     <Alert variant="default" className="text-destructive">
                       {!isServiceAvailable ? "Service is not available in your area." : "Please select at least one item to checkout."}

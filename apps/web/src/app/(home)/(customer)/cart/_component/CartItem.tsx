@@ -3,8 +3,8 @@ import Image from "next/image";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, Trash } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { useAppDispatch } from "@/lib/features/hooks";
+import React, { useEffect, useMemo, useState } from "react";
+import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
 import { deleteCartItem, fetchCart, fetchCartItemCount, updateCartItem, updateQuantity } from "@/lib/features/cart/cartSlice";
 import { formatCurrency } from "@/lib/currency";
 import { CartItemType } from "@/lib/types/cart";
@@ -15,13 +15,16 @@ import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/toaster";
 import { toast } from "@/components/ui/sonner";
 import { getUserProfile } from "@/lib/fetch-api/user/client";
+import { RootState } from "@/lib/features/store";
+import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
 
 interface CartItemProps {
   cart: CartItemType;
   isSelected: boolean;
   onSelect: (itemId: string, isChecked: boolean) => void;
+  setIsCheckoutDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
+const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect, setIsCheckoutDisabled }) => {
   const router = useRouter();
   const selectedAddress = useSuspenseQuery({
     queryKey: ["selected-address"],
@@ -31,6 +34,37 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
     queryKey: ["user-profile"],
     queryFn: getUserProfile,
   });
+  const nearestStocks = useSuspenseQuery({
+    queryKey: ["nearest-stocks", 1, 15, ""],
+    queryFn: async ({ queryKey }) => {
+      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      return getNearestStocks(Number(1), Number(15), filters);
+    },
+  });
+  const { product } = cart.stock;
+  const nearestStock = nearestStocks.data?.stocks?.find((item) => item.id === cart.stockId);
+  const carts = useAppSelector((state: RootState) => state.cart.items);
+
+  const isTwoVariants = useMemo(() => {
+    return carts.filter((item) => item.stockId === cart.stockId && item.isChecked).length === 2;
+  }, [cart.stockId, carts]);
+
+  const isTwoVariantsTotal = useMemo(() => {
+    return carts.filter((item) => item.stockId === cart.stockId && item.isChecked).reduce((total, item) => total + (item.isPack ? item.quantity * product?.packQuantity! : item.quantity), 0);
+  }, [cart.stockId, carts, product?.packQuantity]);
+
+  console.log("isTwoVariantsTotal:", isTwoVariantsTotal);
+  console.log("near stock amount:", nearestStock?.amount);
+
+  useEffect(() => {
+    console.log("isTwoVariantsTotal2:", isTwoVariantsTotal);
+    console.log("near stock amount2:", nearestStock?.amount);
+    if (isTwoVariantsTotal > (nearestStock?.amount ?? 0)) {
+      setIsCheckoutDisabled(true);
+    } else {
+      setIsCheckoutDisabled(false);
+    }
+  }, [isTwoVariantsTotal, nearestStock, setIsCheckoutDisabled]);
 
   if (!userProfile?.data?.user) {
     router.push("/auth/signin");
@@ -47,7 +81,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect }) => {
     return null;
   }
 
-  const { product } = cart.stock;
   const addressId = selectedAddress.data?.address.id;
   if (!addressId) router.push("/cart");
 

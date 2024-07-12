@@ -27,34 +27,21 @@ export const deleteCartItem = createAsyncThunk("cart/deleteCartItem", async (car
 export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ cartItemId, stockId, quantity }: { cartItemId: string; stockId: string; quantity: number }, { rejectWithValue }) => {
   try {
     const res = await updateCart(cartItemId, stockId, quantity);
-    console.log("res from updatedCartItem: ", res);
     return res;
   } catch (error: any) {
     return rejectWithValue(error.message);
   }
 });
 
-export const addCartItem = createAsyncThunk(
-  "cart/addToCart",
-  async (
-    cartData: {
-      productId: string;
-      quantity: number;
-      isPack: boolean;
-      addressId: any;
-      stockId: string;
-    },
-    { rejectWithValue, dispatch },
-  ) => {
-    try {
-      const response = await addCart(cartData);
-      dispatch(fetchCartItemCount());
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error);
-    }
-  },
-);
+export const addCartItem = createAsyncThunk("cart/addToCart", async ({ stockId, quantity, isPack }: { stockId: string; quantity: number; isPack: boolean }, { rejectWithValue, dispatch }) => {
+  try {
+    const response = await addCart(stockId, quantity, isPack);
+    dispatch(fetchCartItemCount());
+    return response.data;
+  } catch (error: any) {
+    return rejectWithValue(error.message);
+  }
+});
 
 export const fetchCartItemCount = createAsyncThunk("cart/fetchCartItemCount", async (_, { rejectWithValue }) => {
   try {

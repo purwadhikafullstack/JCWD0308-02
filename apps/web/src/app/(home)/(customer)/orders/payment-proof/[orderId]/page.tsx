@@ -6,6 +6,8 @@ import { useParams } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { toast } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function UploadPaymentProofPage() {
   const { orderId } = useParams();
@@ -33,11 +35,13 @@ export default function UploadPaymentProofPage() {
       if (file) {
         const res = await uploadPaymentProof(orderId as string, file);
         setSuccess("File uploaded successfully!");
+        toast.success("File uploaded successfully!");
       } else {
         setError("Please select a file to upload.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error uploading image:", error);
+      toast.error(error);
       setError("Error uploading image. Please try again.");
     } finally {
       setUploading(false);
