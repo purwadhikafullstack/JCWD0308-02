@@ -24,9 +24,6 @@ export class CategoryService {
     
     if (req.files && !Array.isArray(req.files)) {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      if (files.iconUrl) {
-        req.body.iconUrl = `${API_URL}/public/images/${files.iconUrl[0].filename}`;
-      }
       if (files.imageUrl) {
         req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
       }
@@ -45,9 +42,6 @@ export class CategoryService {
     
     if (req.files && !Array.isArray(req.files)) {
       const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-      if (files.iconUrl) {
-        req.body.iconUrl = `${API_URL}/public/images/${files.iconUrl[0].filename}`;
-      }
       if (files.imageUrl) {
         req.body.imageUrl = `${API_URL}/public/images/${files.imageUrl[0].filename}`;
       }
