@@ -7,7 +7,7 @@ import Image from "next/image";
 import { checkCart, checkCartAll, getCart } from "@/lib/fetch-api/cart";
 import CartItem from "./_component/CartItem";
 import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
-import { fetchCart, setCart } from "@/lib/features/cart/cartSlice";
+import { fetchCart, fetchCartItemCount, setCart } from "@/lib/features/cart/cartSlice";
 import { RootState } from "@/lib/features/store";
 import { formatCurrency } from "@/lib/currency";
 import { useRouter } from "next/navigation";
@@ -51,23 +51,36 @@ export default function Cart() {
 
   const isServiceAvailable = nearestStocks.data?.isServiceAvailable ?? false;
 
+  // useEffect(() => {
+  //   const fetchCartData = async () => {
+  //     try {
+  //       const cartData = await getCart();
+  //       const updatedCartData = cartData.data.map((item: CartItemType) => ({
+  //         ...item,
+  //       }));
+  //       dispatch(setCart(updatedCartData));
+  //       toast.success("Cart Updated!");
+  //     } catch (error) {
+  //       console.error("Error fetching cart data:", error);
+  //       toast.error("Error fetching cart data.");
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  //   fetchCartData();
+  // }, [dispatch]);
+
   useEffect(() => {
-    const fetchCartData = async () => {
-      try {
-        const cartData = await getCart();
-        const updatedCartData = cartData.data.map((item: CartItemType) => ({
-          ...item,
-        }));
-        dispatch(setCart(updatedCartData));
-        toast.success("Cart Updated!");
-      } catch (error) {
-        console.error("Error fetching cart data:", error);
-        toast.error("Error fetching cart data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCartData();
+    try {
+      dispatch(fetchCart());
+      dispatch(fetchCartItemCount());
+      toast.success("Cart Updated!");
+    } catch (error) {
+      console.error("Error fetching cart data:", error);
+      toast.error("Error fetching cart data.");
+    } finally {
+      setLoading(false);
+    }
   }, [dispatch]);
 
   function calculateSubtotal(items: CartItemType[]) {
@@ -84,6 +97,7 @@ export default function Cart() {
   const subtotal = useAppSelector((state: RootState) => calculateSubtotal(state.cart.items));
 
   useEffect(() => {
+    console.log("Carts state updated:", carts);
     const initialSelectedItems: { [key: string]: boolean } = {};
     carts.forEach((cart: CartItemType) => {
       initialSelectedItems[`${cart.id}-${cart.isPack !== undefined ? cart.isPack.toString() : "missing"}`] = cart.isChecked || false;
