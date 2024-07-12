@@ -5,12 +5,62 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Payment Confirmation</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        background-color: #ffffff;
+        margin: 20px auto;
+        padding: 20px;
+        max-width: 600px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #333333;
+      }
+      p {
+        color: #555555;
+      }
+      .order-details {
+        margin-top: 20px;
+      }
+      .order-details h2 {
+        color: #333333;
+      }
+      .order-details p {
+        color: #555555;
+      }
+      .order-items {
+        margin-top: 10px;
+      }
+      .order-items li {
+        color: #555555;
+        margin-bottom: 5px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Hi {{name}},</h1>
-    <br>
-    <p>Your payment has been confirmed and your order will be processed soon. Thank you.</p>
-    <br>
-</body>
+    <div class="container">
+      <h1>Hi {{name}},</h1>
+      <p>Your payment has been confirmed and your order will be processed soon. Thank you.</p>
+      <div class="order-details">
+        <h2>Order Details</h2>
+        <p>Order ID: {{orderId}}</p>
+        <p>Total Price: Rp{{totalPrice}}</p>
+        <div class="order-items">
+          <h3>Items:</h3>
+          <ul>
+            {{#each items}}
+            <li>{{this.name}} - ${{this.price}} x {{this.quantity}}</li>
+            {{/each}}
+          </ul>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
