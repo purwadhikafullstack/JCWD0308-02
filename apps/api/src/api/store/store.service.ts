@@ -102,7 +102,7 @@ export class StoreService {
 
   static createStore = async (req: Request, res: Response) => {
     if (req.file) {
-      req.body.imageUrl = `${API_URL}/public/images/${req.file.filename}`
+      req.body.imageUrl = `${API_URL}/api/public/images/${req.file.filename}`
     }
     const storeData = Validation.validate(StoreValidation.CREATE, req.body as CreateStoreRequest)
 
@@ -123,7 +123,7 @@ export class StoreService {
 
   static updateStore = async (req: Request, res: Response) => {
     if (req.file) {
-      req.body.imageUrl = `${API_URL}/public/images/${req.file.filename}`
+      req.body.imageUrl = `${API_URL}/api/public/images/${req.file.filename}`
     }
 
     req.body.id = req.params.storeId
