@@ -4,7 +4,7 @@ import { ResponseError } from "@/utils/error.response.js";
 import { Validation } from "@/utils/validation.js";
 import { Response } from "express";
 import { ConfirmPaymentValidation } from "./admin-super.validation.js";
-import { OrderStatus, PaymentMethod } from "@prisma/client";
+import { OrderItem, OrderStatus, PaymentMethod } from "@prisma/client";
 
 import { getEmailTemplate, getOrderWithUser, sendConfirmationEmail, updateOrderStatus } from "@/helpers/order/confirmPaymentByAdmin.js";
 import { mapNewStatus } from "@/helpers/order/mapNewStatus.js";
@@ -42,11 +42,22 @@ export class OrderSuperService {
 
     if (PaymentMethod.MANUAL && !order.paymentPicture) throw new ResponseError(400, "Order can not be processed");
     const user = order.user;
+    const items = order.orderItems.map((item: any) => ({
+      name: item.stock.product.title,
+      quantity: item.quantity,
+    }));
+    const context = {
+      name: user.displayName,
+      orderId: order.id,
+      totalPrice: order.totalPrice,
+      items: items,
+    };
     const mappedStatus: OrderStatus = mapNewStatus(newStatus);
     const templateName = newStatus === "PROCESS" ? "paymentConfirmed.html" : "paymentRejected.html";
     const subject = "Welcome to Grosirun - Payment Confirmation";
-    const html = getEmailTemplate(templateName, { name: user.displayName });
-    await sendConfirmationEmail(user.email, subject, html);
+    const html = getEmailTemplate(templateName, context);
+    await sendConfirmationEmail(user.contactEmail, subject, html);
+
     const updated = await updateOrderStatus(orderId, mappedStatus);
     return updated;
   };
