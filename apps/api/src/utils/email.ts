@@ -9,6 +9,9 @@ import { API_URL, MAIL_USER, WEB_URL } from "@/config.js";
 type ISendEmailVerifyProps = { id?: number, isActive?: boolean, displayName?: string, email: string, token: String }
 type ISendEmailVerify = (props: ISendEmailVerifyProps) => Promise<void>
 
+type ISendWelcomeProps = { displayName?: string, email: string }
+type ISendWelcome = (props: ISendWelcomeProps) => Promise<void>
+
 
 const __filename = fileURLToPath(import.meta.url);
 
@@ -28,6 +31,22 @@ export const sendEmailVerification: ISendEmailVerify = async ({ email, token }) 
     from: MAIL_USER,
     to: email,
     subject: "Welcome to Grosirun",
+    html
+  })
+}
+
+export const sendWelcomeOAuth: ISendWelcome = async ({ email, displayName }) => {
+  const templatePath = path.join(__dirname, "../template", "welcome.html")
+  const templateSource = fs.readFileSync(templatePath, 'utf-8')
+  const compiledTemplate = Handlebars.compile(templateSource)
+  const html = compiledTemplate({
+    displayName
+  })
+
+  await transporter.sendMail({
+    from: MAIL_USER,
+    to: email,
+    subject: `Welcome to Grosirun ${displayName}`,
     html
   })
 }

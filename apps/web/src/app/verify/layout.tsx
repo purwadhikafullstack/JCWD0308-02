@@ -5,6 +5,7 @@ import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/shared/footer';
 import { AvatarDropdown } from '@/components/shared/avatar-dropdown';
+import Image from 'next/image';
 
 const VerifyLayout = async ({ children }: { children: React.ReactNode }) => {
   await protectedRoute.authenticated();
@@ -18,7 +19,7 @@ const VerifyLayout = async ({ children }: { children: React.ReactNode }) => {
               href="/"
               className="flex items-center gap-2 text-lg font-semibold md:text-base"
             >
-              <ShoppingBag className="h-7 w-7" />
+              <Image src={'/logo-only.png'} alt="logo" height={28} width={28} />
               <span className="sr-only">grosirun</span>
             </Link>
           </nav>

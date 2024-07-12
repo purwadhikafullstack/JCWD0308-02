@@ -11,6 +11,7 @@ export interface StockMutation {
   stock: {
     product: {
       title: string
+      slug : string
     }
   }
 }
