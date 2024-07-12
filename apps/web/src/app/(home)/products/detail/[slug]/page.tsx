@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
-import { useAppDispatch } from "@/lib/features/hooks";
-import { addCartItem, addToCart, fetchCartItemCount } from "@/lib/features/cart/cartSlice";
+import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
+import { addCartItem, addToCart, fetchCart, fetchCartItemCount } from "@/lib/features/cart/cartSlice";
 import { fetchProductBySlug } from "@/lib/fetch-api/product";
 import { Product } from "@/lib/types/product";
 import { formatCurrency } from "@/lib/currency";
@@ -16,6 +16,7 @@ import { getSelectedAddress } from "@/lib/fetch-api/address/client";
 import { getUserProfile } from "@/lib/fetch-api/user/client";
 import { toast } from "@/components/ui/sonner";
 import ImageHover from "./components/ImageHover";
+import { RootState } from "@/lib/features/store";
 
 const ProductDetail = () => {
   const params = useParams();
@@ -28,6 +29,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState<number>(1);
   const dispatch = useAppDispatch();
   const router = useRouter();
+  const cartItems = useAppSelector((state: RootState) => state.cart.items);
 
   const nearestStocks = useSuspenseQuery({
     queryKey: ["nearest-stocks", 1, 15, ""],
@@ -65,42 +67,62 @@ const ProductDetail = () => {
     };
 
     fetchProduct();
-  }, [productSlug]);
+    dispatch(fetchCart());
+  }, [productSlug, dispatch]);
 
   const handleThumbnailClick = (index: number) => {
     setCurrentImageIndex(index);
   };
+  const nearestStock = useMemo(() => {
+    if (!product) return nearestStocks.data?.stocks?.[0];
+    return nearestStocks.data?.stocks?.find((stock) => stock.productId === product.id) || nearestStocks.data?.stocks?.[0];
+  }, [product, nearestStocks.data?.stocks]);
 
-  const handleAddToCart = () => {
-    if (!product) return;
+  const totalQuantityInCart = useMemo(() => {
+    if (!product) return 0;
+    const productInCart = cartItems.find((item: any) => item.stock?.productId === product.id);
 
+    return productInCart ? productInCart.quantity : 0;
+  }, [product, cartItems]);
+
+  const totalQuantity = useMemo(() => {
+    if (!product) return 0;
+    if (!isPack) return quantity;
+    return quantity * product?.packQuantity!;
+  }, [product, isPack, quantity]);
+
+  const isMaxQuantity = useMemo(() => {
+    if (!isPack) return quantity === nearestStock.amount;
+    return totalQuantity + product?.packQuantity! >= nearestStock.amount;
+  }, [isPack, nearestStock.amount, product?.packQuantity, quantity, totalQuantity]);
+
+  const isAddToCartDisabled = useMemo(() => {
+    if (!product || !nearestStock) return true;
+
+    const availableStock = nearestStock.amount || 0;
+    const maxQuantityAllowed: any = isPack ? product.packQuantity : availableStock;
+
+    return quantity + totalQuantityInCart > maxQuantityAllowed || quantity > availableStock;
+  }, [product, nearestStock, quantity, totalQuantityInCart, isPack]);
+
+  const handleAddToCart = async () => {
     try {
-      const cartRequest: any = {
-        productId: product.id,
-        quantity,
-        isPack,
-        addressId,
-        stockId: nearestStocks.data?.stocks?.find(stock => stock.productId === product.id)?.id ?? "",
-        isChecked: false,
-      };
-      const availableStock = nearestStocks.data?.stocks?.find(stock => stock.productId === product.id)?.amount ?? 0;
-      if (quantity > availableStock) {
+      const availableStock = nearestStock?.amount || 0;
+
+      let selectedQuantity = quantity;
+      if (isPack) {
+        selectedQuantity = +product?.packQuantity!;
+      }
+
+      if (selectedQuantity > availableStock) {
         toast.error("Quantity exceeds available stock.");
         return;
       }
-      dispatch(addCartItem(cartRequest))
-        .unwrap()
-        .then((response) => {
-          dispatch(addToCart(response));
-          toast.success("Product added to cart!");
-        })
-        .catch((error) => {
-          console.error("Error adding product to cart:", error);
-          toast.error("Failed to add product to cart.");
-        });
+      await dispatch(addCartItem({ stockId: nearestStock?.id!, quantity, isPack }));
+      toast.success("Product added to cart!");
     } catch (error) {
-      console.error("Error adding product to cart:", error);
-      toast.error("An unexpected error occurred.");
+      console.error("Error adding to cart:", error);
+      toast.error("Error adding to cart");
     }
     dispatch(fetchCartItemCount());
   };
@@ -109,12 +131,13 @@ const ProductDetail = () => {
     setQuantity((prevQuantity) => (type === "increment" ? prevQuantity + 1 : Math.max(1, prevQuantity - 1)));
   };
 
-  const nearestStore = useMemo(() => {
-    if (!product) return nearestStocks.data?.stocks?.[0];
-    return nearestStocks.data?.stocks?.find(stock => stock.productId === product.id) || nearestStocks.data?.stocks?.[0];
-  }, [product, nearestStocks.data?.stocks]);
-
-  if (loading) return <p>Loading...</p>;
+  if (loading) {
+    return (
+      <div className="h-screen flex justify-center items-center">
+        <span className="loader"></span>
+      </div>
+    );
+  }
   if (error) return <p>{error}</p>;
 
   return (
@@ -135,7 +158,7 @@ const ProductDetail = () => {
             <div className="w-full flex justify-center items-center overflow-hidden">
               {product.images[currentImageIndex] && (
                 <div className="relative w-full h-96">
-                  <ImageHover alt={product.slug} src={product.images[currentImageIndex].imageUrl} />
+                  <ImageHover alt={product.slug} src={product.images[currentImageIndex].imageUrl} width={650} height={650} />
                 </div>
               )}
             </div>
@@ -144,10 +167,24 @@ const ProductDetail = () => {
             <h1 className="text-4xl font-bold mb-2 text-primary">{product.title}</h1>
             <p className="text-lg mb-4 text-gray-600">{product.description}</p>
             <div className="flex space-x-4 mb-4">
-              <Button variant={!isPack ? "default" : "outline"} onClick={() => setIsPack(false)} className={`flex-1 ${!isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
+              <Button
+                variant={!isPack ? "default" : "outline"}
+                onClick={() => {
+                  setIsPack(false);
+                  setQuantity(quantity * product?.packQuantity!);
+                }}
+                className={`flex-1 ${!isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
+              >
                 Unit Price
               </Button>
-              <Button variant={isPack ? "default" : "outline"} onClick={() => setIsPack(true)} className={`flex-1 ${isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}>
+              <Button
+                variant={isPack ? "default" : "outline"}
+                onClick={() => {
+                  setIsPack(true);
+                  setQuantity(Math.ceil(quantity / product?.packQuantity!));
+                }}
+                className={`flex-1 ${isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
+              >
                 Pack Price
               </Button>
             </div>
@@ -160,22 +197,24 @@ const ProductDetail = () => {
                 <del className="text-xs font-semibold text-gray-500 line-through">{formatCurrency(product.price || 0)}</del> {formatCurrency(product.discountPrice || product.price || 0)}
               </p>
             )}
-            {nearestStore && (
-              <p className="text-sm mb-4 text-gray-600">Available Stock: {nearestStore.amount}</p>
-            )}
+            {isPack && <p className="text-sm mb-4 text-gray-600">Pack Quantity: {product.packQuantity}</p>}
+            {nearestStock && <p className="text-sm mb-4 text-gray-600">Available Stock: {nearestStock.amount}</p>}
+
             <div className="flex items-center space-x-4 mb-4">
-              <Button variant="outline" onClick={() => handleQuantityChange("decrement")} disabled={quantity <= 1}>
-                <Minus size={16} />
+              <Button variant="outline" onClick={() => handleQuantityChange("decrement")} disabled={quantity === 1}>
+                <Minus size={18} />
               </Button>
               <p className="text-lg">{quantity}</p>
-              <Button variant="outline" onClick={() => handleQuantityChange("increment")}>
-                <Plus size={16} />
+              <Button variant="outline" onClick={() => handleQuantityChange("increment")} disabled={isMaxQuantity}>
+                <Plus size={18} />
               </Button>
             </div>
+            {isPack && <p className="text-lg">Total Quantity: {quantity * (product?.packQuantity || 1)}</p>}
+
             <div className="flex space-x-4">
-              <Button variant="default" onClick={handleAddToCart} disabled={nearestStore?.amount === 0 || !isServiceAvailable} className="bg-blue-600 text-white hover:bg-blue-700">
+              <Button variant="default" onClick={handleAddToCart} className="w-full bg-primary">
                 <ShoppingCart size={20} className="mr-2" />
-                {nearestStore?.amount === 0 ? "Out of Stock" : "Add to Cart"}
+                {nearestStock?.amount === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
             </div>
             {isError ? (

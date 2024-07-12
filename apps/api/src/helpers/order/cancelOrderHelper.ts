@@ -1,5 +1,6 @@
 import { ResponseError } from "@/utils/error.response.js";
 import { prisma } from "@/db.js";
+import { OrderStatus } from "@prisma/client";
 
 export const checkPaymentDeadline = (createdAt: Date) => {
   const currentTime = new Date();
@@ -13,13 +14,16 @@ export const checkPaymentDeadline = (createdAt: Date) => {
 
 export const cancelOrderTransaction = async (orderId: string, orderItems: any[]) => {
   const transaction = [
-    prisma.order.update({ where: { id: orderId }, data: { orderStatus: "CANCELLED" } }),
-    ...orderItems.flatMap((item) => [
-      prisma.stock.update({ where: { id: item.stockId }, data: { amount: { increment: item.quantity } } }),
-      prisma.stockMutation.create({
-        data: { stockId: item.stockId, mutationType: "STOCK_IN", amount: item.quantity, orderId },
-      }),
-    ]),
+    prisma.order.update({ where: { id: orderId }, data: { orderStatus: OrderStatus.CANCELLED } }),
+    ...orderItems.flatMap((item) => {
+      const incrementValue = item.isPack ? item.quantity * item.stock.product.packQuantity : item.quantity;
+      return [
+        prisma.stock.update({ where: { id: item.stockId }, data: { amount: { increment: incrementValue } } }),
+        prisma.stockMutation.create({
+          data: { stockId: item.stockId, mutationType: "REFUND", amount: incrementValue, orderId },
+        }),
+      ];
+    }),
   ];
 
   const updatedOrder = await prisma.$transaction(transaction);
