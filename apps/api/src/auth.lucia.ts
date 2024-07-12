@@ -6,7 +6,7 @@ import { prisma } from "./db.js";
 import { GitHub, Google } from "arctic";
 import { webcrypto } from "node:crypto";
 
-// globalThis.crypto = webcrypto as Crypto;
+globalThis.crypto = webcrypto as Crypto;
 
 const adapter = new PrismaAdapter(prisma.session, prisma.user);
 
