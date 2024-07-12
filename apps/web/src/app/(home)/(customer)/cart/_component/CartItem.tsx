@@ -53,12 +53,7 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect, setIsCh
     return carts.filter((item) => item.stockId === cart.stockId && item.isChecked).reduce((total, item) => total + (item.isPack ? item.quantity * product?.packQuantity! : item.quantity), 0);
   }, [cart.stockId, carts, product?.packQuantity]);
 
-  console.log("isTwoVariantsTotal:", isTwoVariantsTotal);
-  console.log("near stock amount:", nearestStock?.amount);
-
   useEffect(() => {
-    console.log("isTwoVariantsTotal2:", isTwoVariantsTotal);
-    console.log("near stock amount2:", nearestStock?.amount);
     if (isTwoVariantsTotal > (nearestStock?.amount ?? 0)) {
       setIsCheckoutDisabled(true);
     } else {

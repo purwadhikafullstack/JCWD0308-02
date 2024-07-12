@@ -31,8 +31,19 @@ export default function UploadPaymentProofPage() {
     setUploading(true);
     setError(null);
     setSuccess(null);
+
     try {
       if (file) {
+        // Check file size (in bytes)
+        const fileSizeInBytes = file.size;
+        // Convert bytes to MB
+        const fileSizeInMB = fileSizeInBytes / (1024 * 1024);
+
+        if (fileSizeInMB > 1) {
+          setError("File size exceeds 1 MB limit. Please upload a smaller file.");
+          return;
+        }
+
         const res = await uploadPaymentProof(orderId as string, file);
         setSuccess("File uploaded successfully!");
         toast.success("File uploaded successfully!");
@@ -41,7 +52,7 @@ export default function UploadPaymentProofPage() {
       }
     } catch (error: any) {
       console.error("Error uploading image:", error);
-      toast.error(error);
+      toast.error("File too large, try again");
       setError("Error uploading image. Please try again.");
     } finally {
       setUploading(false);
