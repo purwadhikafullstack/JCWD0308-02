@@ -16,16 +16,17 @@ const GetCursorPos = ({ children }: { children: (xPos: number, yPos: number, ref
   };
 
   useEffect(() => {
-    if (ref.current) {
-      ref.current.addEventListener("mousemove", updatePos);
-      ref.current.addEventListener("mouseenter", () => setIsHovering(true));
-      ref.current.addEventListener("mouseleave", () => setIsHovering(false));
+    const currentRef = ref.current;
+    if (currentRef) {
+      currentRef.addEventListener("mousemove", updatePos);
+      currentRef.addEventListener("mouseenter", () => setIsHovering(true));
+      currentRef.addEventListener("mouseleave", () => setIsHovering(false));
     }
     return () => {
-      if (ref.current) {
-        ref.current.removeEventListener("mousemove", updatePos);
-        ref.current.removeEventListener("mouseenter", () => setIsHovering(true));
-        ref.current.removeEventListener("mouseleave", () => setIsHovering(false));
+      if (currentRef) {
+        currentRef.removeEventListener("mousemove", updatePos);
+        currentRef.removeEventListener("mouseenter", () => setIsHovering(true));
+        currentRef.removeEventListener("mouseleave", () => setIsHovering(false));
       }
     };
   }, []);
