@@ -14,7 +14,6 @@ import DeleteCategoryDialog from "./_components/dialogs/DeleteCategoriesDialog";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { getUserProfile } from "@/lib/fetch-api/user/client";
 
-const DEFAULT_ICON_URL = "/default-icon.png";
 const DEFAULT_IMAGE_URL = "/default-image-category.jpg";
 
 const CategoryList = () => {
@@ -109,9 +108,6 @@ const CategoryList = () => {
         {categories.map((category) => (
           <Card key={category.id} className="shadow-lg hover:shadow-xl transition-shadow duration-300">
             <CardHeader className="flex items-center ">
-              <div className="flex-shrink-0 w-16 h-16">
-                <Image src={category.iconUrl || DEFAULT_ICON_URL} alt="Icon" width={64} height={64} className="object-cover w-16 h-16" style={{ width: "64px", height: "64px" }} />
-              </div>
               <CardTitle className="text-primary text-2xl font-bold">{category.name}</CardTitle>
             </CardHeader>
             <CardContent className="flex justify-center mb-2">
