@@ -10,17 +10,16 @@ import { OrderItemType } from "@prisma/client";
 export class CartService {
   static addToCart = async (req: CartRequest, res: Response) => {
     const cartRequest: CartRequest = Validation.validate(CartValidation.CART, req);
-    const user = await prisma.user.findUnique({ where: { id: res.locals.user?.id }, select: { id: true, status: true, role: true, addresses: true } });
-    const userAddress = user?.addresses.find((address: any) => address.id === cartRequest.addressId);
-    if (!userAddress) throw new ResponseError(401, "Address not found!");
-    const stock = await prisma.stock.findFirst({ where: { productId: cartRequest.productId, storeId: res.locals?.store?.id } });
+    const stock = await prisma.stock.findUnique({ where: { id: cartRequest?.stockId! } });
     if (!stock) throw new ResponseError(400, "Stock not found!");
-    const existingCartItem = await prisma.orderItem.findFirst({ where: { userId: user?.id, stockId: stock.id, orderItemType: OrderItemType.CART_ITEM, isPack: cartRequest.isPack, isDeleted: false } });
+
+    const userId = res.locals?.user?.id!;
+    const existingCartItem = await prisma.orderItem.findFirst({ where: { userId, stockId: stock.id, orderItemType: OrderItemType.CART_ITEM, isDeleted: false, isPack: cartRequest.isPack } });
     if (existingCartItem) {
-      const updatedCartItem = await prisma.orderItem.update({ where: { id: existingCartItem.id }, data: { quantity: existingCartItem.quantity + cartRequest.quantity, isChecked: false } });
+      const updatedCartItem = await prisma.orderItem.update({ where: { id: existingCartItem.id }, data: { quantity: existingCartItem.quantity + cartRequest.quantity } });
       return updatedCartItem;
     }
-    const orderItem = await prisma.orderItem.create({ data: { userId: user?.id, stockId: stock.id, quantity: cartRequest.quantity, isPack: cartRequest.isPack, isChecked: false, orderItemType: OrderItemType.CART_ITEM } } as any);
+    const orderItem = await prisma.orderItem.create({ data: { userId, stockId: stock.id, quantity: cartRequest.quantity, orderItemType: OrderItemType.CART_ITEM, isPack: cartRequest.isPack } });
     return orderItem;
   };
 
@@ -37,6 +36,10 @@ export class CartService {
       const existingCart = await prisma.orderItem.update({ where: { id: cartItem.id }, data: { isDeleted: true } });
       return existingCart;
     }
+    if (newQuantity > stock.amount) {
+      throw new ResponseError(400, "quantity exceed the stocks");
+    }
+
     const updatedOrderItem = await prisma.orderItem.update({ where: { id: cartItem.id }, data: { quantity: newQuantity } });
     return updatedOrderItem;
   };

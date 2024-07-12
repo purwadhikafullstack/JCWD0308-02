@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Payment Confirmation</title>
+    <title>Order Shipped</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -42,12 +42,18 @@
         color: #555555;
         margin-bottom: 5px;
       }
+      .tracking-info {
+        margin-top: 20px;
+      }
+      .tracking-info p {
+        color: #555555;
+      }
     </style>
   </head>
   <body>
     <div class="container">
       <h1>Hi {{name}},</h1>
-      <p>Your payment has been confirmed and your order will be processed soon. Thank you.</p>
+      <p>Your order has been shipped and is on its way to you. Here are the details:</p>
       <div class="order-details">
         <h2>Order Details</h2>
         <p>Order ID: {{orderId}}</p>
@@ -60,6 +66,12 @@
             {{/each}}
           </ul>
         </div>
+      </div>
+      <div class="tracking-info">
+        <h2>Tracking Information</h2>
+        <p>Courier: {{courier}}</p>
+        <p>Tracking Number: {{trackingNumber}}</p>
+        <p>Estimated Delivery: {{estimation}}</p>
       </div>
     </div>
   </body>

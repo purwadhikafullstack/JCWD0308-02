@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getOrdersByStatus } from "@/lib/fetch-api/order";
 import { OrderStatusMap } from "@/lib/types/order";
-import Image from "next/image";
 import ListOrderItem from "./_component/ListOrderItem";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -28,13 +27,11 @@ export default function ListOrdersPage() {
     const fetchOrdersData = async () => {
       try {
         const awaitingPaymentOrders = await getOrdersByStatus("awaiting_payment", searchTerm, selectedDate?.toISOString());
-        console.log("awaitingpaymentorders:", awaitingPaymentOrders);
         const awaitingConfirmationOrders = await getOrdersByStatus("awaiting_confirmation", searchTerm, selectedDate?.toISOString());
         const processOrders = await getOrdersByStatus("process", searchTerm, selectedDate?.toISOString());
         const shippingOrders = await getOrdersByStatus("shipping", searchTerm, selectedDate?.toISOString());
         const deliveredOrders = await getOrdersByStatus("delivered", searchTerm, selectedDate?.toISOString());
         const confirmedOrders = await getOrdersByStatus("confirmed", searchTerm, selectedDate?.toISOString());
-        console.log("confirmedOrders:", confirmedOrders);
         const cancelledOrders = await getOrdersByStatus("cancelled", searchTerm, selectedDate?.toISOString());
 
         setOrders({
@@ -64,38 +61,38 @@ export default function ListOrdersPage() {
 
   return (
     <div className="mx-4 lg:mx-10 mt-4 flex flex-col gap-2 justify-center">
-      <div className="mb-4 flex w-screen justify-center gap-3">
-        <div className="relative">
-          <input type="text" placeholder="Search by Order ID" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="border p-2 rounded-xl pl-10" />
+      <div className="mb-4 flex flex-col sm:flex-row w-full justify-center gap-3">
+        <div className="relative w-full sm:w-1/2 lg:w-1/3">
+          <input type="text" placeholder="Search by Order ID" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="w-full border p-2 rounded-xl pl-10" />
           <Search className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500" />
         </div>
-        <div className="relative">
-          <DatePicker selected={selectedDate} placeholderText="       Select a Date" onChange={(date) => setSelectedDate(date)} dateFormat="dd-MM-yyyy" className="border p-2 rounded-xl" />
+        <div className="relative w-full sm:w-1/2 lg:w-1/3">
+          <DatePicker selected={selectedDate} placeholderText="        Select a Date" onChange={(date) => setSelectedDate(date)} dateFormat="dd-MM-yyyy" className="w-full border p-2 rounded-xl" />
           <Calendar className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-500" />
         </div>
       </div>
       <div className="flex justify-center items-center">
-        <Tabs defaultValue="awaiting_payment" className="max-w-[70rem]">
+        <Tabs defaultValue="awaiting_payment" className="w-full max-w-[70rem]">
           <TabsList className="flex justify-center mb-4 max-sm:mb-10 flex-wrap">
-            <TabsTrigger value="awaiting_payment" className="px-4 py-2">
+            <TabsTrigger value="awaiting_payment" className="px-2 py-1 sm:px-4 sm:py-2">
               Awaiting Payment
             </TabsTrigger>
-            <TabsTrigger value="awaiting_confirmation" className="px-4 py-2">
+            <TabsTrigger value="awaiting_confirmation" className="px-2 py-1 sm:px-4 sm:py-2">
               Awaiting Confirmation
             </TabsTrigger>
-            <TabsTrigger value="process" className="px-4 py-2">
+            <TabsTrigger value="process" className="px-2 py-1 sm:px-4 sm:py-2">
               Process
             </TabsTrigger>
-            <TabsTrigger value="shipping" className="px-4 py-2">
+            <TabsTrigger value="shipping" className="px-2 py-1 sm:px-4 sm:py-2">
               Shipping
             </TabsTrigger>
-            <TabsTrigger value="delivered" className="px-4 py-2">
+            <TabsTrigger value="delivered" className="px-2 py-1 sm:px-4 sm:py-2">
               Delivered
             </TabsTrigger>
-            <TabsTrigger value="confirmed" className="px-4 py-2">
+            <TabsTrigger value="confirmed" className="px-2 py-1 sm:px-4 sm:py-2">
               Confirmed
             </TabsTrigger>
-            <TabsTrigger value="cancelled" className="px-4 py-2">
+            <TabsTrigger value="cancelled" className="px-2 py-1 sm:px-4 sm:py-2">
               Cancelled
             </TabsTrigger>
           </TabsList>
