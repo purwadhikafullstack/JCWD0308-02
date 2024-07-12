@@ -55,7 +55,7 @@ export default class App {
     this.app.use(AuthMiddleware.identifyUser);
     this.app.use(AuthMiddleware.identifyStoreAdmin);
     this.app.use(AuthMiddleware.identifySuperAdmin);
-    this.app.use("/public", express.static(path.join(__dirname, "../../api/public")));
+    this.app.use("/api/public", express.static(path.join(__dirname, "../../api/public")));
   }
 
   private routes(): void {

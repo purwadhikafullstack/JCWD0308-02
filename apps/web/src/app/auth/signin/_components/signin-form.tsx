@@ -94,7 +94,7 @@ export function SigninForm({ className, ...props }: SigninFormProps) {
         >
           <Link
             className="flex items-center justify-center w-full text-center"
-            href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/github?redirectTo=${redirect}`}
+            href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/github`}
           >
             {signin.isPending ? (
               <FaSpinner className="mr-2 h-4 w-4 animate-spin" />
@@ -112,7 +112,7 @@ export function SigninForm({ className, ...props }: SigninFormProps) {
         >
           <Link
             className="flex items-center justify-center w-full text-center"
-            href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/google?redirectTo=${redirect}`}
+            href={`${env.NEXT_PUBLIC_BASE_API_URL}/auth/google`}
           >
             {signin.isPending ? (
               <FaSpinner className="mr-2 h-4 w-4 animate-spin" />

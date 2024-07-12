@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Footer from '@/components/shared/footer';
+import Image from 'next/image';
 
 const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
   await protectedRoute.noAuthOnly();
@@ -17,8 +18,8 @@ const AuthLayout = async ({ children }: { children: React.ReactNode }) => {
               href="/"
               className="flex items-center gap-2 text-lg font-semibold md:text-base"
             >
-              <ShoppingBag className="h-7 w-7" />
-              <span className="sr-only">rosirun</span>
+              <Image src={'/logo-only.png'} alt="logo" height={28} width={28} />
+              <span className="sr-only">grosirun</span>
             </Link>
           </nav>
           <div className="flex w-full items-center justify-end gap-4 md:gap-2 lg:gap-4">

@@ -48,9 +48,6 @@ export default function CarouselPromo() {
 }
 
 export function VoucherItem({ voucher }: { voucher: Voucher }) {
-  const discount = voucher?.discount
-    ? `${voucher.discount}%`
-    : `Rp.${voucher?.fixedDiscount}`;
   return (
     <CarouselItem className='xl:basis-1/2'>
       <div className="group cursor-pointer relative aspect-[2/1] w-full overflow-hidden rounded-lg">
@@ -58,13 +55,14 @@ export function VoucherItem({ voucher }: { voucher: Voucher }) {
           src={voucher?.imageUrl || '/placeholder.svg'}
           alt="Promotion 1"
           fill
+          priority
           unoptimized
           className="group-hover:scale-110 h-full w-full object-cover rounded-lg transition-transform duration-500 ease-in-out transform hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
         <div className="absolute bottom-6 left-6 text-white">
-          <h2 className="lg:text-lg font-bold">{voucher?.name}</h2>
-          <p className="lg:text-sm">{voucher.description}</p>
+          <h2 className="hidden sm:block lg:text-lg font-bold">{voucher?.name}</h2>
+          <p className="hidden sm:block lg:text-sm">{voucher.description}</p>
         </div>
       </div>
     </CarouselItem>

@@ -76,7 +76,7 @@ export class OrderService {
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
-        paymentPicture: `${process.env.API_URL}/public/images/${fileName}`,
+        paymentPicture: `${process.env.API_URL}/api/public/images/${fileName}`,
         orderStatus: "AWAITING_CONFIRMATION",
       },
     });
