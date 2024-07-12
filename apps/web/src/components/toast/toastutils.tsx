@@ -19,11 +19,18 @@ export const showError = (message: string, errorContent?: string) => {
 
 export const handleApiError = (error: any, defaultMessage: string = 'An unexpected error occurred') => {
   if (error.response && error.response.data) {
-    const { error: apiError, errors, fieldErrors } = error.response.data;
+    const { error: apiError, errors } = error.response.data;
 
-    if (fieldErrors && typeof fieldErrors === 'object') {
-      const fieldErrorMessages = Object.values(fieldErrors).flat().join(', ');
-      showError('Validation Error', fieldErrorMessages);
+    if (errors && errors.fieldErrors && typeof errors.fieldErrors === 'object') {
+      const firstFieldErrorKey = Object.keys(errors.fieldErrors)[0];
+      const firstFieldErrorMessages = errors.fieldErrors[firstFieldErrorKey];
+      const firstFieldErrorMessage = Array.isArray(firstFieldErrorMessages) ? firstFieldErrorMessages[0] : firstFieldErrorMessages;
+      
+      if (typeof firstFieldErrorMessage === 'string') {
+        showError('Validation Error', firstFieldErrorMessage);
+      } else {
+        showError(defaultMessage);
+      }
     } else if (apiError) {
       showError(defaultMessage, apiError);
     } else {

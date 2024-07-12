@@ -72,11 +72,18 @@ export class ProductService {
   };
 
   static updateProduct = async (id: string, req: ProductUpdateRequest, superAdminId: string, imageUrls: string[] = [], imagesToDelete: string[] = []) => {
-    const existingProduct = await prisma.product.findUnique({ where: { id } });
-    if (!existingProduct) {
-      throw new ResponseError(404, "Product not found");
-    }
+    const existingProduct = await this.checkProductExists(id);
+    const updatedProductData = this.prepareUpdatedProductData(req);
+    const validatedProduct = this.validateProductData(updatedProductData);
 
+    const product = await this.updateProductInDB(id, validatedProduct, superAdminId);
+    await this.addProductImages(product.id, imageUrls);
+    await this.deleteProductImages(imagesToDelete);
+
+    return await this.getProductWithImages(product.id);
+  };
+
+  private static prepareUpdatedProductData = (req: ProductUpdateRequest) => {
     const updatedProductData: Partial<ProductUpdateRequest> = {};
     Object.keys(req).forEach((key) => {
       const value = req[key as keyof ProductUpdateRequest];
@@ -84,26 +91,35 @@ export class ProductService {
         (updatedProductData as any)[key] = value;
       }
     });
+    return updatedProductData;
+  };
 
-    const updatedProduct = Validation.validate(ProductValidation.updateProduct, updatedProductData);
+  private static validateProductData = (updatedProductData: Partial<ProductUpdateRequest>) => {
+    return Validation.validate(ProductValidation.updateProduct, updatedProductData);
+  };
 
-    const product = await prisma.product.update({
+  private static updateProductInDB = async (id: string, updatedProduct: Partial<ProductUpdateRequest>, superAdminId: string) => {
+    return await prisma.product.update({
       where: { id },
       data: { ...updatedProduct, superAdminId },
       select: { ...ProductFields },
     });
+  };
 
+  private static addProductImages = async (productId: string, imageUrls: string[]) => {
     if (imageUrls.length > 0) {
       for (const imageUrl of imageUrls) {
         await prisma.productImage.create({
           data: {
-            productId: product.id,
+            productId,
             imageUrl: `${API_URL}${imageUrl}`,
           },
         });
       }
     }
+  };
 
+  private static deleteProductImages = async (imagesToDelete: string[]) => {
     if (imagesToDelete.length > 0) {
       for (const imageId of imagesToDelete) {
         const imageExists = await prisma.productImage.findUnique({
@@ -116,9 +132,11 @@ export class ProductService {
         }
       }
     }
+  };
 
+  private static getProductWithImages = async (productId: string) => {
     return await prisma.product.findUnique({
-      where: { id: product.id },
+      where: { id: productId },
       select: {
         ...ProductFields,
         images: true,
@@ -151,11 +169,9 @@ export class ProductService {
         },
       },
     });
-
     if (!product) {
       throw new Error('Product not found');
     }
-
     return product;
   };
 }

@@ -26,31 +26,31 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete, deleting
     <Table className="min-w-full divide-y divide-gray-200">
       <TableCaption>A list of users in the system.</TableCaption>
       <TableHeader>
-        <TableRow>
-          <TableHead className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Name</TableHead>
-          <TableHead className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Email</TableHead>
-          <TableHead className="hidden lg:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Contact Email</TableHead>
-          <TableHead className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Role</TableHead>
-          <TableHead className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Status</TableHead>
-          <TableHead className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Referral Code</TableHead>
-          <TableHead className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Created At</TableHead>
-          <TableHead className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Updated At</TableHead>
-          <TableHead className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">Actions</TableHead>
+        <TableRow >
+          <TableHead className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">Name</TableHead>
+          <TableHead className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">Email</TableHead>
+          <TableHead className="hidden lg:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">Contact Email</TableHead>
+          <TableHead className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">Role</TableHead>
+          <TableHead className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">Status</TableHead>
+          <TableHead className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">Referral Code</TableHead>
+          <TableHead className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">Created At</TableHead>
+          <TableHead className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">Updated At</TableHead>
+          <TableHead className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">Actions</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {users.map((user) => (
           <TableRow key={user.id}>
-            <TableCell className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{user.displayName}</TableCell>
-            <TableCell className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{user.email}</TableCell>
-            <TableCell className="hidden lg:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{user.contactEmail}</TableCell>
-            <TableCell className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{user.role}</TableCell>
-            <TableCell className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{user.status}</TableCell>
-            <TableCell className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{user.referralCode}</TableCell>
-            <TableCell className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{new Date(user.createdAt).toLocaleDateString()}</TableCell>
-            <TableCell className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm">{new Date(user.updatedAt).toLocaleDateString()}</TableCell>
-            <TableCell className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm flex flex-col space-y-2">
-              <Button onClick={() => onEdit(user)}>Edit</Button>
+            <TableCell className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">{user.displayName}</TableCell>
+            <TableCell className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">{user.email}</TableCell>
+            <TableCell className="hidden lg:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">{user.contactEmail}</TableCell>
+            <TableCell className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">{user.role}</TableCell>
+            <TableCell className="hidden md:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20">{user.status}</TableCell>
+            <TableCell className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">{user.referralCode}</TableCell>
+            <TableCell className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">{new Date(user.createdAt).toLocaleDateString()}</TableCell>
+            <TableCell className="hidden xl:table-cell px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-40">{new Date(user.updatedAt).toLocaleDateString()}</TableCell>
+            <TableCell className="px-2 py-1 sm:px-4 sm:py-2 text-xs sm:text-sm w-20 flex flex-col space-y-2">
+              <Button onClick={() => onEdit(user)} >Edit</Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button variant="destructive" onClick={() => onDelete(user)}>Delete</Button>

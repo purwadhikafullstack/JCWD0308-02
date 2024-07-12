@@ -20,7 +20,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { handleApiError } from '@/components/toast/toastutils';
 import { showSuccess } from '@/components/toast/toastutils';
 import DeleteVoucherDialog from './_components/dialogs/DeleteVoucherDialog';
