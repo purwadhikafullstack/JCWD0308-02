@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { cn } from '@/lib/utils';
 import { validateRequest } from '@/lib/auth';
-import { NavbBar } from './_components/NavBar';
+import { NavbBar } from './_components/navbar';
 import { getCategory } from '@/lib/fetch-api/category/server';
 import Footer from '@/components/shared/footer';
 

@@ -24,11 +24,11 @@ export default function UserAddress() {
   if (userProfile.data?.user?.role !== "USER") return null;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-2 h-5">
       <MapPinIcon className="w-5 h-5 text-muted-foreground" />
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
-          <button className="text-sm text-muted-foreground hover:underline underline-offset-4">
+          <button className="text-sm text-muted-foreground hover:underline underline-offset-4 max-w-32 sm:max-w-none truncate">
             {selectedAddress.data?.address ? selectedAddress.data.address.labelAddress : "Set your Shipping address"}
           </button>
         </DialogTrigger>

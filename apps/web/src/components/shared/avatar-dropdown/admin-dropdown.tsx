@@ -32,7 +32,7 @@ const AdminDropdown = () => {
         <Link href={"/dashboard/orders"}>
           <DropdownMenuItem>
             <ReceiptText className="mr-2 h-4 w-4" />
-            <span>orders</span>
+            <span>Orders</span>
           </DropdownMenuItem>
         </Link>
       </DropdownMenuGroup>
