@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Heart, Percent, ReceiptText, ShoppingCart, User } from 'lucide-react';
+import { Heart, Percent, ReceiptText, ShoppingCart, Ticket, TicketPercent, User } from 'lucide-react';
 import Link from 'next/link';
 
 const UserDropdown = () => {
@@ -39,6 +39,12 @@ const UserDropdown = () => {
           <DropdownMenuItem>
             <ReceiptText className="mr-2 h-4 w-4" />
             <span>Orders</span>
+          </DropdownMenuItem>
+        </Link>
+        <Link href={'/vouchers'}>
+          <DropdownMenuItem>
+            <TicketPercent className="mr-2 h-4 w-4" />
+            <span>Vouchers</span>
           </DropdownMenuItem>
         </Link>
       </DropdownMenuGroup>
