@@ -53,7 +53,7 @@ export class VoucherController {
 
       const file = req.file as Express.Multer.File | undefined;
       const imageUrl = file
-        ? `${API_URL}/public/images/${file.filename}`
+        ? `${API_URL}/api/public/images/${file.filename}`
         : undefined;
 
       const voucher = await VoucherService.createVoucher(
@@ -98,7 +98,7 @@ export class VoucherController {
 
       const file = req.file as Express.Multer.File | undefined;
       const imageUrl = file
-        ? `${API_URL}/public/images/${file.filename}`
+        ? `${API_URL}/api/public/images/${file.filename}`
         : undefined;
 
       const voucher = await VoucherService.updateVoucher(
