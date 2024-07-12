@@ -1,5 +1,4 @@
 import { deleteCart, getCart, updateCart, addCart, getCartItemCount } from "@/lib/fetch-api/cart";
-import { postStockId } from "@/lib/fetch-api/stock";
 import { CartItemType } from "@/lib/types/cart";
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
@@ -69,6 +68,7 @@ export const fetchCartItemCount = createAsyncThunk("cart/fetchCartItemCount", as
 export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { rejectWithValue }) => {
   try {
     const response = await getCart();
+    console.log("fetchCart response data:", response.data);
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.message);
@@ -145,10 +145,12 @@ export const cartSlice = createSlice({
       })
       //get
       .addCase(fetchCart.fulfilled, (state, action) => {
+        console.log("fetchCart fulfilled action payload:", action.payload);
         state.items = action.payload;
         state.error = null;
       })
       .addCase(fetchCart.rejected, (state, action) => {
+        console.log("fetchCart rejected action payload:", action.payload);
         state.error = action.payload as string;
       })
       //remove selected items

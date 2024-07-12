@@ -16,12 +16,12 @@ export default function SecondNavbar() {
   });
 
   return (
-    <div className="hidden border-t sm:block py-2">
+    <div className="border-t sm:block py-2">
       <div className="container flex items-center justify-between px-4 md:px-6">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 h-5">
           <TruckIcon className="w-5 h-5 text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">
-            Delivering from <span className="font-medium">{nearestStocks?.data?.store?.name}</span>
+          <p className="text-sm text-muted-foreground h-5 max-w-32 sm:max-w-none truncate">
+            <span className='hidden sm:inline-block'>Delivering from</span> <span className="font-medium">{nearestStocks?.data?.store?.name}</span>
           </p>
         </div>
         <UserAddress />

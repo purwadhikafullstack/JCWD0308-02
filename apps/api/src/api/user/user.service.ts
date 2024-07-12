@@ -8,6 +8,7 @@ import { generateId } from "lucia";
 import { API_URL } from "@/config.js";
 import { Request, Response } from "express";
 import { sendChangeEmail } from "@/utils/email.js";
+import { deleteFile, getBaseUrl } from "@/utils/file.js";
 
 export class UserService {
   static getUsers = async ({ page, limit, search }: { page: number, limit?: number, search: string }) => {
@@ -32,7 +33,7 @@ export class UserService {
   static createUser = async (req: CreateUserRequest, res: Response) => {
     let newUser = Validation.validate(UserValidation.createUser, req);
     if (!newUser.avatarUrl) {
-      newUser.avatarUrl = `${API_URL}/public/images/avatar.png`;
+      newUser.avatarUrl = `${API_URL}/api/public/images/avatar.png`;
     }
 
     const findUser = await prisma.user.findUnique({
@@ -141,9 +142,15 @@ export class UserService {
 
   static updateUser = async (body: UpdateUserRequest, req: Request, res: Response) => {
 
-    if (req.file) body.avatarUrl = `${API_URL}/public/images/${req.file.filename}`
+    if (req.file) body.avatarUrl = `${API_URL}/api/public/images/${req.file.filename}`
 
     let updatedUser = Validation.validate(UserValidation.updateUser, body);
+
+    const currentUser = await prisma.user.findUnique({ where: { id: res.locals?.user?.id }, select: { avatarUrl: true } })
+
+    if (getBaseUrl(API_URL) === getBaseUrl(currentUser?.avatarUrl!) && updatedUser.avatarUrl !== currentUser?.avatarUrl && currentUser?.avatarUrl !== `${API_URL}/api/public/images/avatar.png` ) {
+      deleteFile(currentUser?.avatarUrl!)
+    }
 
     const user = await prisma.user.update({
       where: { id: res?.locals?.user?.id! },

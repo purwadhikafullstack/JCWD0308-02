@@ -17,7 +17,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 const UpdateStore = dynamic(() => import('../update-store'), { ssr: false });
 
-export default function StorePreview() {
+export default function StorePreview({ store }: { store?: Store }) {
   const userProfile = useSuspenseQuery({
     queryKey: ['user-profile'],
     queryFn: getUserProfile,
@@ -31,7 +31,7 @@ export default function StorePreview() {
     <Card className="overflow-hidden" x-chunk="dashboard-05-chunk-4">
       <CardContent className="flex aspect-square items-center justify-center py-6">
         <Image
-          src={data?.store?.imageUrl || ''}
+          src={store?.imageUrl || data?.store?.imageUrl || ''}
           width="400"
           height="400"
           alt="Product image"
@@ -40,23 +40,26 @@ export default function StorePreview() {
       </CardContent>
       <CardHeader>
         <Badge variant={'outline'} className="text-xs text-primary max-w-min">
-          {data?.store?.status}
+          {store?.status || data?.store?.status}
         </Badge>
         <CardTitle className="flex items-center gap-3">
-          {data?.store?.name}
+          {store?.name || data?.store?.name}
         </CardTitle>
         <CardDescription>
-          <Link target="_blank" href={`/stores/${data?.store?.slug}`}>
+          <Link
+            target="_blank"
+            href={`/stores/${store?.slug || data?.store?.slug}`}
+          >
             <span className="flex items-center gap-1">
               <Link2 className="h-4 w-4" />
-              {data?.store?.slug}
+              {store?.slug || data?.store?.slug}
             </span>
           </Link>
         </CardDescription>
       </CardHeader>
       {userProfile.data?.user?.role === 'SUPER_ADMIN' ? (
         <CardContent className="text-3xl font-semibold ">
-          <UpdateStore store={data?.store!} />
+          <UpdateStore store={store || data?.store!} />
         </CardContent>
       ) : null}
     </Card>

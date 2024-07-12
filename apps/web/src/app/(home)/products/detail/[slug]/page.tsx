@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
-import { addCartItem, addToCart } from "@/lib/features/cart/cartSlice";
+import { addCartItem, addToCart, fetchCartItemCount } from "@/lib/features/cart/cartSlice";
 import { fetchProductBySlug } from "@/lib/fetch-api/product";
 import { Product } from "@/lib/types/product";
 import { formatCurrency } from "@/lib/currency";
@@ -101,6 +101,7 @@ const ProductDetail = () => {
       console.error("Error adding product to cart:", error);
       toast.error("An unexpected error occurred.");
     }
+    dispatch(fetchCartItemCount());
   };
 
   const handleQuantityChange = (type: "increment" | "decrement") => {

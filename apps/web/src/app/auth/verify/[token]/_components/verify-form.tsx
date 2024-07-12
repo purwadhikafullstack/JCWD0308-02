@@ -78,12 +78,6 @@ export function VerifyForm({ className, token, ...props }: VerifyFormProps) {
                   setAccount?.error?.errors?.fieldErrors?.confirmPassword
                 }
               />
-              <FieldRegisterCode
-                form={form}
-                errorMessage={
-                  setAccount?.error?.errors?.fieldErrors?.registerCode
-                }
-              />
             </div>
             <Submit pending={setAccount.isPending}>
               {setAccount.isPending && (
