@@ -51,7 +51,7 @@ export class AuthService {
         referralCode: generateId(8),
         contactEmail: userData.email,
         accountType: 'EMAIL',
-        avatarUrl: `${API_URL}/api/public/images/avatar.png`,
+        avatarUrl: `${API_URL}/public/images/avatar.png`,
       },
       select: { ...UserFields },
     });
