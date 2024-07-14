@@ -48,7 +48,6 @@ export const deleteStore = async (
     if (!res.ok) throw new Error(await res.json());
     return await res.json();
   } catch (error) {
-    console.log("hit error");
 
     throw error;
   }

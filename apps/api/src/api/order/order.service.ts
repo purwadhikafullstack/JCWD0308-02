@@ -11,6 +11,7 @@ import path from 'path';
 import { mapStatusToEnum } from '@/helpers/order/mapStatusToEnum.js';
 import { handlePaymentLinkCreation } from '@/helpers/order/addOrderToPayment.js';
 import { cancelOrderTransaction, checkPaymentDeadline } from '@/helpers/order/cancelOrderHelper.js';
+import { API_URL } from '@/config.js';
 
 export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
@@ -75,7 +76,7 @@ export class OrderService {
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
-        paymentPicture: `${process.env.API_URL}/public/images/${fileName}`,
+        paymentPicture: `${API_URL}/public/images/${fileName}`,
         orderStatus: 'AWAITING_CONFIRMATION',
       },
     });

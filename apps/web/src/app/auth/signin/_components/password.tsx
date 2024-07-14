@@ -9,9 +9,11 @@ import {
 import { UseFormReturn } from 'react-hook-form';
 import { z } from 'zod';
 import { Dispatch, SetStateAction } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
 import { SigninFormSchema } from './validation';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 export default function FieldPassword({
   errorMessage,
@@ -50,6 +52,7 @@ export default function FieldPassword({
               </Button>
             </div>
           </FormControl>
+          <Link className={cn(buttonVariants({size: 'sm', variant: 'link'}), 'pl-0 text-primary/80')} href="/auth/reset">Forgot password?</Link>
           <FormMessage>
             {typeof errorMessage !== 'string' && errorMessage}
           </FormMessage>

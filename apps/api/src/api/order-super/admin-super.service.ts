@@ -37,10 +37,28 @@ export class OrderSuperService {
   static confirmPayment = async (req: ChangeStatusRequest, res: Response) => {
     const { orderId, newStatus } = Validation.validate(ConfirmPaymentValidation.CONFIRM_PAYMENT, req);
     const order = await getOrderWithUser(orderId);
-    if (!order) throw new ResponseError(404, "Order not found");
-    if (order.orderStatus !== "AWAITING_CONFIRMATION") throw new ResponseError(400, "Order is not awaiting confirmation");
 
-    if (PaymentMethod.MANUAL && !order.paymentPicture) throw new ResponseError(400, "Order can not be processed");
+    if (!order) {
+      throw new ResponseError(404, 'Order not found');
+    }
+
+    const currentStatus = order.orderStatus as OrderStatus;
+
+    const allowedTransitions: { [key in OrderStatus]: OrderStatus[] } = {
+      [OrderStatus.AWAITING_PAYMENT]: [],
+      [OrderStatus.AWAITING_CONFIRMATION]: [OrderStatus.AWAITING_PAYMENT, OrderStatus.PROCESS],
+      [OrderStatus.PROCESS]: [OrderStatus.SHIPPING],
+      [OrderStatus.SHIPPING]: [OrderStatus.DELIVERED],
+      [OrderStatus.DELIVERED]: [],
+      [OrderStatus.CONFIRMED]: [],
+      [OrderStatus.CANCELLED]: [],
+    };
+    if (!allowedTransitions[currentStatus].includes(newStatus)) {
+      throw new ResponseError(403, `Invalid status transition from ${currentStatus} to ${newStatus}`);
+    }
+    if (currentStatus === OrderStatus.AWAITING_CONFIRMATION && PaymentMethod.MANUAL && !order.paymentPicture) {
+      throw new ResponseError(400, 'Order cannot be processed without payment picture');
+    }
     const user = order.user;
     const items = order.orderItems.map((item: any) => ({
       name: item.stock.product.title,
@@ -52,13 +70,15 @@ export class OrderSuperService {
       totalPrice: order.totalPrice,
       items: items,
     };
-    const mappedStatus: OrderStatus = mapNewStatus(newStatus);
-    const templateName = newStatus === "PROCESS" ? "paymentConfirmed.html" : "paymentRejected.html";
-    const subject = "Welcome to Grosirun - Payment Confirmation";
-    const html = getEmailTemplate(templateName, context);
-    await sendConfirmationEmail(user.contactEmail, subject, html);
 
+    const mappedStatus: OrderStatus = mapNewStatus(newStatus);
+    const templateName = newStatus === OrderStatus.PROCESS ? 'paymentConfirmed.html' : 'paymentRejected.html';
+    const subject = 'Welcome to Grosirun - Payment Confirmation';
+    const html = getEmailTemplate(templateName, context);
+
+    await sendConfirmationEmail(user.contactEmail, subject, html);
     const updated = await updateOrderStatus(orderId, mappedStatus);
+
     return updated;
   };
 }

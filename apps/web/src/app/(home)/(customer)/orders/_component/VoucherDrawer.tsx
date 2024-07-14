@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useSuspenseQuery, useMutation } from '@tanstack/react-query';
@@ -14,9 +15,16 @@ import fixedDiscountProduct from '../../../../../../public/fixeddiscountproduct.
 import discountProduct from '../../../../../../public/discountproduct.png';
 import shippingCash from '../../../../../../public/shippingcash.png';
 import shippingDiscount from '../../../../../../public/shippingdiscount.png';
+import { Separator } from '@/components/ui/separator';
 
 interface VoucherDrawerProps {
-  onSelectVoucher: (voucherId: string, voucherName: string, voucherDiscount: number, voucherType: string, discountType: string) => void;
+  onSelectVoucher: (
+    voucherId: string,
+    voucherName: string,
+    voucherDiscount: number,
+    voucherType: string,
+    discountType: string,
+  ) => void;
   selectedItems: any[];
   shippingCost: number | null;
 }
@@ -57,11 +65,17 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher, selected
 
   useEffect(() => {
     if (userVouchers && Array.isArray(userVouchers)) {
-      setClaimedVouchers(userVouchers.map((userVoucher: any) => userVoucher.voucher.id));
+      setClaimedVouchers(
+        userVouchers.map((userVoucher: any) => userVoucher.voucher.id),
+      );
     }
   }, [userVouchers]);
 
-  const filteredVouchers = vouchers?.filter((voucher: any) => !voucher.storeId || voucher.storeId === nearestStocks?.data?.store.id) || [];
+  const filteredVouchers =
+    vouchers?.filter(
+      (voucher: any) =>
+        !voucher.storeId || voucher.storeId === nearestStocks?.data?.store.id,
+    ) || [];
 
   const getVoucherIcon = (voucher: any): StaticImageData => {
     if (voucher.voucherType === 'PRODUCT' && voucher.discountType === 'FIXED_DISCOUNT') {
@@ -126,9 +140,48 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher, selected
           <DrawerDescription>Select a voucher to claim it</DrawerDescription>
         </DrawerHeader>
         <div className="p-4 space-y-4 h-96 overflow-y-auto">
+
+          <h3 className='text-lg font-semibold' >Your Vouchers</h3>
+          {userVouchers.map((voucher: any) => (
+            <div
+              key={voucher.id}
+              className="flex items-center p-4 border rounded-lg"
+            >
+              <Image
+                src={getVoucherIcon(voucher.voucher)}
+                alt={voucher.voucher.name}
+                width={50}
+                height={50}
+              />
+              <div className="ml-4 flex-1">
+                <h2 className="text-lg font-bold">{voucher.voucher.name}</h2>
+                <p className="text-sm">{voucher.voucher.description}</p>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  onClick={() => handleUseVoucher(voucher.voucher)}
+                >
+                  Use
+                </Button>
+              </div>
+            </div>
+          ))}
+
+          <Separator />
+
+          <h3 className='text-lg font-semibold' >Available Vouchers</h3>
           {filteredVouchers.map((voucher: any) => (
-            <div key={voucher.id} className="flex items-center p-4 border rounded-lg">
-              <Image src={getVoucherIcon(voucher)} alt={voucher.name} width={50} height={50} />
+            <div
+              key={voucher.id}
+              className="flex items-center p-4 border rounded-lg"
+            >
+              <Image
+                src={getVoucherIcon(voucher)}
+                alt={voucher.name}
+                width={50}
+                height={50}
+              />
               <div className="ml-4 flex-1">
                 <h2 className="text-lg font-bold">{voucher.name}</h2>
                 <p className="text-sm">{voucher.description}</p>
@@ -137,7 +190,10 @@ const VoucherDrawer: React.FC<VoucherDrawerProps> = ({ onSelectVoucher, selected
                 <Button variant={claimedVouchers.includes(voucher.id) ? 'secondary' : 'default'} disabled={claimedVouchers.includes(voucher.id)} onClick={() => handleClaimVoucher.mutate(voucher.id)}>
                   {claimedVouchers.includes(voucher.id) ? 'Claimed' : 'Claim'}
                 </Button>
-                <Button variant="default" onClick={() => handleUseVoucher(voucher)}>
+                <Button
+                  variant="default"
+                  onClick={() => handleUseVoucher(voucher)}
+                >
                   Use
                 </Button>
               </div>

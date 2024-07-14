@@ -9,7 +9,6 @@ import { PaginationDemo } from './_component/Pagination';
 import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { getSelectedStore } from '@/lib/fetch-api/store/client';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
-import { Toast } from '@/components/ui/toast';
 import { toast } from '@/components/ui/sonner';
 
 export default function ListOrdersPage() {
@@ -92,6 +91,7 @@ export default function ListOrdersPage() {
         throw new Error('Failed to update order status');
       }
     } catch (error) {
+      toast.error(`You are not authorized to change the status to ${newStatus}`);
       console.error(error);
     }
   };
@@ -106,6 +106,7 @@ export default function ListOrdersPage() {
         throw new Error('Failed to cancel order');
       }
     } catch (error) {
+      toast.error(`You are not authorized to change the status to other than cancel`);
       console.error(error);
     }
   };

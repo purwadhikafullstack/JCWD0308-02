@@ -76,9 +76,6 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect, setIsCh
     return null;
   }
 
-  const addressId = selectedAddress.data?.address?.id;
-  // if (!addressId) router.push('/cart');
-
   const handleQuantityChange = async (newQuantity: number) => {
     if (newQuantity === 0) {
       dispatch(deleteCartItem(cart.id));
