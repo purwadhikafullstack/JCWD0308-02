@@ -52,22 +52,22 @@ const CartItem: React.FC<CartItemProps> = ({
       return getNearestStocks(Number(1), Number(15), filters);
     },
   });
-  const { product } = cart.stock;
+  const product = cart?.stock?.product;
   const nearestStock = nearestStocks.data?.stocks?.find(
-    (item) => item.id === cart.stockId,
+    (item) => item.id === cart?.stockId,
   );
   const carts = useAppSelector((state: RootState) => state.cart.items);
 
   const isTwoVariants = useMemo(() => {
     return (
-      carts.filter((item) => item.stockId === cart.stockId && item.isChecked)
+      carts.filter((item) => item?.stockId === cart?.stockId && item?.isChecked)
         .length === 2
     );
   }, [cart.stockId, carts]);
 
   const isTwoVariantsTotal = useMemo(() => {
     return carts
-      .filter((item) => item.stockId === cart.stockId && item.isChecked)
+      .filter((item) => item.stockId === cart?.stockId && item.isChecked)
       .reduce(
         (total, item) =>
           total +
@@ -97,7 +97,7 @@ const CartItem: React.FC<CartItemProps> = ({
     setQuantity(cart.quantity);
   }, [cart.quantity]);
 
-  if (!cart.stock || !cart.stock.product) {
+  if (!cart?.stock || !cart?.stock?.product) {
     return null;
   }
 
@@ -112,7 +112,7 @@ const CartItem: React.FC<CartItemProps> = ({
         const resultAction = await dispatch(
           updateCartItem({
             cartItemId: cart.id,
-            stockId: cart.stock.id,
+            stockId: cart?.stock?.id,
             quantity: newQuantity,
           }),
         );
@@ -122,9 +122,9 @@ const CartItem: React.FC<CartItemProps> = ({
           dispatch(fetchCartItemCount());
         }
         setQuantity(newQuantity);
-        if (newQuantity > cart.stock.amount) {
+        if (newQuantity > cart?.stock?.amount) {
           toast.error(
-            `Sorry, there are only ${cart.stock.amount} items available.`,
+            `Sorry, there are only ${cart?.stock?.amount} items available.`,
           );
         }
       } catch (error) {
