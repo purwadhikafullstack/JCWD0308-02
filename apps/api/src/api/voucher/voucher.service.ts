@@ -17,7 +17,10 @@ export class VoucherService {
 
     const total = await prisma.voucher.count({ where });
     const vouchers = await prisma.voucher.findMany({
-      where,
+      where: {
+        isPrivate: false, isClaimable: true,
+        ...where
+      },
       skip: (page - 1) * limit,
       take: limit,
       include: {

@@ -15,7 +15,7 @@ import { getCities } from '@/lib/fetch-api/city/server';
 
 import { getAddressList, getSelectedAddress } from '@/lib/fetch-api/address/server';
 import { getNearestStocks } from '@/lib/fetch-api/stocks/server';
-import { getVouchers } from '@/lib/fetch-api/voucher/server';
+import { getUserVouchers, getVouchers } from '@/lib/fetch-api/voucher/server';
 
 
 export const runtime = 'nodejs'; // 'nodejs' (default) | 'edge'
@@ -68,6 +68,11 @@ export default async function RootLayout({
   queryClient.prefetchQuery({
     queryKey: ['provinces'],
     queryFn: getProvinces,
+  });
+
+  queryClient.prefetchQuery({
+    queryKey: ['user-vouchers'],
+    queryFn: getUserVouchers,
   });
 
   queryClient.prefetchQuery({

@@ -5,8 +5,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const auth = await protectedRoute.user();
-  // console.log(auth);
+  await protectedRoute.user();
 
   return <>{children}</>;
 }

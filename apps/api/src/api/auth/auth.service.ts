@@ -8,11 +8,10 @@ import { UserFields } from '@/types/user.type.js';
 import { pool, prisma } from '@/db.js';
 import { API_URL } from '@/config.js';
 import { sendEmailVerification, sendResetPassword } from '@/utils/email.js';
+import { AuthHelper } from './auth.helper.js';
 
 export class AuthService {
   static registerByEmail = async (req: RegisterRequest) => {
-    console.log(req);
-
     let userData = Validation.validate(AuthValidation.REGISTER, req);
 
     const findUser = await prisma.user.findUnique({
@@ -133,6 +132,10 @@ export class AuthService {
     });
 
     await prisma.userTokens.deleteMany({ where: { userId: user.id, type: "REGISTER" } })
+
+    if (userData.registerCode) {
+      await AuthHelper.assignReferral(user.id, userData.registerCode)
+    }
 
     return user;
   };

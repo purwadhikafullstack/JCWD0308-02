@@ -1,12 +1,13 @@
 import { UserFields } from '@/types/user.type.js';
 import { GITHUB_OAUTH_URL, GOOGLE_OAUTH_URL, NODE_ENV } from '@/config.js';
-import { prisma } from '@/db.js';
+import { pool, prisma } from '@/db.js';
 import { AccountType, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 import { generateId } from 'lucia';
 import { CookieAttributes, parseCookies, serializeCookie } from 'oslo/cookie';
 import { user } from './auth.validation.js';
 import { sendWelcomeOAuth } from '@/utils/email.js';
+import { VoucherHelper } from '@/api/voucher/voucher.helper.js';
 
 export interface ICreateUserByEmail extends Prisma.UserCreateInput {
   email: string;
@@ -66,7 +67,7 @@ export class AuthHelper {
   };
 
   static setCookies = async (user: user, res: Response) => {
-    
+
     if (user?.role === "STORE_ADMIN") {
       const store = await prisma.storeAdmin.findUnique({ where: { storeAdminId: user!.id } })
       AuthHelper.setStoreIdCookie(res, store?.storeId!)
@@ -78,7 +79,7 @@ export class AuthHelper {
     }
 
     if (user?.role === "USER") {
-      const address = await prisma.userAddress.findFirst({ where: {userId: user.id, isMainAddress: true } })
+      const address = await prisma.userAddress.findFirst({ where: { userId: user.id, isMainAddress: true } })
       AuthHelper.setAddressIdCookie(res, address?.id!)
     }
   }
@@ -152,13 +153,13 @@ export class AuthHelper {
 
   static createUserByGitHub = async (data: ICreateUserByGitHub) => {
     const user = await prisma.user.create({ data });
-    await sendWelcomeOAuth({email: user.contactEmail!, displayName: user.displayName!})
+    await sendWelcomeOAuth({ email: user.contactEmail!, displayName: user.displayName! })
     return user
   };
 
   static createUserByGoogle = async (data: ICreateUserByGoogle) => {
     const user = await prisma.user.create({ data });
-    await sendWelcomeOAuth({email: user.contactEmail!, displayName: user.displayName!})
+    await sendWelcomeOAuth({ email: user.contactEmail!, displayName: user.displayName! })
     return user
   };
 
@@ -171,5 +172,18 @@ export class AuthHelper {
         ],
       },
     });
+  };
+
+  static assignReferral = async (userId: string, registerCode: string) => {
+    const findUserByReff = await prisma.user.findUnique({ where: { referralCode: registerCode } })
+
+    if (!findUserByReff) return
+
+    const diskonTeman = await prisma.voucher.findUnique({ where: { code: "DISKONTEMAN" } })
+
+    await VoucherHelper.assignReferral(userId, findUserByReff.id, diskonTeman?.id!)
+
+    await VoucherHelper.assignReferralExpires(userId, diskonTeman?.id!)
+    await VoucherHelper.assignReferralExpires(findUserByReff.id, diskonTeman?.id!)
   };
 }

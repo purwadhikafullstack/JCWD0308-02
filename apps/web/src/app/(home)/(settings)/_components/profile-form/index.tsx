@@ -105,6 +105,15 @@ export function ProfileForm() {
             </FormItem>
           )}
         />
+        <FormItem>
+          <FormLabel>Referral Code</FormLabel>
+          <Input
+            disabled
+            placeholder="shadcn"
+            value={userProfile?.data?.user?.referralCode}
+          />
+          <FormMessage />
+        </FormItem>
         {userProfile?.data?.user?.accountType === 'EMAIL' ? (
           <>
             <FormField

@@ -1,11 +1,11 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { formatCurrency } from "@/lib/currency";
-import { confirmOrder } from "@/lib/fetch-api/order";
-import { OrderItemProps } from "@/lib/types/order";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+'use client';
+import { Button } from '@/components/ui/button';
+import { formatCurrency } from '@/lib/currency';
+import { confirmOrder } from '@/lib/fetch-api/order';
+import { OrderItemProps } from '@/lib/types/order';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
 
 const DeliveredOrderItem: React.FC<OrderItemProps> = ({ order }) => {
   const [confirmed, setConfirmed] = useState(false);
@@ -16,7 +16,7 @@ const DeliveredOrderItem: React.FC<OrderItemProps> = ({ order }) => {
       setConfirmed(true);
       window.location.reload();
     } catch (error) {
-      console.error("Error confirming order:", error);
+      console.error('Error confirming order:', error);
     }
   };
   return (
@@ -38,7 +38,7 @@ const DeliveredOrderItem: React.FC<OrderItemProps> = ({ order }) => {
       {order.orderItems.map((item) => (
         <div key={item.id} className="flex flex-col md:flex-row items-start gap-4 border-t pt-4 mt-4">
           <div className="w-24 h-24 relative">
-            <Image src={item.stock.product.images[0] || "/indomie.jpg"} layout="fill" objectFit="cover" alt="Product Image" className="rounded-lg" />
+            <Image src={item.stock.product.images[0].imageUrl} layout="fill" objectFit="cover" alt="Product Image" className="rounded-lg" />
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center">
