@@ -5,13 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Minus, Plus, Trash } from 'lucide-react';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
-import {
-  deleteCartItem,
-  fetchCart,
-  fetchCartItemCount,
-  updateCartItem,
-  updateQuantity,
-} from '@/lib/features/cart/cartSlice';
+import { deleteCartItem, fetchCart, fetchCartItemCount, updateCartItem, updateQuantity } from '@/lib/features/cart/cartSlice';
 import { formatCurrency } from '@/lib/currency';
 import { CartItemType } from '@/lib/types/cart';
 import { useSuspenseQuery } from '@tanstack/react-query';
@@ -30,12 +24,7 @@ interface CartItemProps {
   onSelect: (itemId: string, isChecked: boolean) => void;
   setIsCheckoutDisabled: React.Dispatch<React.SetStateAction<boolean>>;
 }
-const CartItem: React.FC<CartItemProps> = ({
-  cart,
-  isSelected,
-  onSelect,
-  setIsCheckoutDisabled,
-}) => {
+const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect, setIsCheckoutDisabled }) => {
   const router = useRouter();
   const selectedAddress = useSuspenseQuery({
     queryKey: ['selected-address'],
@@ -53,29 +42,15 @@ const CartItem: React.FC<CartItemProps> = ({
     },
   });
   const product = cart?.stock?.product;
-  const nearestStock = nearestStocks.data?.stocks?.find(
-    (item) => item.id === cart?.stockId,
-  );
+  const nearestStock = nearestStocks.data?.stocks?.find((item) => item.id === cart?.stockId);
   const carts = useAppSelector((state: RootState) => state.cart.items);
 
   const isTwoVariants = useMemo(() => {
-    return (
-      carts.filter((item) => item?.stockId === cart?.stockId && item?.isChecked)
-        .length === 2
-    );
+    return carts.filter((item) => item?.stockId === cart?.stockId && item?.isChecked).length === 2;
   }, [cart.stockId, carts]);
 
   const isTwoVariantsTotal = useMemo(() => {
-    return carts
-      .filter((item) => item.stockId === cart?.stockId && item.isChecked)
-      .reduce(
-        (total, item) =>
-          total +
-          (item.isPack
-            ? item.quantity * product?.packQuantity!
-            : item.quantity),
-        0,
-      );
+    return carts.filter((item) => item.stockId === cart?.stockId && item.isChecked).reduce((total, item) => total + (item.isPack ? item.quantity * product?.packQuantity! : item.quantity), 0);
   }, [cart.stockId, carts, product?.packQuantity]);
 
   useEffect(() => {
@@ -101,8 +76,8 @@ const CartItem: React.FC<CartItemProps> = ({
     return null;
   }
 
-  const addressId = selectedAddress.data?.address.id;
-  if (!addressId) router.push('/cart');
+  const addressId = selectedAddress.data?.address?.id;
+  // if (!addressId) router.push('/cart');
 
   const handleQuantityChange = async (newQuantity: number) => {
     if (newQuantity === 0) {
@@ -123,9 +98,7 @@ const CartItem: React.FC<CartItemProps> = ({
         }
         setQuantity(newQuantity);
         if (newQuantity > cart?.stock?.amount) {
-          toast.error(
-            `Sorry, there are only ${cart?.stock?.amount} items available.`,
-          );
+          toast.error(`Sorry, there are only ${cart?.stock?.amount} items available.`);
         }
       } catch (error) {
         console.error('Update Cart Error:', error);
@@ -149,65 +122,30 @@ const CartItem: React.FC<CartItemProps> = ({
     <div className="mb-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 mb-4 sm:mb-0 sm:w-auto">
-          <Checkbox
-            id={cart.id}
-            checked={isSelected}
-            onCheckedChange={() => onSelect(cart.id, !isSelected)}
-            onChange={() => onSelect(cart.id, !isSelected)}
-          />
+          <Checkbox id={cart.id} checked={isSelected} onCheckedChange={() => onSelect(cart.id, !isSelected)} onChange={() => onSelect(cart.id, !isSelected)} />
 
           <figure className="max-w-[70%] sm:max-w-none sm:w-[90px] w-[60%]">
-            <Image
-              src={product.images[0]?.imageUrl || '/indomie.jpg'}
-              width={50}
-              height={50}
-              alt="product image"
-            />
+            <Image src={product.images[0]?.imageUrl || '/indomie.jpg'} width={50} height={50} alt="product image" />
           </figure>
         </div>
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left sm:flex-1">
           <p className="font-semibold "> {product.title}</p>
           <p className="text-gray-500">{cart.isPack ? 'grosir' : 'eceran'}</p>
-          <p className="font-bold hidden max-md:flex">
-            {' '}
-            {cart.isPack
-              ? formatCurrency(product.packPrice)
-              : formatCurrency(product.price)}
-          </p>
+          <p className="font-bold hidden max-md:flex"> {cart.isPack ? formatCurrency(product.packPrice) : formatCurrency(product.price)}</p>
         </div>
         <div className="mt-4 sm:mt-0 sm:text-right text-center">
-          <p className="font-bold max-md:hidden">
-            {' '}
-            {cart.isPack
-              ? formatCurrency(product.packPrice)
-              : formatCurrency(product.price)}
-          </p>
+          <p className="font-bold max-md:hidden"> {cart.isPack ? formatCurrency(product.packPrice) : formatCurrency(product.price)}</p>
         </div>
       </div>
       <div className="flex justify-end items-center gap-2 mt-4">
-        <Button
-          variant="outline"
-          size="icon"
-          className="bg-destructive text-destructive-foreground"
-          onClick={handleRemove}
-        >
+        <Button variant="outline" size="icon" className="bg-destructive text-destructive-foreground" onClick={handleRemove}>
           <Trash className="w-4 h-4" />
         </Button>
-        <Button
-          variant="outline"
-          size="icon"
-          className="text-primary"
-          onClick={() => handleQuantityChange(quantity - 1)}
-        >
+        <Button variant="outline" size="icon" className="text-primary" onClick={() => handleQuantityChange(quantity - 1)}>
           <Minus className="w-4 h-4" />
         </Button>
         <span className="mx-2 text-lg">{cart.quantity}</span>
-        <Button
-          variant="outline"
-          size="icon"
-          className="text-primary"
-          onClick={() => handleQuantityChange(quantity + 1)}
-        >
+        <Button variant="outline" size="icon" className="text-primary" onClick={() => handleQuantityChange(quantity + 1)}>
           <Plus className="w-4 h-4" />
         </Button>
       </div>

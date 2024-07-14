@@ -51,11 +51,12 @@ export interface OrderItemProps {
           price: number;
           packQuantity: any;
           packPrice: number;
-          images: string[];
+          images: any[];
           title: string;
         };
       };
       quantity: number;
     }[];
   };
+  onOrderCancelled?: any;
 }

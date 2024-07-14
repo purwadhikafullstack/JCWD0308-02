@@ -1,6 +1,6 @@
-import { deleteCart, getCart, updateCart, addCart, getCartItemCount } from "@/lib/fetch-api/cart";
-import { CartItemType } from "@/lib/types/cart";
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { deleteCart, getCart, updateCart, addCart, getCartItemCount } from '@/lib/fetch-api/cart';
+import { CartItemType } from '@/lib/types/cart';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface CartSlice {
   items: CartItemType[];
@@ -14,17 +14,16 @@ const initialState: CartSlice = {
   error: null,
 };
 
-export const deleteCartItem = createAsyncThunk("cart/deleteCartItem", async (cartId: any, { rejectWithValue }) => {
+export const deleteCartItem = createAsyncThunk('cart/deleteCartItem', async (cartId: any, { rejectWithValue }) => {
   try {
     const res = await deleteCart(cartId);
-    console.log("res from cartslice:", res);
     return cartId;
   } catch (error: any) {
     return rejectWithValue(error.message);
   }
 });
 
-export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ cartItemId, stockId, quantity }: { cartItemId: string; stockId: string; quantity: number }, { rejectWithValue }) => {
+export const updateCartItem = createAsyncThunk('cart/updateCartItem', async ({ cartItemId, stockId, quantity }: { cartItemId: string; stockId: string; quantity: number }, { rejectWithValue }) => {
   try {
     const res = await updateCart(cartItemId, stockId, quantity);
     return res;
@@ -33,7 +32,7 @@ export const updateCartItem = createAsyncThunk("cart/updateCartItem", async ({ c
   }
 });
 
-export const addCartItem = createAsyncThunk("cart/addToCart", async ({ stockId, quantity, isPack }: { stockId: string; quantity: number; isPack: boolean }, { rejectWithValue, dispatch }) => {
+export const addCartItem = createAsyncThunk('cart/addToCart', async ({ stockId, quantity, isPack }: { stockId: string; quantity: number; isPack: boolean }, { rejectWithValue, dispatch }) => {
   try {
     const response = await addCart(stockId, quantity, isPack);
     dispatch(fetchCartItemCount());
@@ -43,7 +42,7 @@ export const addCartItem = createAsyncThunk("cart/addToCart", async ({ stockId, 
   }
 });
 
-export const fetchCartItemCount = createAsyncThunk("cart/fetchCartItemCount", async (_, { rejectWithValue }) => {
+export const fetchCartItemCount = createAsyncThunk('cart/fetchCartItemCount', async (_, { rejectWithValue }) => {
   try {
     const response = await getCartItemCount();
     return response.data;
@@ -52,24 +51,23 @@ export const fetchCartItemCount = createAsyncThunk("cart/fetchCartItemCount", as
   }
 });
 
-export const fetchCart = createAsyncThunk("cart/fetchCart", async (_, { rejectWithValue }) => {
+export const fetchCart = createAsyncThunk('cart/fetchCart', async (_, { rejectWithValue }) => {
   try {
     const response = await getCart();
-    console.log("fetchCart response data:", response.data);
     return response.data;
   } catch (error: any) {
     return rejectWithValue(error.message);
   }
 });
 
-export const removeSelectedItems = createAsyncThunk("cart/removeSelectedItems", async (selectedItemIds: string[], { getState }) => {
+export const removeSelectedItems = createAsyncThunk('cart/removeSelectedItems', async (selectedItemIds: string[], { getState }) => {
   const state = getState() as { cart: CartSlice };
   const remainingItems = state.cart.items.filter((item) => !selectedItemIds.includes(`${item.id}-${item.isPack}`));
   return remainingItems;
 });
 
 export const cartSlice = createSlice({
-  name: "cart",
+  name: 'cart',
   initialState,
   reducers: {
     addToCart: (state, action: PayloadAction<CartItemType>) => {
@@ -132,12 +130,10 @@ export const cartSlice = createSlice({
       })
       //get
       .addCase(fetchCart.fulfilled, (state, action) => {
-        console.log("fetchCart fulfilled action payload:", action.payload);
         state.items = action.payload;
         state.error = null;
       })
       .addCase(fetchCart.rejected, (state, action) => {
-        console.log("fetchCart rejected action payload:", action.payload);
         state.error = action.payload as string;
       })
       //remove selected items

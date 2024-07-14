@@ -1,8 +1,8 @@
-"use client";
-import { formatCurrency } from "@/lib/currency";
-import { OrderItemProps } from "@/lib/types/order";
-import Image from "next/image";
-import React from "react";
+'use client';
+import { formatCurrency } from '@/lib/currency';
+import { OrderItemProps } from '@/lib/types/order';
+import Image from 'next/image';
+import React from 'react';
 
 const ListOrderItem: React.FC<OrderItemProps> = ({ order }) => {
   return (
@@ -24,7 +24,7 @@ const ListOrderItem: React.FC<OrderItemProps> = ({ order }) => {
       {order.orderItems.map((item) => (
         <div key={item.id} className="flex flex-col md:flex-row items-start gap-4 border-t pt-4 mt-4">
           <div className="w-24 h-24 relative">
-            <Image src={item.stock.product.images[0] || "/indomie.jpg"} layout="fill" objectFit="cover" alt="Product Image" className="rounded-lg" />
+            <Image src={item.stock.product.images[0]?.imageUrl} layout="fill" objectFit="cover" alt="Product Image" className="rounded-lg" />
           </div>
           <div className="flex-1">
             <div className="flex justify-between items-center">

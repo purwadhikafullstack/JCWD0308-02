@@ -1,16 +1,16 @@
-import { prisma } from "@/db.js";
-import { OrderRequest, OrderId } from "@/types/order.type.js";
-import { ResponseError } from "@/utils/error.response.js";
-import { Validation } from "@/utils/validation.js";
-import { Request, Response } from "express";
-import { OrderIdValidation, OrderValidation } from "./order.validation.js";
-import { applyDiscounts, calculateShipping, calculateTotalPriceAndWeight, getAddress, updateOrderItemsAndStock } from "@/helpers/order/addOrderHelper.js";
-import { createOrder, prepareOrderData } from "@/helpers/order/addOrderToPayment.js";
-import { handleCartItems } from "@/helpers/order/handleCartItems.js";
-import path from "path";
-import { mapStatusToEnum } from "@/helpers/order/mapStatusToEnum.js";
-import { handlePaymentLinkCreation } from "@/helpers/order/addOrderToPayment.js";
-import { cancelOrderTransaction, checkPaymentDeadline } from "@/helpers/order/cancelOrderHelper.js";
+import { prisma } from '@/db.js';
+import { OrderRequest, OrderId } from '@/types/order.type.js';
+import { ResponseError } from '@/utils/error.response.js';
+import { Validation } from '@/utils/validation.js';
+import { Request, Response } from 'express';
+import { OrderIdValidation, OrderValidation } from './order.validation.js';
+import { applyDiscounts, calculateShipping, calculateTotalPriceAndWeight, getAddress, updateOrderItemsAndStock } from '@/helpers/order/addOrderHelper.js';
+import { createOrder, prepareOrderData } from '@/helpers/order/addOrderToPayment.js';
+import { handleCartItems } from '@/helpers/order/handleCartItems.js';
+import path from 'path';
+import { mapStatusToEnum } from '@/helpers/order/mapStatusToEnum.js';
+import { handlePaymentLinkCreation } from '@/helpers/order/addOrderToPayment.js';
+import { cancelOrderTransaction, checkPaymentDeadline } from '@/helpers/order/cancelOrderHelper.js';
 
 export class OrderService {
   static addOrder = async (req: OrderRequest, res: Response) => {
@@ -57,27 +57,26 @@ export class OrderService {
     const userId = res.locals.user?.id;
     const order = await prisma.order.findUnique({
       where: { id: cancelOrder.orderId },
-      include: { user: true, orderItems: true },
+      include: { user: true, orderItems: { include: { stock: { include: { product: true } } } } },
     });
-    if (!order || order.userId !== userId) throw new ResponseError(404, "Order not found");
-    if (order.orderStatus !== "AWAITING_PAYMENT") throw new ResponseError(400, "Order cannot be canceled");
-    if (order.paymentPicture) throw new ResponseError(400, "Order cannot be canceled because payment proof has been uploaded");
-    checkPaymentDeadline(order.createdAt);
+    if (!order || order.userId !== userId) throw new ResponseError(404, 'Order not found');
+    if (order.orderStatus !== 'AWAITING_PAYMENT') throw new ResponseError(400, 'Order cannot be canceled');
+    if (order.paymentPicture) throw new ResponseError(400, 'Order cannot be canceled because payment proof has been uploaded');
     const updatedOrder = await cancelOrderTransaction(cancelOrder.orderId, order.orderItems);
     return updatedOrder;
   };
 
   static uploadProof = async (orderId: any, file: Express.Multer.File, req: Request, res: Response) => {
     const order = await prisma.order.findUnique({ where: { id: orderId } });
-    if (!order) throw new ResponseError(404, "Order not found!");
-    if (order.paymentMethod !== "MANUAL") throw new ResponseError(400, "Proof of payment is not required for this payment method");
+    if (!order) throw new ResponseError(404, 'Order not found!');
+    if (order.paymentMethod !== 'MANUAL') throw new ResponseError(400, 'Proof of payment is not required for this payment method');
     const filePath = file.path;
     const fileName = path.basename(filePath);
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
       data: {
         paymentPicture: `${process.env.API_URL}/public/images/${fileName}`,
-        orderStatus: "AWAITING_CONFIRMATION",
+        orderStatus: 'AWAITING_CONFIRMATION',
       },
     });
     return updatedOrder;
@@ -90,12 +89,12 @@ export class OrderService {
       where: { id: orderId },
       include: { user: true },
     });
-    if (!order) throw new ResponseError(404, "Order not found");
-    if (order.userId !== userId) throw new ResponseError(403, "Unauthorized");
-    if (order.orderStatus !== "DELIVERED") throw new ResponseError(400, "Order is not delivered yet");
+    if (!order) throw new ResponseError(404, 'Order not found');
+    if (order.userId !== userId) throw new ResponseError(403, 'Unauthorized');
+    if (order.orderStatus !== 'DELIVERED') throw new ResponseError(400, 'Order is not delivered yet');
     const updatedOrder = await prisma.order.update({
       where: { id: orderId },
-      data: { orderStatus: "CONFIRMED" },
+      data: { orderStatus: 'CONFIRMED' },
     });
     return updatedOrder;
   };

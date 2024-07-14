@@ -1,7 +1,9 @@
-"use client";
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { formatCurrency } from "@/lib/currency";
+'use client';
+import React from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatCurrency } from '@/lib/currency';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
 
 interface SummaryProps {
   selectedItems: any[];
@@ -11,12 +13,16 @@ interface SummaryProps {
 }
 
 const Summary: React.FC<SummaryProps> = ({ selectedItems, discount, selectedAddress, shippingCost }) => {
+  const userProfile = useSuspenseQuery({
+    queryKey: ['user-profile'],
+    queryFn: getUserProfile,
+  });
   const calculateSubtotal = () => {
     let subtotal = 0;
     selectedItems.forEach((item) => {
       let itemPrice = item.isPack ? item.stock.product.packPrice : item.stock.product.price;
 
-      if (item.quantity && typeof itemPrice === "number" && !isNaN(itemPrice)) {
+      if (item.quantity && typeof itemPrice === 'number' && !isNaN(itemPrice)) {
         subtotal += item.quantity * itemPrice;
       }
     });
@@ -24,7 +30,7 @@ const Summary: React.FC<SummaryProps> = ({ selectedItems, discount, selectedAddr
   };
 
   const subtotal = calculateSubtotal();
-  const validDiscount = typeof discount === "number" && !isNaN(discount) ? discount : 0;
+  const validDiscount = typeof discount === 'number' && !isNaN(discount) ? discount : 0;
   const discountedSubtotal = subtotal - validDiscount;
   const total = (shippingCost || 0) + discountedSubtotal;
   const totalDiscount = discount;
@@ -81,7 +87,7 @@ const Summary: React.FC<SummaryProps> = ({ selectedItems, discount, selectedAddr
         </div>
         <div className="flex justify-between mb-2">
           <span>Email</span>
-          <span className="ml-3">{selectedAddress.data?.address?.email}</span>
+          <span className="ml-3">{userProfile.data?.user?.contactEmail}</span>
         </div>
       </CardContent>
     </Card>

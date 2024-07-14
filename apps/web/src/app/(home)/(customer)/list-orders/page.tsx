@@ -1,14 +1,14 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { getOrdersByStatus } from "@/lib/fetch-api/order";
-import { OrderStatusMap } from "@/lib/types/order";
-import ListOrderItem from "./_component/ListOrderItem";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-import DeliveredOrderItem from "./_component/DeliveredOrderItem.";
-import AwaitingPayment from "./_component/AwaitingPayment";
-import { Calendar, Search } from "lucide-react";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getOrdersByStatus } from '@/lib/fetch-api/order';
+import { OrderStatusMap } from '@/lib/types/order';
+import ListOrderItem from './_component/ListOrderItem';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import DeliveredOrderItem from './_component/DeliveredOrderItem.';
+import AwaitingPayment from './_component/AwaitingPayment';
+import { Calendar, Search } from 'lucide-react';
 
 export default function ListOrdersPage() {
   const [orders, setOrders] = useState<OrderStatusMap>({
@@ -20,19 +20,19 @@ export default function ListOrdersPage() {
     confirmed: [],
     cancelled: [],
   });
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
   useEffect(() => {
     const fetchOrdersData = async () => {
       try {
-        const awaitingPaymentOrders = await getOrdersByStatus("awaiting_payment", searchTerm, selectedDate?.toISOString());
-        const awaitingConfirmationOrders = await getOrdersByStatus("awaiting_confirmation", searchTerm, selectedDate?.toISOString());
-        const processOrders = await getOrdersByStatus("process", searchTerm, selectedDate?.toISOString());
-        const shippingOrders = await getOrdersByStatus("shipping", searchTerm, selectedDate?.toISOString());
-        const deliveredOrders = await getOrdersByStatus("delivered", searchTerm, selectedDate?.toISOString());
-        const confirmedOrders = await getOrdersByStatus("confirmed", searchTerm, selectedDate?.toISOString());
-        const cancelledOrders = await getOrdersByStatus("cancelled", searchTerm, selectedDate?.toISOString());
+        const awaitingPaymentOrders = await getOrdersByStatus('awaiting_payment', searchTerm, selectedDate?.toISOString());
+        const awaitingConfirmationOrders = await getOrdersByStatus('awaiting_confirmation', searchTerm, selectedDate?.toISOString());
+        const processOrders = await getOrdersByStatus('process', searchTerm, selectedDate?.toISOString());
+        const shippingOrders = await getOrdersByStatus('shipping', searchTerm, selectedDate?.toISOString());
+        const deliveredOrders = await getOrdersByStatus('delivered', searchTerm, selectedDate?.toISOString());
+        const confirmedOrders = await getOrdersByStatus('confirmed', searchTerm, selectedDate?.toISOString());
+        const cancelledOrders = await getOrdersByStatus('cancelled', searchTerm, selectedDate?.toISOString());
 
         setOrders({
           awaiting_payment: awaitingPaymentOrders.data,
@@ -44,7 +44,7 @@ export default function ListOrdersPage() {
           cancelled: cancelledOrders.data,
         });
       } catch (error) {
-        console.error("Error fetching orders:", error);
+        console.error('Error fetching orders:', error);
       }
     };
 
@@ -99,41 +99,41 @@ export default function ListOrdersPage() {
 
           {/* Tabs Content */}
           <TabsContent value="awaiting_payment">
-            {filteredOrders("awaiting_payment").map((order) => (
+            {filteredOrders('awaiting_payment').map((order) => (
               <AwaitingPayment key={order.id} order={order} />
             ))}
           </TabsContent>
 
           <TabsContent value="awaiting_confirmation">
-            {filteredOrders("awaiting_confirmation").map((order) => (
+            {filteredOrders('awaiting_confirmation').map((order) => (
               <ListOrderItem key={order.id} order={order} />
             ))}
           </TabsContent>
 
           <TabsContent value="process">
-            {filteredOrders("process").map((order) => (
+            {filteredOrders('process').map((order) => (
               <ListOrderItem key={order.id} order={order} />
             ))}
           </TabsContent>
 
           <TabsContent value="shipping">
-            {filteredOrders("shipping").map((order) => (
+            {filteredOrders('shipping').map((order) => (
               <ListOrderItem key={order.id} order={order} />
             ))}
           </TabsContent>
 
           <TabsContent value="delivered">
-            {filteredOrders("delivered").map((order) => (
+            {filteredOrders('delivered').map((order) => (
               <DeliveredOrderItem key={order.id} order={order} />
             ))}
           </TabsContent>
           <TabsContent value="confirmed">
-            {filteredOrders("confirmed").map((order) => (
+            {filteredOrders('confirmed').map((order) => (
               <ListOrderItem key={order.id} order={order} />
             ))}
           </TabsContent>
           <TabsContent value="cancelled">
-            {filteredOrders("cancelled").map((order) => (
+            {filteredOrders('cancelled').map((order) => (
               <ListOrderItem key={order.id} order={order} />
             ))}
           </TabsContent>
