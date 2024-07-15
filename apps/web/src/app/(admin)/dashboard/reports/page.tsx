@@ -120,7 +120,6 @@ const StockMutationChart: React.FC = () => {
               <option key={store.slug} value={store.slug}>{store.name}</option>
             ))}
           </select>
-          <input type="text" value={storeId} onChange={(e) => setStoreId(e.target.value)} placeholder="Store ID" className="border p-2 rounded w-full mt-2" disabled />
         </div>
         <ChartContainer config={chartConfig} className="aspect-auto h-[250px] w-full">
           <BarChart accessibilityLayer data={data} margin={{ left: 12, right: 12 }}>

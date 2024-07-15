@@ -18,6 +18,10 @@ export class VoucherRouter {
       '/',
       this.voucherController.getVouchers,
     );
+    this.router.get(
+      '/admin',
+      this.voucherController.getVouchersAdmin,
+    );
     this.router.get('/voucher-user',AuthMiddleware.authed, this.voucherController.getUserVouchers);
     this.router.get(
       '/:id',
