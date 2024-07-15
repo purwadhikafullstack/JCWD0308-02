@@ -3,7 +3,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useSuspenseQuery, useMutation } from '@tanstack/react-query';
-import { getVouchers, assignVoucherToUser, getUserVouchers } from '@/lib/fetch-api/voucher';
+import { assignVoucherToUser, getUserVouchers } from '@/lib/fetch-api/voucher';
 import { getUserProfile } from '@/lib/fetch-api/user/client';
 import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription, DrawerFooter, DrawerClose } from '@/components/ui/drawer';
@@ -16,6 +16,7 @@ import discountProduct from '../../../../../../public/discountproduct.png';
 import shippingCash from '../../../../../../public/shippingcash.png';
 import shippingDiscount from '../../../../../../public/shippingdiscount.png';
 import { Separator } from '@/components/ui/separator';
+import { getVouchers } from '@/lib/fetch-api/voucher/client';
 
 interface VoucherDrawerProps {
   onSelectVoucher: (

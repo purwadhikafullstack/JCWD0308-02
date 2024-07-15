@@ -138,10 +138,10 @@ export class StoreService {
 
     if (!existingStore) throw new ResponseError(400, "Store is not found!")
 
-    
-      if (getBaseUrl(API_URL) === getBaseUrl(existingStore?.imageUrl!) && storeData.imageUrl !== existingStore?.imageUrl ) {
-        deleteFile(existingStore?.imageUrl!)
-      }
+
+    if (storeData.imageUrl && getBaseUrl(API_URL) === getBaseUrl(existingStore?.imageUrl!) && storeData.imageUrl !== existingStore?.imageUrl) {
+      deleteFile(existingStore?.imageUrl!)
+    }
 
     const updatedStore = await prisma.store.update({
       where: {
