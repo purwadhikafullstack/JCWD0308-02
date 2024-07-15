@@ -9,6 +9,7 @@ export const OrderValidation = {
     note: z.string(),
     voucherId: z.string().uuid().optional(),
     serviceDescription: z.string().optional(),
+    storeId: z.string().uuid()
   }),
 };
 
