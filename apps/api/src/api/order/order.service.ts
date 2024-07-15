@@ -19,12 +19,16 @@ export class OrderService {
     const userId = res.locals.user?.id;
     const userAddress = await getAddress(res);
     const { address, cityId } = userAddress;
-    const { updatedCartItem, nearestStore } = await handleCartItems(userId, address);
+    const storeId = orderRequest.storeId;
+    if (!storeId) throw new ResponseError(400, 'Store ID not found in request');
+    const store = await prisma.store.findUnique({ where: { id: storeId! } });
+
+    const { updatedCartItem } = await handleCartItems(userId, storeId);
     const { totalPrice, weight } = calculateTotalPriceAndWeight(updatedCartItem);
-    const { cost, estimation } = await calculateShipping(nearestStore, cityId, weight, orderRequest.courier);
+    const { cost, estimation } = await calculateShipping(store, cityId, weight, orderRequest.courier);
     const discounts = await applyDiscounts(orderRequest, totalPrice, cost, updatedCartItem.length);
-    const { finalTotalPrice, finalShippingCost, orderStatus, discountProducts, discountShippingCost, totalPayment } = await prepareOrderData(orderRequest, userId, nearestStore, updatedCartItem, totalPrice, cost, estimation, discounts);
-    const newOrder = await createOrder(orderRequest, userId, nearestStore, updatedCartItem, finalTotalPrice, finalShippingCost, estimation, orderStatus, discountProducts, discountShippingCost, totalPayment);
+    const { finalTotalPrice, finalShippingCost, orderStatus, discountProducts, discountShippingCost, totalPayment } = await prepareOrderData(orderRequest, userId, store, updatedCartItem, totalPrice, cost, estimation, discounts);
+    const newOrder = await createOrder(orderRequest, userId, store, updatedCartItem, finalTotalPrice, finalShippingCost, estimation, orderStatus, discountProducts, discountShippingCost, totalPayment);
     await updateOrderItemsAndStock(updatedCartItem, newOrder.id);
     const paymentLink = await handlePaymentLinkCreation(orderRequest, newOrder, totalPayment);
     return { ...newOrder, paymentLink };
