@@ -42,7 +42,7 @@ export class AddressService {
   static getSelectedAddress = async (res: Response) => {
     const addressId = res.locals.address?.id;
     if (!addressId) {
-      throw new ResponseError(404, 'Stock not found!');
+      throw new ResponseError(404, 'Address not found!');
     }
     const address = await prisma.userAddress.findUnique({
       where: { id: addressId },
@@ -51,7 +51,7 @@ export class AddressService {
       }
     });
     if (!address) {
-      throw new ResponseError(404, 'Stock not found!');
+      throw new ResponseError(404, 'Address not found!');
     }
     return address;
   };

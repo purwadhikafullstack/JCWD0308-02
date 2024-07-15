@@ -1,14 +1,15 @@
-"use client";
+'use client';
 
-import React, { useState } from "react";
-import { cancelOrderByAdmin, confirmPaymentByAdmin, getAllOrders, sendOrder } from "@/lib/fetch-api/order";
-import { confirmAlert } from "react-confirm-alert";
-import "react-confirm-alert/src/react-confirm-alert.css";
-import { OrderTable } from "./_component/OrderTable";
-import { PaginationDemo } from "./_component/Pagination";
-import { useQuery, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { getSelectedStore } from "@/lib/fetch-api/store/client";
-import { getUserProfile } from "@/lib/fetch-api/user/client";
+import React, { useState } from 'react';
+import { cancelOrderByAdmin, confirmPaymentByAdmin, getAllOrders, sendOrder } from '@/lib/fetch-api/order';
+import { confirmAlert } from 'react-confirm-alert';
+import 'react-confirm-alert/src/react-confirm-alert.css';
+import { OrderTable } from './_component/OrderTable';
+import { PaginationDemo } from './_component/Pagination';
+import { useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { getSelectedStore } from '@/lib/fetch-api/store/client';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { toast } from '@/components/ui/sonner';
 
 export default function ListOrdersPage() {
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -16,23 +17,23 @@ export default function ListOrdersPage() {
   const queryClient = useQueryClient();
 
   const { data: selectedStoreData } = useSuspenseQuery({
-    queryKey: ["store"],
+    queryKey: ['store'],
     queryFn: getSelectedStore,
   });
   const storeId = selectedStoreData?.store?.id;
   const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
+    queryKey: ['user-profile'],
     queryFn: getUserProfile,
   });
 
-  const superAdminOnly = userProfile.data?.user?.role === "SUPER_ADMIN";
+  const superAdminOnly = userProfile.data?.user?.role === 'SUPER_ADMIN';
 
   const {
     data: ordersData,
     isLoading,
     isError,
   } = useSuspenseQuery({
-    queryKey: ["orders", currentPage],
+    queryKey: ['orders', currentPage],
     queryFn: () => {
       return getAllOrders(currentPage, perPage);
     },
@@ -43,16 +44,16 @@ export default function ListOrdersPage() {
 
   const handleStatusChange = (orderId: string, newStatus: string) => {
     confirmAlert({
-      title: "Confirm to submit",
-      message: "Are you sure to change the order status?",
+      title: 'Confirm to submit',
+      message: 'Are you sure to change the order status?',
       buttons: [
         {
-          label: "Yes",
+          label: 'Yes',
           onClick: () => {
             if (superAdminOnly) {
               confirmPaymentStatus(orderId, newStatus);
             } else {
-              if (newStatus === "CANCELLED") {
+              if (newStatus === 'CANCELLED') {
                 cancelOrderAdmin(orderId);
               } else {
                 sendOrderAdmin(orderId, newStatus);
@@ -61,7 +62,7 @@ export default function ListOrdersPage() {
           },
         },
         {
-          label: "No",
+          label: 'No',
         },
       ],
     });
@@ -70,12 +71,13 @@ export default function ListOrdersPage() {
   const confirmPaymentStatus = async (orderId: string, newStatus: string) => {
     try {
       const response = await confirmPaymentByAdmin(orderId, newStatus);
-      if (response.status === "OK") {
-        queryClient.invalidateQueries(["orders", { currentPage, storeId }] as any);
+      if (response.status === 'OK') {
+        queryClient.invalidateQueries(['orders', { currentPage, storeId }] as any);
       } else {
-        throw new Error("Failed to update order status");
+        throw new Error('Failed to update order status');
       }
     } catch (error) {
+      toast.error(`You are not authorized to change the status to ${newStatus}`);
       console.error(error);
     }
   };
@@ -83,12 +85,13 @@ export default function ListOrdersPage() {
   const sendOrderAdmin = async (orderId: string, newStatus: string) => {
     try {
       const response = await sendOrder(orderId, newStatus);
-      if (response.status === "OK") {
-        queryClient.invalidateQueries(["orders", currentPage, storeId] as any);
+      if (response.status === 'OK') {
+        queryClient.invalidateQueries(['orders', currentPage, storeId] as any);
       } else {
-        throw new Error("Failed to update order status");
+        throw new Error('Failed to update order status');
       }
     } catch (error) {
+      toast.error(`You are not authorized to change the status to ${newStatus}`);
       console.error(error);
     }
   };
@@ -96,13 +99,14 @@ export default function ListOrdersPage() {
   const cancelOrderAdmin = async (orderId: string) => {
     try {
       const response = await cancelOrderByAdmin(orderId);
-      console.log("response from frontend:", response);
-      if (response.status === "OK") {
-        queryClient.invalidateQueries(["orders", currentPage, storeId] as any);
+      console.log('response from frontend:', response);
+      if (response.status === 'OK') {
+        queryClient.invalidateQueries(['orders', currentPage, storeId] as any);
       } else {
-        throw new Error("Failed to cancel order");
+        throw new Error('Failed to cancel order');
       }
     } catch (error) {
+      toast.error(`You are not authorized to change the status to other than cancel`);
       console.error(error);
     }
   };

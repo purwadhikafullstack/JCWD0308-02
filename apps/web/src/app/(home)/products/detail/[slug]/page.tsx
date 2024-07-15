@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import React, { useEffect, useState, useMemo } from "react";
-import { useRouter, useParams } from "next/navigation";
-import { useAppDispatch, useAppSelector } from "@/lib/features/hooks";
-import { addCartItem, addToCart, fetchCart, fetchCartItemCount } from "@/lib/features/cart/cartSlice";
-import { fetchProductBySlug } from "@/lib/fetch-api/product";
-import { Product } from "@/lib/types/product";
-import { formatCurrency } from "@/lib/currency";
-import { Button } from "@/components/ui/button";
-import { ShoppingCart, Plus, Minus, Box } from "lucide-react";
-import Image from "next/image";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
-import { getSelectedAddress } from "@/lib/fetch-api/address/client";
-import { getUserProfile } from "@/lib/fetch-api/user/client";
-import { toast } from "@/components/ui/sonner";
-import ImageHover from "./components/ImageHover";
-import { RootState } from "@/lib/features/store";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/lib/features/hooks';
+import { addCartItem, addToCart, fetchCart, fetchCartItemCount } from '@/lib/features/cart/cartSlice';
+import { fetchProductBySlug } from '@/lib/fetch-api/product';
+import { Product } from '@/lib/types/product';
+import { formatCurrency } from '@/lib/currency';
+import { Button } from '@/components/ui/button';
+import { ShoppingCart, Plus, Minus, Box } from 'lucide-react';
+import Image from 'next/image';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
+import { getSelectedAddress } from '@/lib/fetch-api/address/client';
+import { getUserProfile } from '@/lib/fetch-api/user/client';
+import { toast } from '@/components/ui/sonner';
+import ImageHover from './components/ImageHover';
+import { RootState } from '@/lib/features/store';
 
 const ProductDetail = () => {
   const params = useParams();
@@ -32,20 +32,20 @@ const ProductDetail = () => {
   const cartItems = useAppSelector((state: RootState) => state.cart.items);
 
   const nearestStocks = useSuspenseQuery({
-    queryKey: ["nearest-stocks", 1, 15, ""],
+    queryKey: ['nearest-stocks', 1, 15, ''],
     queryFn: async () => {
-      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      const filters = Object.fromEntries(new URLSearchParams(String('')));
       return getNearestStocks(1, 15, filters);
     },
   });
 
   const selectedAddress = useSuspenseQuery({
-    queryKey: ["selected-address"],
+    queryKey: ['selected-address'],
     queryFn: getSelectedAddress,
   });
 
   const userProfile = useSuspenseQuery({
-    queryKey: ["user-profile"],
+    queryKey: ['user-profile'],
     queryFn: getUserProfile,
   });
 
@@ -59,8 +59,8 @@ const ProductDetail = () => {
         const fetchedProduct = await fetchProductBySlug(productSlug);
         setProduct(fetchedProduct);
       } catch (error) {
-        console.error("Error fetching product:", error);
-        setError("Failed to fetch product");
+        console.error('Error fetching product:', error);
+        setError('Failed to fetch product');
       } finally {
         setLoading(false);
       }
@@ -98,12 +98,10 @@ const ProductDetail = () => {
 
   const isAddToCartDisabled = useMemo(() => {
     if (!product || !nearestStock) return true;
-
     const availableStock = nearestStock.amount || 0;
-    const maxQuantityAllowed: any = isPack ? product.packQuantity : availableStock;
-
-    return quantity + totalQuantityInCart > maxQuantityAllowed || quantity > availableStock;
-  }, [product, nearestStock, quantity, totalQuantityInCart, isPack]);
+    const maxQuantityAllowed = isPack ? availableStock / product.packQuantity! : availableStock;
+    return quantity + totalQuantityInCart > maxQuantityAllowed || totalQuantity > availableStock;
+  }, [product, nearestStock, quantity, totalQuantityInCart, totalQuantity, isPack]);
 
   const handleAddToCart = async () => {
     try {
@@ -115,20 +113,20 @@ const ProductDetail = () => {
       }
 
       if (selectedQuantity > availableStock) {
-        toast.error("Quantity exceeds available stock.");
+        toast.error('Quantity exceeds available stock.');
         return;
       }
       await dispatch(addCartItem({ stockId: nearestStock?.id!, quantity, isPack }));
-      toast.success("Product added to cart!");
+      toast.success('Product added to cart!');
     } catch (error) {
-      console.error("Error adding to cart:", error);
-      toast.error("Error adding to cart");
+      console.error('Error adding to cart:', error);
+      toast.error('Error adding to cart');
     }
     dispatch(fetchCartItemCount());
   };
 
-  const handleQuantityChange = (type: "increment" | "decrement") => {
-    setQuantity((prevQuantity) => (type === "increment" ? prevQuantity + 1 : Math.max(1, prevQuantity - 1)));
+  const handleQuantityChange = (type: 'increment' | 'decrement') => {
+    setQuantity((prevQuantity) => (type === 'increment' ? prevQuantity + 1 : Math.max(1, prevQuantity - 1)));
   };
 
   if (loading) {
@@ -150,7 +148,7 @@ const ProductDetail = () => {
           <div className="w-full md:w-1/2 relative p-4 flex">
             <div className="flex flex-col space-y-2 mr-4">
               {product.images.map((image, index) => (
-                <div key={index} className={`cursor-pointer p-1 border-2 ${currentImageIndex === index ? "border-blue-600" : "border-transparent"} rounded-lg`} onClick={() => handleThumbnailClick(index)}>
+                <div key={index} className={`cursor-pointer p-1 border-2 ${currentImageIndex === index ? 'border-blue-600' : 'border-transparent'} rounded-lg`} onClick={() => handleThumbnailClick(index)}>
                   <Image src={image.imageUrl} alt={product.title} width={80} height={80} className="object-cover rounded-lg hover:border-blue-600 transition" />
                 </div>
               ))}
@@ -168,22 +166,22 @@ const ProductDetail = () => {
             <p className="text-lg mb-4 text-gray-600">{product.description}</p>
             <div className="flex space-x-4 mb-4">
               <Button
-                variant={!isPack ? "default" : "outline"}
+                variant={!isPack ? 'default' : 'outline'}
                 onClick={() => {
                   setIsPack(false);
                   setQuantity(quantity * product?.packQuantity!);
                 }}
-                className={`flex-1 ${!isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                className={`flex-1 ${!isPack ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
               >
                 Unit Price
               </Button>
               <Button
-                variant={isPack ? "default" : "outline"}
+                variant={isPack ? 'default' : 'outline'}
                 onClick={() => {
                   setIsPack(true);
                   setQuantity(Math.ceil(quantity / product?.packQuantity!));
                 }}
-                className={`flex-1 ${isPack ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-700"}`}
+                className={`flex-1 ${isPack ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700'}`}
               >
                 Pack Price
               </Button>
@@ -201,20 +199,20 @@ const ProductDetail = () => {
             {nearestStock && <p className="text-sm mb-4 text-gray-600">Available Stock: {nearestStock.amount}</p>}
 
             <div className="flex items-center space-x-4 mb-4">
-              <Button variant="outline" onClick={() => handleQuantityChange("decrement")} disabled={quantity === 1}>
+              <Button variant="outline" onClick={() => handleQuantityChange('decrement')} disabled={quantity === 1}>
                 <Minus size={18} />
               </Button>
               <p className="text-lg">{quantity}</p>
-              <Button variant="outline" onClick={() => handleQuantityChange("increment")} disabled={isMaxQuantity}>
+              <Button variant="outline" onClick={() => handleQuantityChange('increment')} disabled={isMaxQuantity}>
                 <Plus size={18} />
               </Button>
             </div>
             {isPack && <p className="text-lg">Total Quantity: {quantity * (product?.packQuantity || 1)}</p>}
 
             <div className="flex space-x-4">
-              <Button variant="default" onClick={handleAddToCart} className="w-full bg-primary">
+              <Button variant="default" onClick={handleAddToCart} className="w-full bg-primary" disabled={!isServiceAvailable || isAddToCartDisabled}>
                 <ShoppingCart size={20} className="mr-2" />
-                {nearestStock?.amount === 0 ? "Out of Stock" : "Add to Cart"}
+                {nearestStock?.amount === 0 ? 'Out of Stock' : 'Add to Cart'}
               </Button>
             </div>
             {isError ? (

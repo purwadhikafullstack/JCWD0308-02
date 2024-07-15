@@ -1,13 +1,13 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Percent, Truck } from "lucide-react";
-import { calculateShippingCost } from "@/lib/fetch-api/shipping";
-import { courierServices, formattedCourierNames } from "@/lib/courierServices";
-import { formatCurrency } from "@/lib/currency";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { getNearestStocks } from "@/lib/fetch-api/stocks/client";
-import VoucherDrawer from "./VoucherDrawer";
+'use client';
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Percent, Truck } from 'lucide-react';
+import { calculateShippingCost } from '@/lib/fetch-api/shipping';
+import { courierServices, formattedCourierNames } from '@/lib/courierServices';
+import { formatCurrency } from '@/lib/currency';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { getNearestStocks } from '@/lib/fetch-api/stocks/client';
+import VoucherDrawer from './VoucherDrawer';
 
 interface ShippingAndDiscountProps {
   shippingCourier: string;
@@ -41,9 +41,9 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   selectedItems,
 }) => {
   const nearestStocks = useSuspenseQuery({
-    queryKey: ["nearest-stocks", 1, 15, ""],
+    queryKey: ['nearest-stocks', 1, 15, ''],
     queryFn: async ({ queryKey }) => {
-      const filters = Object.fromEntries(new URLSearchParams(String("")));
+      const filters = Object.fromEntries(new URLSearchParams(String('')));
       return getNearestStocks(Number(1), Number(15), filters);
     },
   });
@@ -65,7 +65,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
           setShippingCost(result.cost);
           setShippingEstimation(result.estimation);
         } catch (error) {
-          console.error("Failed to fetch shipping cost:", error);
+          console.error('Failed to fetch shipping cost:', error);
         }
       }
     };
@@ -76,14 +76,14 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
   const handleCourierChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedCourier = e.target.value;
     setShippingCourier(selectedCourier);
-    setShippingMethod("");
+    setShippingMethod('');
   };
 
   const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedMethod = e.target.value;
     const selectedService = courierServices[shippingCourier].find((service) => service.service === selectedMethod);
     setShippingMethod(selectedMethod);
-    setServiceDescription(selectedService?.description || "");
+    setServiceDescription(selectedService?.description || '');
   };
 
   const handleSelectVoucher = (voucherId: string, voucherName: string, voucherDiscount: number) => {
@@ -96,10 +96,10 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
 
   const calculateDiscount = () => {
     if (!selectedVoucher) return 0;
-    if (selectedVoucher.discountType === "DISCOUNT") {
+    if (selectedVoucher.discountType === 'DISCOUNT') {
       return (selectedVoucher.discount / 100) * (shippingCost || 0);
     }
-    if (selectedVoucher.discountType === "FIXED_DISCOUNT") {
+    if (selectedVoucher.discountType === 'FIXED_DISCOUNT') {
       return selectedVoucher.fixedDiscount;
     }
     return 0;
@@ -159,7 +159,7 @@ const ShippingAndDiscount: React.FC<ShippingAndDiscountProps> = ({
         </CardHeader>
         <CardContent className="p-4">
           <p>Use discount codes to save more.</p>
-          <VoucherDrawer onSelectVoucher={handleSelectVoucher} selectedItems={selectedItems} />
+          <VoucherDrawer onSelectVoucher={handleSelectVoucher} selectedItems={selectedItems} shippingCost={shippingCost} />
           {selectedVoucherName && (
             <div className="mt-4">
               <p>Selected Voucher: {selectedVoucherName}</p>
