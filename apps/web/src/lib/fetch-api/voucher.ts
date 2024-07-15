@@ -3,13 +3,13 @@ import { API_URL } from "./lib";
 
 const URL = `${API_URL}/voucher`;
 
-export const getVouchers = async (page: number = 1, limit: number = 8, filters: any = {}) => {
+export const getVouchersAdmin = async (page: number = 1, limit: number = 8, filters: any = {}) => {
   const query = new URLSearchParams({
     page: page.toString(),
     limit: limit.toString(),
     ...filters,
   }).toString();
-  const response = await axios.get(`${URL}?${query}`, {
+  const response = await axios.get(`${URL}/admin?${query}`, {
     withCredentials: true,
   });
   if (response.status !== 200) {

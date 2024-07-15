@@ -3,6 +3,33 @@ import { Validation } from '@/utils/validation.js';
 import { VoucherValidation } from './voucher.validation.js';
 
 export class VoucherService {
+  static async getVouchersAdmin(page: number, limit: number, filters: any) {
+    const where: any = {};
+    if (filters.search) {
+      where.name = { contains: filters.search };
+      delete filters.search;
+    }
+    for (const [key, value] of Object.entries(filters)) {
+      if (value) {
+        where[key] = value;
+      }
+    }
+
+    const total = await prisma.voucher.count({ where });
+    const vouchers = await prisma.voucher.findMany({
+      where,
+      skip: (page - 1) * limit,
+      take: limit,
+      include: {
+        superAdmin: true,
+        storeAdmin: true,
+        store: true,
+      },
+    });
+
+    return { total, page, limit, vouchers };
+  }
+
   static async getVouchers(page: number, limit: number, filters: any) {
     const where: any = {};
     if (filters.search) {
