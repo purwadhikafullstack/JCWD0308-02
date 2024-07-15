@@ -36,7 +36,6 @@ export const createOrder = async (
   discountShippingCost: number,
   totalPayment: number,
 ) => {
-  console.log('neareststore in here:', nearestStore);
   return await prisma.order.create({
     data: {
       userId,
