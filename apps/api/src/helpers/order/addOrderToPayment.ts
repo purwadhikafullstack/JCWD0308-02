@@ -1,13 +1,13 @@
-import { prisma } from "@/db.js";
-import { getCourierType, OrderRequest } from "@/types/order.type.js";
-import { getPaymentLink } from "./paymentGateway.js";
-import { PaymentMethod } from "@prisma/client";
-import { Response } from "express";
+import { prisma } from '@/db.js';
+import { getCourierType, OrderRequest } from '@/types/order.type.js';
+import { getPaymentLink } from './paymentGateway.js';
+import { PaymentMethod } from '@prisma/client';
+import { Response } from 'express';
 
 export const prepareOrderData = async (orderRequest: any, userId: any, nearestStore: any, updatedCartItem: any[], totalPrice: number, cost: number, estimation: number, discounts: any) => {
   const { discountProducts, discountShippingCost } = discounts;
   const { finalTotalPrice, finalShippingCost, totalPayment } = calculateFinalPrices(totalPrice, cost, discountProducts, discountShippingCost);
-  const orderStatus = "AWAITING_PAYMENT";
+  const orderStatus = 'AWAITING_PAYMENT';
   return {
     orderRequest,
     userId,
@@ -45,7 +45,7 @@ export const createOrder = async (
       service: orderRequest.service,
       serviceDescription: orderRequest.serviceDescription,
       estimation,
-      storeId: nearestStore?.id,
+      storeId: orderRequest.storeId,
       note: orderRequest.note,
       totalPrice: finalTotalPrice,
       shippingCost: finalShippingCost,
@@ -67,7 +67,7 @@ export const calculateFinalPrices = (totalPrice: number, cost: number, discountP
 export const getPaymentLinkData = (orderId: string, totalPayment: number) => {
   return {
     transaction_details: { order_id: orderId, gross_amount: totalPayment },
-    expiry: { unit: "minutes", duration: 10 },
+    expiry: { unit: 'minutes', duration: 10 },
   };
 };
 
@@ -80,7 +80,7 @@ export const updateOrderPaymentLink = async (orderId: string, paymentLink: strin
 
 export const handlePaymentLinkCreation = async (orderRequest: OrderRequest, newOrder: any, totalPayment: number) => {
   let paymentLink = null;
-  if (orderRequest.paymentMethod === "GATEWAY") {
+  if (orderRequest.paymentMethod === 'GATEWAY') {
     const data = getPaymentLinkData(newOrder.id, totalPayment);
     const paymentResponse = await getPaymentLink(data);
     paymentLink = paymentResponse.redirect_url;

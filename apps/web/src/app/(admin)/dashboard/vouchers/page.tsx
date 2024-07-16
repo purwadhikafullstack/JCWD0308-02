@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import {
-  getVouchers,
+  getVouchersAdmin,
   createVoucher,
   deleteVoucher,
 } from '@/lib/fetch-api/voucher';
@@ -67,7 +67,7 @@ const VoucherManagement = () => {
       setLoading(true);
       try {
         const filterData = isStoreAdmin && storeAdminStoreId ? { ...filters, storeId: storeAdminStoreId } : filters;
-        const voucherData = await getVouchers(page, limit, filterData);
+        const voucherData = await getVouchersAdmin(page, limit, filterData);
         setVouchers(voucherData.vouchers || []);
         setTotal(voucherData.total || 0);
       } catch (error) {

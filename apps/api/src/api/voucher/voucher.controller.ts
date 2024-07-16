@@ -1,10 +1,27 @@
-// src/controllers/voucher.controller.ts
 import { ICallback } from '@/types/index.js';
 import { VoucherService } from './voucher.service.js';
 import { User } from 'lucia';
 import { API_URL } from '@/config.js';
 
 export class VoucherController {
+  getVouchersAdmin: ICallback = async (req, res, next) => {
+    try {
+      const { page = 1, limit = 10, search, ...filters } = req.query;
+      const pageNumber = parseInt(page as string, 10);
+      const limitNumber = parseInt(limit as string, 10);
+
+      const vouchers = await VoucherService.getVouchersAdmin(
+        pageNumber,
+        limitNumber,
+        { ...filters, search },
+      );
+      res.status(200).json(vouchers);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+
   getVouchers: ICallback = async (req, res, next) => {
     try {
       const { page = 1, limit = 10, search, ...filters } = req.query;
