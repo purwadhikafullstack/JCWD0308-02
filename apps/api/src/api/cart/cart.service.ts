@@ -12,9 +12,17 @@ export class CartService {
     const cartRequest: CartRequest = Validation.validate(CartValidation.CART, req);
     const stock = await prisma.stock.findUnique({
       where: { id: cartRequest?.stockId! },
+      select: {
+        id: true,
+        amount: true,
+        product: { select: { packQuantity: true } },
+      },
     });
     if (!stock) throw new ResponseError(400, 'Stock not found!');
-
+    const requiredStock = cartRequest.isPack ? cartRequest.quantity * stock.product.packQuantity : cartRequest.quantity;
+    if (stock.amount < requiredStock) {
+      throw new ResponseError(400, 'Insufficient stock available');
+    }
     const userId = res.locals?.user?.id!;
     const existingCartItem = await prisma.orderItem.findFirst({
       where: {
@@ -26,6 +34,10 @@ export class CartService {
       },
     });
     if (existingCartItem) {
+      const newRequiredStock = existingCartItem.quantity + requiredStock;
+      if (stock.amount < newRequiredStock) {
+        throw new ResponseError(400, 'Insufficient stock available for update');
+      }
       const updatedCartItem = await prisma.orderItem.update({
         where: { id: existingCartItem.id },
         data: { quantity: existingCartItem.quantity + cartRequest.quantity },

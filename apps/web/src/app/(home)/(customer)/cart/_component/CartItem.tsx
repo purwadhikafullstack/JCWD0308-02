@@ -128,10 +128,10 @@ const CartItem: React.FC<CartItemProps> = ({ cart, isSelected, onSelect, setIsCh
         <div className="flex flex-col items-center sm:items-start text-center sm:text-left sm:flex-1">
           <p className="font-semibold "> {product.title}</p>
           <p className="text-gray-500">{cart.isPack ? 'grosir' : 'eceran'}</p>
-          <p className="font-bold hidden max-md:flex"> {cart.isPack ? formatCurrency(product.packPrice) : formatCurrency(product.price)}</p>
+          <p className="font-bold hidden max-md:flex"> {cart.isPack ? formatCurrency(product?.discountPackPrice || product?.packPrice) : formatCurrency(product?.discountPrice || product?.price)}</p>
         </div>
         <div className="mt-4 sm:mt-0 sm:text-right text-center">
-          <p className="font-bold max-md:hidden"> {cart.isPack ? formatCurrency(product.packPrice) : formatCurrency(product.price)}</p>
+          <p className="font-bold max-md:hidden"> {cart.isPack ? formatCurrency(product?.discountPackPrice || product?.packPrice) : formatCurrency(product?.discountPrice || product?.price)}</p>
         </div>
       </div>
       <div className="flex justify-end items-center gap-2 mt-4">
