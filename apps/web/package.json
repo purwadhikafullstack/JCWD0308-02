@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3082 --turbo",
+    "dev": "next dev -p 3085 --turbo",
     "build": "next build",
-    "serve": "next start -p 3082",
+    "serve": "next start -p 3085",
     "lint": "next lint",
     "test": "npx cypress verify & cypress run --component"
   },
