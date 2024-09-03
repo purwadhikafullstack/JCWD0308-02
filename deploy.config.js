@@ -1,24 +1,24 @@
 module.exports = {
     apps: [
       {
-        name: 'jcwd030802-web',
+        name: 'grosirun-web',
         script: 'npm',
         args: 'run serve',
         env: {
-          PORT: 3082,
+          PORT: 3085,
           NODE_ENV: 'production',
         },
-        cwd: '/var/www/html/jcwd030802.purwadhikabootcamp.com/apps/web',
+        cwd: '/var/www/html/grosirun.purwadhikabootcamp.com/apps/web',
       },
       {
-        name: 'jcwd030802-api',
+        name: 'grosirun-api',
         script: 'npm',
         args: 'run serve',
         env: {
-          PORT: 3182,
+          PORT: 3185,
           NODE_ENV: 'production',
         },
-        cwd: '/var/www/html/jcwd030802.purwadhikabootcamp.com/apps/api',
+        cwd: '/var/www/html/grosirun.purwadhikabootcamp.com/apps/api',
       },
     ],
    };
